@@ -10,6 +10,6 @@ void main(string[] args) {
 }
 
 /*
- * Linker imports: -Llib -lDerelictUtil -lDerelictSDL2 -lDerelictGL3
+ * Linker imports: -lDerelictUtil -lDerelictSDL2 -lDerelictGL3 -ldl
  * 
  */
