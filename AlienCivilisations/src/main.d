@@ -4,7 +4,12 @@ import std.stdio;
 import derelict.opengl3.gl3;
 
 void main(string[] args) {
-	//DerelictGL3.load();
+	DerelictGL3.load();
 	readln();
 	writeln("test");
 }
+
+/*
+ * Linker imports: -Llib -lDerelictUtil -lDerelictSDL2 -lDerelictGL3
+ * 
+ */
