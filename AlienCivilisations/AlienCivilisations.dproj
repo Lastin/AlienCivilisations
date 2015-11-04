@@ -19,9 +19,10 @@
     <Target>Executable</Target>
     <DebugLevel>0</DebugLevel>
     <ConsolePause>false</ConsolePause>
-    <ExtraLinkerArguments>-Llib/derelict/DerelictSDL2/lib/libDerelictSDL2.a
+    <ExtraLinkerArguments>lib/derelict/DerelictSDL2/lib/libDerelictSDL2.a
 -Llib/derelict/DerelictGL3/lib/libDerelictGL3.a
--Llib/derelict/DerelictUtil/lib/libDerelictUtil.a -ldl</ExtraLinkerArguments>
+-Llib/derelict/DerelictUtil/lib/libDerelictUtil.a -ldl
+</ExtraLinkerArguments>
     <Libs>
       <Libs>
         <Lib>-Ilib/derelict/DerelictSDL2/source</Lib>
