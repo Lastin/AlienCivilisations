@@ -13,7 +13,7 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug</OutputPath>
     <ObjectsDirectory>obj/Debug</ObjectsDirectory>
-    <LinkinThirdPartyLibraries>true</LinkinThirdPartyLibraries>
+    <LinkinThirdPartyLibraries>false</LinkinThirdPartyLibraries>
     <UnittestMode>false</UnittestMode>
     <OutputName>AlienCivilisations</OutputName>
     <Target>Executable</Target>
@@ -21,13 +21,16 @@
     <ConsolePause>false</ConsolePause>
     <ExtraLinkerArguments>lib/derelict/DerelictSDL2/lib/libDerelictSDL2.a
 -Llib/derelict/DerelictGL3/lib/libDerelictGL3.a
--Llib/derelict/DerelictUtil/lib/libDerelictUtil.a -ldl
+-Llib/derelict/DerelictGLFW3/lib/libDerelictGLFW3.a
+-Llib/derelict/DerelictUtil/lib/libDerelictUtil.a
+-L-ldl -lglfw3
 </ExtraLinkerArguments>
     <Libs>
       <Libs>
         <Lib>-Ilib/derelict/DerelictSDL2/source</Lib>
         <Lib>-Ilib/derelict/DerelictGL3/source</Lib>
         <Lib>-Ilib/derelict/DerelictUtil/source</Lib>
+        <Lib>-Ilib/derelict/DerelictGLFW3/source</Lib>
       </Libs>
     </Libs>
   </PropertyGroup>
