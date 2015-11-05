@@ -24,6 +24,7 @@ void main(string[] args) {
 		glfwPollEvents();
 	}
 	glfwTerminate();
+	DerelictGL3.reload();
 }
 
 /*
