@@ -41,7 +41,6 @@
     <UnittestMode>false</UnittestMode>
     <OutputName>AlienCivilisations</OutputName>
     <Target>Executable</Target>
-    <Externalconsole>true</Externalconsole>
     <DebugLevel>0</DebugLevel>
     <ConsolePause>false</ConsolePause>
     <ExtraLinkerArguments>-ldl</ExtraLinkerArguments>
@@ -61,7 +60,6 @@
     <UnittestMode>true</UnittestMode>
     <OutputName>AlienCivilisations</OutputName>
     <Target>Executable</Target>
-    <Externalconsole>true</Externalconsole>
     <DebugLevel>0</DebugLevel>
     <ConsolePause>false</ConsolePause>
     <ExtraLinkerArguments>-ldl</ExtraLinkerArguments>
@@ -77,6 +75,9 @@
     <Compile Include="src\main.d" />
     <Compile Include="src\entities\planet.d" />
     <Compile Include="src\handlers\vector2d.d" />
+    <Compile Include="src\handlers\gameManager.d" />
+    <Compile Include="src\handlers\map.d" />
+    <Compile Include="src\entities\player.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

@@ -2,11 +2,17 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/main.d">
     <Files>
-      <File FileName="AlienCivilisations/src/main.d" Line="9" Column="23" />
+      <File FileName="AlienCivilisations/src/main.d" Line="14" Column="49" />
+      <File FileName="AlienCivilisations/src/entities/planet.d" Line="44" Column="14" />
+      <File FileName="AlienCivilisations/src/handlers/gameManager.d" Line="9" Column="2" />
+      <File FileName="AlienCivilisations/src/handlers/map.d" Line="8" Column="1" />
+      <File FileName="AlienCivilisations/src/entities/player.d" Line="8" Column="22" />
+      <File FileName="AlienCivilisations/src/handlers/vector2d.d" Line="26" Column="80" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <AuthorInfo Name="Maksym Makuch" Email="" Copyright="Maksym Makuch" Company="" Trademark="" />
 </Properties>
