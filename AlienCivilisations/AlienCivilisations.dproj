@@ -78,6 +78,7 @@
     <Compile Include="src\handlers\gameManager.d" />
     <Compile Include="src\handlers\map.d" />
     <Compile Include="src\entities\player.d" />
+    <Compile Include="src\handlers\knowledgeTree.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

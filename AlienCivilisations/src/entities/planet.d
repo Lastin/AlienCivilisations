@@ -4,6 +4,7 @@ import handlers.vector2d;
 import std.conv;
 import handlers.gameManager;
 import entities.player;
+import handlers.knowledgeTree;
 
 class Planet {
 	private GameManager gameManager;
@@ -54,8 +55,15 @@ class Planet {
 		return format("X: %s \n Y:%s", vec2d.getX(), vec2d.getY());
 	}
 
-	public void setOwnership(Player player){
+	public void setOwnership(Player player, int population){
 		this.owner = player;
+	}
+
+	public void growPopulation(){
+		if(!owner){
+			//KnowledgeTree kt = owner.getKnowledgeTree();
+			//population *= kt.get
+		}
 	}
 }
 

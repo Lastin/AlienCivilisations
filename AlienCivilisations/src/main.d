@@ -8,11 +8,14 @@ import handlers.map;
 import entities.planet;
 import std.random;
 import handlers.vector2d;
+import std.process;
+import core.thread;
 
 void main(string[] args) {
-	Map map = new Map(10000.0);
+	Map map = new Map(1000.0);
 	GameManager gameManager = new GameManager(map);
 	createPlanets(gameManager, map);
+	//createWindow();
 }
 
 void createPlanets(GameManager gameManager, Map map){
@@ -27,6 +30,7 @@ void createPlanets(GameManager gameManager, Map map){
 	Vector2D vecB = map.getFreeLocation(radius);
 	Planet planetB = new Planet(gameManager, vecB, radius, capacity, true);
 	writeln("planets created");
+	writeln("distance: ", Vector2D.getEucliDist(vecA, vecB));
 }
 
 void createWindow(){
@@ -47,6 +51,7 @@ void createWindow(){
 	while(!glfwWindowShouldClose(window)){
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		Thread.sleep(dur!("msecs")(50));
 	}
 	glfwTerminate();
 	DerelictGL3.reload();

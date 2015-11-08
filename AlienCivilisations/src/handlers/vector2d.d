@@ -23,6 +23,6 @@ class Vector2D {
 
 	public static getEucliDist(Vector2D vecA, Vector2D vecB){
 		import std.math;
-		return sqrt((vecA.getX() - vecB.getY())^^2 + (vecA.getY() - vecB.getY())^^2);
+		return sqrt((vecA.getX() - vecB.getX())^^2 + (vecA.getY() - vecB.getY())^^2);
 	}
 }

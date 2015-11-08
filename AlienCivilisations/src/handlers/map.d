@@ -10,7 +10,7 @@ class Map {
 	private float endX;
 	private float endY;
 	private SList!Planet planets;
-	private immutable float minDistance = 100;
+	private immutable float minDistance = 30;
 
 	this(float size){
 		endX = endY = size;
