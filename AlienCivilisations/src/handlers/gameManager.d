@@ -10,7 +10,9 @@ class GameManager {
 	this(Map map){
 		this.map = map;
 	}
+
 	public Map getMap(){
 		return map;
 	}
+
 }

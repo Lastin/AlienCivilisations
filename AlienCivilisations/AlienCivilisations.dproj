@@ -84,5 +84,6 @@
     <Folder Include="src\" />
     <Folder Include="src\entities\" />
     <Folder Include="src\handlers\" />
+    <Folder Include="src\states\" />
   </ItemGroup>
 </Project>

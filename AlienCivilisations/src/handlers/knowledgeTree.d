@@ -1,4 +1,5 @@
 ﻿module handlers.knowledgeTree;
+import std.container.dlist;
 
 class KnowledgeTree {
 	private string[] classes = ["Food", "Science", "Military", "Energy"];
@@ -8,10 +9,36 @@ class KnowledgeTree {
 		["Defence", "Offence", "Enervating", "Spying", "Intimidation"],
 		["Fossil fuels", "Hydro power", "Nuclear", "Solar power", "Wind"]];
 
-	private int[][] levels;
+	private int[] food = [0,0,0,0,0];
+	private int[] science = [0,0,0,0,0];
+	private int[] military = [0,0,0,0,0];
+	private int[] energy = [0,0,0,0,0];
+
+	private DList!int[] queue;
 
 	this(){
-		levels = [[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]];
+
 	}
 
+	public int[] getBranch(string branch){
+		switch(branch){
+			default:
+				throw new Exception("unknown branch");
+			case "Food":
+				return food;
+			case "Science":
+				return science;
+			case "Military":
+				return military;
+			case "Energy":
+				return energy;
+		}
+	}
+
+	public void develop(int civil_units){
+		int level = 0;
+		switch(level){
+			default: return;
+		}
+	}
 }

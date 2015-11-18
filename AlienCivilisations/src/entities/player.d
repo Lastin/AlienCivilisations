@@ -23,4 +23,11 @@ class Player {
 	public KnowledgeTree getKnowledgeTree(){
 		return knowledgeTree;
 	}
+
+	public void endTurn(){
+		foreach(Planet planet; planets){
+			planet.growPopulation();
+		}
+
+	}
 }

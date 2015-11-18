@@ -5,6 +5,7 @@ import std.conv;
 import handlers.gameManager;
 import entities.player;
 import handlers.knowledgeTree;
+import std.algorithm;
 
 class Planet {
 	private GameManager gameManager;
@@ -61,8 +62,9 @@ class Planet {
 
 	public void growPopulation(){
 		if(!owner){
-			//KnowledgeTree kt = owner.getKnowledgeTree();
-			//population *= kt.get
+			KnowledgeTree kt = owner.getKnowledgeTree();
+			int[] foodBranch = kt.getBranch("food");
+			population += to!int(population * sum(foodBranch) * (2 ? breathable_atmosphere : 1.5));
 		}
 	}
 }
