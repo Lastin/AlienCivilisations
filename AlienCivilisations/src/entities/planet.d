@@ -47,6 +47,10 @@ class Planet {
 		return capacity;
 	}
 
+	public int getPopulation(){
+		return population;
+	}
+
 	public float getRadius(){
 		return radius;
 	}
@@ -63,7 +67,7 @@ class Planet {
 	public void growPopulation(){
 		if(!owner){
 			KnowledgeTree kt = owner.getKnowledgeTree();
-			int[] foodBranch = kt.getBranch("food");
+			int[] foodBranch = kt.getBranch("Food");
 			population += to!int(population * sum(foodBranch) * (2 ? breathable_atmosphere : 1.5));
 		}
 	}

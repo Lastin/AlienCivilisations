@@ -25,9 +25,12 @@ class Player {
 	}
 
 	public void endTurn(){
+		//collect total civils, and develop, then grow
+		int total_civil_units = 0;
 		foreach(Planet planet; planets){
+			total_civil_units += planet.getPopulation();
 			planet.growPopulation();
 		}
-		knowledgeTree.develop();
+		knowledgeTree.develop(total_civil_units);
 	}
 }
