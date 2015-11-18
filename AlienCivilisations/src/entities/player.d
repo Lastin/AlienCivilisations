@@ -28,6 +28,6 @@ class Player {
 		foreach(Planet planet; planets){
 			planet.growPopulation();
 		}
-
+		knowledgeTree.develop();
 	}
 }

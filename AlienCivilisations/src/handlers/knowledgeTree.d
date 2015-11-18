@@ -36,9 +36,11 @@ class KnowledgeTree {
 	}
 
 	public void develop(int civil_units){
-		int level = 0;
-		switch(level){
-			default: return;
-		}
+		//l1 = 2
+		//l2 = 4
+		//l3 = 8
+		//l4 = 16
+		//l5 = 32
+		//steps = (multiplier * 50,000) / civil_units
 	}
 }
