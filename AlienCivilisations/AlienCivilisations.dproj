@@ -18,7 +18,6 @@
     <OutputName>AlienCivilisations</OutputName>
     <Target>Executable</Target>
     <DebugLevel>0</DebugLevel>
-    <ConsolePause>false</ConsolePause>
     <ExtraLinkerArguments>lib/derelict/DerelictSDL2/lib/libDerelictSDL2.a
 -Llib/derelict/DerelictGL3/lib/libDerelictGL3.a
 -Llib/derelict/DerelictGLFW3/lib/libDerelictGLFW3.a
@@ -33,6 +32,7 @@
         <Lib>-Ilib/derelict/DerelictGLFW3/source</Lib>
       </Libs>
     </Libs>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release</OutputPath>
@@ -79,6 +79,7 @@
     <Compile Include="src\handlers\map.d" />
     <Compile Include="src\entities\player.d" />
     <Compile Include="src\handlers\knowledgeTree.d" />
+    <Compile Include="src\handlers\branch.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

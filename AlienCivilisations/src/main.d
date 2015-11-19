@@ -10,12 +10,15 @@ import std.random;
 import handlers.vector2d;
 import std.process;
 import core.thread;
+import handlers.knowledgeTree;
 
 void main(string[] args) {
-	Map map = new Map(1000.0);
-	GameManager gameManager = new GameManager(map);
-	createPlanets(gameManager, map);
+	//Map map = new Map(1000.0);
+	//GameManager gameManager = new GameManager(map);
+	//createPlanets(gameManager, map);
 	//createWindow();
+	KnowledgeTree kt = new KnowledgeTree();
+	//writeln(kt.pointsToLevel(2*50000));
 }
 
 void createPlanets(GameManager gameManager, Map map){

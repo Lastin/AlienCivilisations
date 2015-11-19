@@ -2,12 +2,10 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/handlers/knowledgeTree.d">
     <Files>
-      <File FileName="AlienCivilisations/src/main.d" Line="17" Column="34" />
-      <File FileName="AlienCivilisations/src/entities/planet.d" Line="71" Column="52" />
-      <File FileName="AlienCivilisations/src/handlers/gameManager.d" Line="17" Column="2" />
-      <File FileName="AlienCivilisations/src/handlers/map.d" Line="13" Column="20" />
-      <File FileName="AlienCivilisations/src/entities/player.d" Line="28" Column="49" />
-      <File FileName="AlienCivilisations/src/handlers/knowledgeTree.d" Line="37" Column="4" />
+      <File FileName="AlienCivilisations/src/main.d" Line="21" Column="4" />
+      <File FileName="AlienCivilisations/src/entities/player.d" Line="1" Column="1" />
+      <File FileName="AlienCivilisations/src/handlers/knowledgeTree.d" Line="36" Column="21" />
+      <File FileName="AlienCivilisations/src/handlers/branch.d" Line="41" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
