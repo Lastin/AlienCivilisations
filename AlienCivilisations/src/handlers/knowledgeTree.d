@@ -24,11 +24,13 @@ public class KnowledgeTree {
 	private Branch military;
 	private Branch energy;
 
-	private double branchEffect = 0.02;
+	private double branchEffect = 0.04;
 	private double leafEffect = 0.1;
 
 	private DList!(kOrder) queue;
-	private alias kOrder = Tuple!(BranchName, "branchName", int, "subBranch");
+	private alias kOrder = Tuple!(string, "branchName", int, "leafIndex");
+	//dependencies
+	private alias dependency = Tuple!();
 
 	/*
 	 * Energy > Food
@@ -72,11 +74,39 @@ public class KnowledgeTree {
 	}
 
 	public void develop(int civil_units){
+		int points_left = civil_units;
+		while(!queue.empty() || points_left <= 0){
+
+		}
 	}
 
-	public void addToQueue(string branch, int subBranch){
+	public void addToQueue(string branchName, int leafIndex){
+		kOrder newOrder;
+		newOrder.branchName = branchName;
+		newOrder.leafIndex = leafIndex;
+		int levels_left = 5;
+		foreach(kOrder order; queue){
+			if(compare(newOrder, order)){
+				--levels_left;
+			}
+		}
+		if(levels_left > 0){
+			kOrder order;
+			order.branchName = branchName;
+			order.leafIndex = leafIndex;
+			queue.insertBack(order);
+		}
 	}
 
-	public void removeFromQueue(string branch, int subBranch){
+	public void removeFromQueue(string branchName, int leafIndex){
+		kOrder order;
+		order.branchName = branchName;
+		order.leafIndex = leafIndex;
+		//int last = find!()(queue, order);
+	}
+
+	static bool compare(kOrder ord1, kOrder ord2){
+		return (ord1.branchName == ord2.branchName &&
+			ord1.leafIndex == ord2.leafIndex);
 	}
 }
