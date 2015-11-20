@@ -40,7 +40,21 @@ class Branch {
 		return level;
 	}
 
-	public void develop(int leafId, double bonus){
-
+	public int develop(int usable_points, int leafId){
+		int nextLevel = pointsToLevel(points[leafId]) + 1;
+		int nextLevelPoints = (multipliers[nextLevel] * pop_const);
+		if(nextLevel > 5){
+			return usable_points;
+		}
+		int pointsNeeded = nextLevelPoints - points[leafId];
+		if(pointsNeeded <= usable_points){
+			points[leafId] += pointsNeeded;
+			usable_points -= pointsNeeded;
+		}
+		else {
+			points[leafId] += usable_points;
+			usable_points = -1;
+		}
+		return usable_points;
 	}
 }
