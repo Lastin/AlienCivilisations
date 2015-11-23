@@ -6,19 +6,17 @@ import std.algorithm.searching;
 import handlers.branch;
 import std.conv;
 
+
+
 public class KnowledgeTree {
-	public enum BranchName {
-		Food = "Food",
-		Science = "Science",
-		Military = "Military",
-		Energy = "Energy"
+
+	enum leafNames : string[]{
+		Food = ["Agricultural Economics", "Agricultural Engineering", "Argonomy", "Animal Science", "Horticulture"],
+		Science = ["Automation", "Biology", "Chemistry", "Mathematics", "Physics"],
+		Military = ["Defence", "Offence", "Enervating", "Spying", "Intimidation"],
+		Energy = ["Fossil Fuels", "Hydro Power", "Nuclear", "Solar Power", "Wind"]
+
 	}
-	string[][] leafsNames = [
-		["Agricultural Economics", "Agricultural Engineering", "Argonomy", "Animal Science"],
-		["Automation", "Biology", "Chemistry", "Mathematics", "Physics"],
-		["Defence", "Offence", "Enervating", "Spying", "Intimidation"],
-		["Fossil Fuels", "Hydro Power", "Nuclear", "Solar Power", "Wind"]
-	];
 
 	private Branch food;
 	private Branch science;
@@ -34,11 +32,11 @@ public class KnowledgeTree {
 	private alias dependency = Tuple!();
 
 	this(){
-		int[5] points;
-		food = new Branch(BranchName.Food, leafsNames[0], points);
-		science = new Branch(BranchName.Science, leafsNames[1], points);
-		military = new Branch(BranchName.Military, leafsNames[2], points);
-		energy = new Branch(BranchName.Energy, leafsNames[3], points);
+		int[5] points = [0,0,0,0,0];
+		food = new Branch("Food", leafNames.Food, points);
+		science = new Branch("Science", leafNames.Science, points);
+		military = new Branch("Military", leafNames.Military, points);
+		energy = new Branch("Energy", leafNames.Energy, points);
 	}
 
 	public Branch getBranch(string branchName){
