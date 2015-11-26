@@ -32,7 +32,7 @@
         <Lib>-Ilib/derelict/DerelictGLFW3/source</Lib>
       </Libs>
     </Libs>
-    <ConsolePause>false</ConsolePause>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release</OutputPath>
@@ -80,6 +80,8 @@
     <Compile Include="src\entities\player.d" />
     <Compile Include="src\handlers\knowledgeTree.d" />
     <Compile Include="src\handlers\branch.d" />
+    <Compile Include="src\handlers\commandParser.d" />
+    <Compile Include="src\handlers\window.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

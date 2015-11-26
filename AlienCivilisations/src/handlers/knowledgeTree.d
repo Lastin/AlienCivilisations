@@ -9,13 +9,11 @@ import std.conv;
 
 
 public class KnowledgeTree {
-
 	enum leafNames : string[]{
 		Food = ["Agricultural Economics", "Agricultural Engineering", "Argonomy", "Animal Science", "Horticulture"],
 		Science = ["Automation", "Biology", "Chemistry", "Mathematics", "Physics"],
 		Military = ["Defence", "Offence", "Enervating", "Spying", "Intimidation"],
 		Energy = ["Fossil Fuels", "Hydro Power", "Nuclear", "Solar Power", "Wind"]
-
 	}
 
 	private Branch food;

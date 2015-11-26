@@ -1,6 +1,22 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="AlienCivilisations" expanded="True">
+            <Node name="AlienCivilisations" expanded="True">
+              <Node name="src" expanded="True">
+                <Node name="handlers" expanded="True">
+                  <Node name="window.d" selected="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
