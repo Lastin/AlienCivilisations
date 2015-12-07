@@ -6,7 +6,6 @@ import src.entities.map;
 import src.containers.vector2d;
 import src.entities.planet;
 
-
 void main(string[] args) {
 
 	//Map map = new Map(1000.0);

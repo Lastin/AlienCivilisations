@@ -6,6 +6,7 @@ import src.entities.player;
 class GameManager {
 	private Map map;
 	private Player[] players = new Player[2];
+	private int queuePosition;
 
 	this(Map map){
 		this.map = map;
@@ -15,4 +16,7 @@ class GameManager {
 		return map;
 	}
 
+	public void startNewGame(){
+
+	}
 }

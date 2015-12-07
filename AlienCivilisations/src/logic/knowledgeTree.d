@@ -63,27 +63,27 @@ public class KnowledgeTree {
 
 	private double getBonus(identifier i){
 	/*
-	 * Food < Science
-	 * Food < Energy
-	 * Food < Science[1]
-	 * Food < Science[2]
-	 * Food[3] < Science[3]
-	 * Food[3] < Science[4]
+	 * Food <- Science
+	 * Food <- Energy
+	 * Food <- Science[1]
+	 * Food <- Science[2]
+	 * Food[3] <- Science[3]
+	 * Food[3] <- Science[4]
 	 * 
-	 * Military < Energy
-	 * Miliatry < Science[1]
-	 * Military < Science[3]
-	 * Miliatry[0] < Science[2]
-	 * Military[0] < Science[4]
-	 * Miliatry[1] < Science[2]
-	 * Military[1] < Science[4]
+	 * Military <- Energy
+	 * Miliatry <- Science[1]
+	 * Military <- Science[3]
+	 * Miliatry[0] <- Science[2]
+	 * Military[0] <- Science[4]
+	 * Miliatry[1] <- Science[2]
+	 * Military[1] <- Science[4]
 	 * 
-	 * Science < Energy
+	 * Science <- Energy
 	 * 
-	 * Energy < Science[3]
-	 * Energy < Science[4]
-	 * Energy[0] < Science[0]
-	 * Energy[1] < Science[0]
+	 * Energy <- Science[3]
+	 * Energy <- Science[4]
+	 * Energy[0] <- Science[0]
+	 * Energy[1] <- Science[0]
 	 */
 		double total = 1.0;
 		final switch(i.branchName){
@@ -120,35 +120,32 @@ public class KnowledgeTree {
 	}
 
 	public void addToQueue(string branchName, int leafIndex){
-		identifier newOrder;
-		newOrder.branchName = branchName;
-		newOrder.leafIndex = leafIndex;
+		identifier newOrder = identifier(branchName, leafIndex);
 		int levels_left = 5;
 		foreach(identifier order; queue){
 			if(newOrder == order){
 				--levels_left;
 			}
 		}
-		if(levels_left > 0){
-			identifier order;
-			order.branchName = branchName;
-			order.leafIndex = leafIndex;
-			queue.insertBack(order);
+		synchronized {
+			if(levels_left > 0){
+				queue.insertBack(newOrder);
+			}
 		}
 	}
 
 	public void removeFromQueue(string branchName, int leafIndex){
-		identifier newOrder;
-		newOrder.branchName = branchName;
-		newOrder.leafIndex = leafIndex;
+		identifier newOrder = identifier(branchName, leafIndex);
 		DList!identifier newQueue;
 		int found = 0;
-		foreach_reverse(identifier each; queue){
-			if(each == newOrder && found==0){
-				++found;
-			} 
-			else {
-				newQueue.insertFront(each);
+		synchronized {
+			foreach_reverse(identifier each; queue){
+				if(each == newOrder && found==0){
+					++found;
+				} 
+				else {
+					newQueue.insertFront(each);
+				}
 			}
 			queue = newQueue;
 		}

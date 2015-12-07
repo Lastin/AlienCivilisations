@@ -18,17 +18,6 @@ class Planet {
 	private bool breathable_atmosphere;
 	private Player owner;
 
-	/*this(GameManager gameManager){
-		import std.random;
-		float x = uniform(0.0, gameManager.getMap().getEndX());
-		float y = uniform(0.0, gameManager.getMap().getEndY()); 
-		Vector2D v = new Vector2D(x, y);
-		float r = uniform(0.05, 2.0);
-		int c = cast(int)(uniform(1, 10) * radius) * 10000;
-		bool b = uniform(0,2) == 1;
-		this(gameManager, v, r, c, b);
-	}*/
-
 	this(GameManager gameManager, Vector2D vec2d, float radius, int capacity, bool breathable_atmosphere){
 		this.gameManager = gameManager;
 		this.vec2d = vec2d;
