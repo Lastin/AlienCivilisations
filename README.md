@@ -5,10 +5,10 @@ http://dlang.org/
 Compiler:
 DMD64 D Compiler v2.068.2
 Copyright (c) 1999-2015 by Digital Mars written by Walter Bright
-=================================================
+--------------
 Using monodevelop requires installation of add-in:
 *Tools > Add-in Manager > Gallery > Languge Bindings > D Language Binding*
-=================================================
+--------------
 Project uses set of Derelict libraries.
 Those are build using "dub" (http://code.dlang.org/download)
 ```
