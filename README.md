@@ -63,11 +63,9 @@ git clone https://github.com/glfw/glfw.git
 cd glfw
 ```
 Generate makefiles
-
-`cmake -DBUILD_SHARED_LIBS=ON -G "Unix Makefiles"`
+```cmake -DBUILD_SHARED_LIBS=ON -G "Unix Makefiles"```
 Install compiled files
-
-`sudo make install`
+```sudo make install```
 
 -----------------------------------------
 Now these files should be present in the directory */usr/local/lib/*
