@@ -1,4 +1,4 @@
-﻿module handlers.commandParser;
+﻿module src.handlers.commandParser;
 import std.stdio;
 class CommandParser {
 	immutable string[][string] commands;

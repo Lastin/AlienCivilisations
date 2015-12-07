@@ -1,4 +1,5 @@
-﻿module handlers.window;
+﻿module src.handlers.window;
+
 import core.thread;
 import std.stdio;
 import std.exception;

@@ -1,9 +1,9 @@
-﻿module entities.player;
+﻿module src.entities.player;
 
 import std.container.slist;
-import entities.planet;
-import handlers.gameManager;
-import handlers.knowledgeTree;
+import src.entities.planet;
+import src.handlers.gameManager;
+import src.logic.knowledgeTree;
 
 class Player {
 	private SList!Planet planets;
@@ -26,11 +26,11 @@ class Player {
 
 	public void endTurn(){
 		//collect total civils, and develop, then grow
-		int total_civil_units = 0;
+		/*int total_civil_units = 0;
 		foreach(Planet planet; planets){
 			total_civil_units += planet.getPopulation();
 			planet.growPopulation();
 		}
-		knowledgeTree.develop(total_civil_units);
+		knowledgeTree.develop(total_civil_units);*/
 	}
 }

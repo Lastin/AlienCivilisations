@@ -1,4 +1,4 @@
-﻿module handlers.vector2d;
+﻿module src.containers.vector2d;
 
 class Vector2D {
 	private float x;

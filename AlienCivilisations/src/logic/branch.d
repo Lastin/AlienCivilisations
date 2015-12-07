@@ -1,7 +1,8 @@
-﻿module handlers.branch;
-import handlers.gameManager;
+﻿module src.logic.branch;
+
+import src.handlers.gameManager;
 import std.algorithm;
-import handlers.knowledgeTree;
+import src.logic.knowledgeTree;
 
 class Branch {
 	private string name;

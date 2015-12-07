@@ -1,8 +1,8 @@
-﻿module handlers.map;
+﻿module src.entities.map;
 
-import entities.planet;
 import std.container: SList;
-import handlers.vector2d;
+import src.entities.planet;
+import src.containers.vector2d;
 import std.stdio;
 import std.random;
 

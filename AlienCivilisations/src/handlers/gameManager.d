@@ -1,7 +1,7 @@
-﻿module handlers.gameManager;
+﻿module src.handlers.gameManager;
 
-import handlers.map;
-import entities.player;
+import src.entities.map;
+import src.entities.player;
 
 class GameManager {
 	private Map map;

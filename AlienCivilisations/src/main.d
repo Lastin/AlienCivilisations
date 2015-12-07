@@ -1,25 +1,10 @@
-﻿module main;
+﻿module src.main;
 
 import std.stdio;
-import derelict.opengl3.gl3;
-import derelict.glfw3.glfw3;
-import handlers.gameManager;
-import handlers.map;
-import entities.planet;
-import std.random;
-import handlers.vector2d;
-import std.process;
-import core.thread;
-import handlers.knowledgeTree;
-import std.typecons;
-import std.container.dlist;
-import std.algorithm;
-import std.range;
-import handlers.branch;
-import handlers.commandParser;
-import handlers.window;
-
-
+import src.handlers.gameManager;
+import src.entities.map;
+import src.containers.vector2d;
+import src.entities.planet;
 
 
 void main(string[] args) {
@@ -27,12 +12,11 @@ void main(string[] args) {
 	//Map map = new Map(1000.0);
 	//GameManager gameManager = new GameManager(map);
 	//createPlanets(gameManager, map);
-	Window window = new Window(1280, 720);
-	window.start();
+	//Window window = new Window(1280, 720);
+	//window.start();
 	//KnowledgeTree kt = new KnowledgeTree();
 	//writeln(kt.pointsToLevel(2*50000));
-	Branch b = new Branch("", [""], [0,0,0,0,0]);
-	CommandParser cp = new CommandParser();
+	//CommandParser cp = new CommandParser();
 }
 
 

@@ -51,6 +51,7 @@
         <Lib>lib/libDerelictUtil.a</Lib>
       </Libs>
     </Libs>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Unittest|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -70,23 +71,29 @@
         <Lib>lib/libDerelictUtil.a</Lib>
       </Libs>
     </Libs>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\main.d" />
     <Compile Include="src\entities\planet.d" />
-    <Compile Include="src\handlers\vector2d.d" />
     <Compile Include="src\handlers\gameManager.d" />
-    <Compile Include="src\handlers\map.d" />
     <Compile Include="src\entities\player.d" />
-    <Compile Include="src\handlers\knowledgeTree.d" />
-    <Compile Include="src\handlers\branch.d" />
     <Compile Include="src\handlers\commandParser.d" />
     <Compile Include="src\handlers\window.d" />
+    <Compile Include="src\entities\map.d" />
+    <Compile Include="src\states\play.d" />
+    <Compile Include="src\states\menu.d" />
+    <Compile Include="src\logic\branch.d" />
+    <Compile Include="src\logic\knowledgeTree.d" />
+    <Compile Include="src\containers\vector2d.d" />
+    <Compile Include="src\logic\ai.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
     <Folder Include="src\entities\" />
     <Folder Include="src\handlers\" />
     <Folder Include="src\states\" />
+    <Folder Include="src\containers\" />
+    <Folder Include="src\logic\" />
   </ItemGroup>
 </Project>

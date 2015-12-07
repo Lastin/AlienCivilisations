@@ -1,9 +1,10 @@
-﻿module handlers.knowledgeTree;
+﻿module src.logic.knowledgeTree;
+
 import std.container.dlist;
 import std.typecons;
 import std.range;
 import std.algorithm.searching;
-import handlers.branch;
+import src.logic.branch;
 import std.conv;
 
 
