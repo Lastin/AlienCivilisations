@@ -56,15 +56,15 @@ Library GLFW3 must be installed on the system.
 It can be downloaded from official website: http://www.glfw.org/
 
 Steps:
---install dependencies
+1. Install dependencies
 ```
 sudo apt-get install cmake xorg-dev libglu1-mesa-dev
 git clone https://github.com/glfw/glfw.git
 cd glfw
 ```
-Generate makefiles
+2. Generate makefiles
 ```cmake -DBUILD_SHARED_LIBS=ON -G "Unix Makefiles"```
-Install compiled files
+3. Install compiled files
 ```sudo make install```
 
 -----------------------------------------
