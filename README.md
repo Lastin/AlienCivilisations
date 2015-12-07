@@ -34,21 +34,22 @@ Derelict files have to be linked to project:
 Project > :AlienCivilisations: Options > Build > Compiling
 
 Libraries filed contains:
---------------------------------------------
+``
 -Ilib/derelict/DerelictSDL2/source
 -Ilib/derelict/DerelictGL3/source
 -Ilib/derelict/DerelictUtil/source
 -Ilib/derelict/DerelictGLFW3/source
+``
 --------------------------------------------
 
 Extra linker options contain:
---------------------------------------------
+``
 lib/derelict/DerelictSDL2/lib/libDerelictSDL2.a
 -Llib/derelict/DerelictGL3/lib/libDerelictGL3.a
 -Llib/derelict/DerelictGLFW3/lib/libDerelictGLFW3.a
 -Llib/derelict/DerelictUtil/lib/libDerelictUtil.a
 -L-ldl -lglfw3
---------------------------------------------
+``
 
 (all but this first one in linker options must have -L prefix, otherwise it will not be passed as linkerflag refer to: -Llinkerflag)
 
@@ -57,21 +58,17 @@ Library GLFW3 must be installed on the system.
 It can be downloaded from official website: http://www.glfw.org/
 
 Steps:
-
 --install dependencies
-sudo apt-get install cmake xorg-dev libglu1-mesa-dev
-
-git clone https://github.com/glfw/glfw.git
-cd glfw
-
+`sudo apt-get install cmake xorg-dev libglu1-mesa-dev`
+`git clone https://github.com/glfw/glfw.git`
+`cd glfw`
 --Generate makefiles
-cmake -DBUILD_SHARED_LIBS=ON -G "Unix Makefiles"
-
+`cmake -DBUILD_SHARED_LIBS=ON -G "Unix Makefiles"`
 --Install compiled files
-sudo make install
+`sudo make install`
 
 -----------------------------------------
-Now these files should be present in the directory /usr/local/lib/
+Now these files should be present in the directory `/usr/local/lib/`
 libglfw.so
 libglfw.so.3
 libglfw.so.3.2
