@@ -5,14 +5,12 @@ http://dlang.org/
 Compiler:
 DMD64 D Compiler v2.068.2
 Copyright (c) 1999-2015 by Digital Mars written by Walter Bright
-
 =================================================
 Using monodevelop requires installation of add-in:
 *Tools > Add-in Manager > Gallery > Languge Bindings > D Language Binding*
-
 =================================================
 Project uses set of Derelict libraries.
-Those are build using "dub":
+Those are build using "dub" (http://code.dlang.org/download)
 ```
 cd $DERELICT
 git clone https://github.com/DerelictOrg/DerelictSDL2.git
@@ -28,11 +26,9 @@ dub build
 ```
 I have placed them in:
 AlienCivilisations/AlienCivilisations/lib/derelict/
-
 =================================================
 Derelict files have to be linked to project:
-Project > :AlienCivilisations: Options > Build > Compiling
-
+*Project > :AlienCivilisations: Options > Build > Compiling*
 Libraries filed contains:
 ```
 -Ilib/derelict/DerelictSDL2/source
@@ -40,7 +36,6 @@ Libraries filed contains:
 -Ilib/derelict/DerelictUtil/source
 -Ilib/derelict/DerelictGLFW3/source
 ```
---------------------------------------------
 
 Extra linker options contain:
 ```
