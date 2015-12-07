@@ -5,9 +5,11 @@ http://dlang.org/
 Compiler:
 DMD64 D Compiler v2.068.2
 Copyright (c) 1999-2015 by Digital Mars written by Walter Bright
+
 --------------
 Using monodevelop requires installation of add-in:
 *Tools > Add-in Manager > Gallery > Languge Bindings > D Language Binding*
+
 --------------
 Project uses set of Derelict libraries.
 Those are build using "dub" (http://code.dlang.org/download)
@@ -26,6 +28,7 @@ dub build
 ```
 I have placed them in:
 AlienCivilisations/AlienCivilisations/lib/derelict/
+
 =================================================
 Derelict files have to be linked to project:
 *Project > :AlienCivilisations: Options > Build > Compiling*
@@ -63,10 +66,10 @@ Steps:
 `sudo make install`
 
 -----------------------------------------
-Now these files should be present in the directory `/usr/local/lib/`
-libglfw.so
-libglfw.so.3
-libglfw.so.3.2
+Now these files should be present in the directory */usr/local/lib/*
+-libglfw.so
+-libglfw.so.3
+-libglfw.so.3.2
 -----------------------------------------
 
 
