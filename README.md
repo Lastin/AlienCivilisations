@@ -57,19 +57,25 @@ It can be downloaded from official website: http://www.glfw.org/
 
 Steps:
 1. Install dependencies
+
 `sudo apt-get install cmake xorg-dev libglu1-mesa-dev`
+
 `git clone https://github.com/glfw/glfw.git`
+
 `cd glfw`
 2. Generate makefiles
+
 `cmake -DBUILD_SHARED_LIBS=ON -G "Unix Makefiles"`
+
 3. Install compiled files
+
 `sudo make install`
 
 -----------------------------------------
 Now these files should be present in the directory */usr/local/lib/*
--libglfw.so
--libglfw.so.3
--libglfw.so.3.2
+* libglfw.so
+* libglfw.so.3
+* libglfw.so.3.2
 
 
 
