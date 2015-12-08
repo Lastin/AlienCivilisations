@@ -87,6 +87,8 @@
     <Compile Include="src\logic\knowledgeTree.d" />
     <Compile Include="src\containers\vector2d.d" />
     <Compile Include="src\logic\ai.d" />
+    <Compile Include="src\containers\kdTree.d" />
+    <Compile Include="src\containers\hypotheticalWorld.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
