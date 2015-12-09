@@ -5,14 +5,14 @@ import std.algorithm;
 import src.logic.knowledgeTree;
 
 class Branch {
-	private string name;
-	private string[] leafsNames;
+	private immutable string name;
+	private immutable string[] leafsNames;
+	private immutable int[] multipliers = [2,4,8,16,32];
+	private immutable int pop_const = 50000;
+	private immutable int maxLevel = 5;
 	private int[] points;
-	private int[] multipliers = [2,4,8,16,32];
-	private int pop_const = 50000;
-	private int maxLevel = 5;
 
-	this(string name, string[] leafsNames, int[] points){
+	pure this(immutable string name, immutable string[] leafsNames, int[] points){
 		this.name = name;
 		this.leafsNames = leafsNames;
 		this.points = points;
@@ -57,5 +57,9 @@ class Branch {
 			usable_points = -1;
 		}
 		return usable_points;
+	}
+
+	public Branch dup() pure {
+		return new Branch(name, leafsNames, points.dup());
 	}
 }

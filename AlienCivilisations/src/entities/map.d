@@ -9,21 +9,26 @@ import std.random;
 class Map {
 	private float endX;
 	private float endY;
-	private SList!Planet planets;
+	private float size;
+	private Planet[] planets;
 	private immutable float minDistance = 30;
 
 	this(float size){
+		this.size = size;
 		endX = endY = size;
 	}
 
-	public void addPlanet(Planet planet){
-		planets.insert(planet);
+	this(float size, Planet[] planets){
+		this(size);
+		this.planets = planets;
 	}
 
-	public void addPlanets(SList!Planet newPlanets){
-		foreach(planet; newPlanets.opSlice){
-			planets.insert(planet);
-		}
+	public void addPlanet(Planet planet){
+		planets ~= planet;
+	}
+
+	public void addPlanets(Planet[] newPlanets){
+		planets ~= newPlanets;
 	}
 
 	public bool collides(Planet planetA){
@@ -52,12 +57,12 @@ class Map {
 		return vector;
 	}
 
-	public SList!(Planet) getPlanets(){
+	public Planet[] getPlanets(){
 		return planets;
 	}
 
 	public Planet getPlanetAt(Vector2D vec2d){
-		foreach(Planet planet; planets.opSlice()){
+		foreach(Planet planet; planets){
 			if(vec2d == planet.getVec2d()){
 				return planet;
 			}
@@ -71,5 +76,9 @@ class Map {
 
 	public float getEndY(){
 		return endY;
+	}
+
+	public Map dup(){
+		return new Map(size, planets);
 	}
 }
