@@ -18,7 +18,6 @@ void main(string[] args) {
 	//CommandParser cp = new CommandParser();
 }
 
-
 void createPlanets(GameManager gameManager, Map map){
 	//GameManager gameManager, Vector2D vec2d, float radius, int capacity, bool breathable_atmosphere
 	float radius = 2.0;

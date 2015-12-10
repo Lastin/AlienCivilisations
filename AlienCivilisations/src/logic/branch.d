@@ -59,7 +59,7 @@ class Branch {
 		return usable_points;
 	}
 
-	public Branch dup() pure {
+	public Branch dup() const {
 		return new Branch(name, leafsNames, points.dup());
 	}
 }

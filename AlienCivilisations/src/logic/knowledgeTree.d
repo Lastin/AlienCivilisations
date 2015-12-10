@@ -1,27 +1,29 @@
 ﻿module src.logic.knowledgeTree;
 
-import std.container.dlist;
 import std.typecons;
 import std.range;
 import std.algorithm.searching;
 import src.logic.branch;
 import std.conv;
 
+private struct Order {
+	Branch branch;
+	int leaf;
+}
 
 
 public class KnowledgeTree {
+
 	enum leafNames : string[]{
 		Food = ["Agricultural Economics", "Agricultural Engineering", "Argonomy", "Animal Science", "Horticulture"],
 		Science = ["Automation", "Biology", "Chemistry", "Mathematics", "Physics"],
 		Military = ["Defence", "Offence", "Enervating", "Spying", "Intimidation"],
 		Energy = ["Fossil Fuels", "Hydro Power", "Nuclear", "Solar Power", "Wind"]
 	}
-
 	private Branch food, science, military, energy;
 	private double branchEffect = 0.04;
 	private double leafEffect = 0.1;
-	private alias dev_ord = Tuple!(Branch, "branch", int, "leaf");
-	private DList!(dev_ord) queue;
+	Order[] queue;
 
 	this(){
 		int[5] points = [0,0,0,0,0];
@@ -31,7 +33,7 @@ public class KnowledgeTree {
 		energy = new Branch("Energy", leafNames.Energy, points);
 	}
 
-	pure this(Branch[4] branches, DList!(dev_ord) queue){
+	this(Branch[4] branches, Order[] queue){
 		food = branches[0];
 		science = branches[1];
 		military = branches[2];
@@ -52,17 +54,17 @@ public class KnowledgeTree {
 	public void develop(int civil_units){
 		int points_left = civil_units;
 		while(!queue.empty() || points_left <= 0){
-			dev_ord frnt = queue.front;
+			Order frnt = queue.front;
 			double bonus = getBonus(frnt);
 			points_left = frnt.branch.develop(to!int(points_left * bonus), frnt.leaf);
 			if(points_left >= 0){
 				points_left = to!int(points_left/bonus);
-				queue.removeFront;
+				queue = queue[1..$];
 			}
 		}
 	}
 
-	private double getBonus(dev_ord i){
+	private double getBonus(Order i){
 	/*
 	 * Food <- Science
 	 * Food <- Energy
@@ -119,41 +121,47 @@ public class KnowledgeTree {
 		return total;
 	}
 
-	public void addToQueue(Branch branch, int leafIndex){
-		dev_ord newOrder = dev_ord(branch, leafIndex);
+	public KnowledgeTree dup(){
+		//creates duplicate of the object
+		Branch[4] bclone = [food.dup(), science.dup(), military.dup(), energy.dup()];
+		return new KnowledgeTree(bclone, queue.dup());
+	}
+
+	//QUEUE FUNCTIONS
+	void addToQueue(Branch branch, int leaf){
+		Order newOrder;
+		newOrder.branch = branch;
+		newOrder.leaf = leaf;
 		int levels_left = 5;
-		foreach(dev_ord order; queue){
-			if(newOrder == order){
-				--levels_left;
-			}
-		}
 		synchronized {
+			foreach(Order order; queue){
+				if(newOrder == order){
+					--levels_left;
+				}
+			}
 			if(levels_left > 0){
-				queue.insertBack(newOrder);
+				queue ~= newOrder;
 			}
 		}
 	}
 
-	public void removeFromQueue(Branch branch, int leafIndex){
-		dev_ord newOrder = dev_ord(branch, leafIndex);
-		DList!dev_ord newQueue;
+	void removeFromQueue(Branch branch, int leaf){
+		Order tbr;
+		tbr.branch = branch;
+		tbr.leaf = leaf;
+		Order[] newQueue;
+		newQueue.reserve(queue.capacity); //reserve to avoid reallocation
 		int found = 0;
 		synchronized {
-			foreach_reverse(dev_ord each; queue){
-				if(each == newOrder && found==0){
+			foreach_reverse(Order order; queue){
+				if(found==0 && order == tbr){
 					++found;
 				} 
 				else {
-					newQueue.insertFront(each);
+					newQueue = order ~ newQueue;
 				}
 			}
 			queue = newQueue;
 		}
-	}
-
-	public KnowledgeTree dup() pure {
-		//creates duplicate of the object
-		Branch[4] bclone = [food.dup(), science.dup(), military.dup(), energy.dup()];
-		return new KnowledgeTree(bclone, queue.dup());
 	}
 }
