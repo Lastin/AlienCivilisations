@@ -9,7 +9,6 @@ import std.algorithm;
 import src.logic.branch;
 
 class Planet {
-	private GameManager gameManager;
 	private Vector2D vec2d;
 	private float radius;
 	private int capacity;
@@ -18,11 +17,10 @@ class Planet {
 	private bool breathable_atmosphere;
 	private Player owner;
 
-	this(GameManager gameManager, Vector2D vec2d, float radius, int capacity, bool breathable_atmosphere){
-		this.gameManager = gameManager;
+	this(Vector2D vec2d, float radius, bool breathable_atmosphere){
 		this.vec2d = vec2d;
 		this.radius = radius;
-		this.capacity = capacity;
+		this.capacity = to!int(radius * 10000);
 		this.breathable_atmosphere = breathable_atmosphere;
 	}
 
@@ -76,6 +74,12 @@ class Planet {
 		food += to!int(contributing_units * foodBranch.getBranchLevel() / 0.5);
 	}
 	private void growPopulation(){
+		double opf = 1;
+		int totalPop = getPopulationSum();
+		if(totalPop > capacity){
+			int overflow =  totalPop - capacity;
+			opf = overflow * 10 / capacity;
+		}
 		//population grows at exponential rate
 		//1 > 2 > 4 > 8 > 16
 		//but is also affected by the food
@@ -84,7 +88,7 @@ class Planet {
 			population[i] = population[i-1];
 		}
 		int reproductive_units = population[2] + population[3];
-		population[0] = to!int(reproductive_units * getPopulationSum / food);
+		population[0] = to!int(reproductive_units / 2 * 2.5 * getPopulationSum / food * opf);
 	}
 }
 

@@ -7,19 +7,20 @@ import std.stdio;
 import std.random;
 
 class Map {
-	private float endX;
-	private float endY;
-	private float size;
-	private Planet[] planets;
+	private immutable float endX;
+	private immutable float endY;
+	private immutable float size;
 	private immutable float minDistance = 30;
+	private Planet[] planets;
 
-	this(float size){
-		this.size = size;
-		endX = endY = size;
+	this(float size, int planetCount){
+		this.size = endX = endY = size;
+		planets ~= new Planet(getFreeLocation(10), 10, true);
+		planets ~= new Planet(getFreeLocation(10), 10, true);
 	}
 
 	this(float size, Planet[] planets){
-		this(size);
+		this.size = endX = endY = size;
 		this.planets = planets;
 	}
 
@@ -80,5 +81,9 @@ class Map {
 
 	public Map dup(){
 		return new Map(size, planets);
+	}
+
+	public void render(){
+
 	}
 }

@@ -1,4 +1,4 @@
-﻿module src.handlers.window;
+﻿module src.graphics.window;
 
 import core.thread;
 import std.stdio;
@@ -6,6 +6,7 @@ import std.exception;
 import derelict.opengl3.gl3;
 import derelict.opengl3.gl;
 import derelict.glfw3.glfw3;
+import src.states.state;
 
 class Window : Thread {
 	private GLFWmonitor* primaryMonitor;
@@ -13,6 +14,7 @@ class Window : Thread {
 	private GLFWwindow* window;
 	private int width;
 	private int height;
+	public static State currState;
 
 	shared static this(){
 		DerelictGL.load();
@@ -20,10 +22,11 @@ class Window : Thread {
 		DerelictGLFW3.load();
 	}
 
-	this(int width, int height) {
+	this(int width, int height, State defState) {
 		super(&run);
 		this.width = width;
 		this.height = height;
+		currState = defState;
 
 		enforce(glfwInit());
 		//set error listener
@@ -33,8 +36,17 @@ class Window : Thread {
 		mode = glfwGetVideoMode(primaryMonitor);
 		window = glfwCreateWindow(width, height, "Alien Civilisations v0.001", null, null);
 		//set key listener
-		glfwSetKeyCallback(window, &key_callback);
+		//glfwSetKeyCallback(window, &key_callback);
+		glfwSetMouseButtonCallback(window, &mouse_callback);
 	}
+
+	extern (C) static void mouse_callback(GLFWwindow* window, int a, int b, int c) nothrow {
+		try{
+			currState.interact(window, a, b, c, 0);
+		} catch (Exception e){}
+
+	}
+
 	private void run(){
 		//check if window was created before
 		if(!window){
@@ -74,12 +86,14 @@ class Window : Thread {
 		DerelictGL3.unload();
 	}
 
-	extern(C) static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) nothrow{
-		printf("%d", key);
+	extern(C) {
+		void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) nothrow{
+			printf("%d", key);
+			//this.currState.interact(window, key, scancode, action, mods);
+		}
 	}
-
 	extern(C) static void error_callback(int error, const(char)* description) nothrow {
-		printf("%d %s", error, description);
+		printf("%s %s", error, description);
 	}
 }
 

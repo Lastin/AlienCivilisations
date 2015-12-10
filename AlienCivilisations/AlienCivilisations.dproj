@@ -79,7 +79,6 @@
     <Compile Include="src\handlers\gameManager.d" />
     <Compile Include="src\entities\player.d" />
     <Compile Include="src\handlers\commandParser.d" />
-    <Compile Include="src\handlers\window.d" />
     <Compile Include="src\entities\map.d" />
     <Compile Include="src\states\play.d" />
     <Compile Include="src\states\menu.d" />
@@ -89,6 +88,8 @@
     <Compile Include="src\logic\ai.d" />
     <Compile Include="src\containers\kdTree.d" />
     <Compile Include="src\containers\hypotheticalWorld.d" />
+    <Compile Include="src\graphics\window.d" />
+    <Compile Include="src\states\state.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
@@ -97,5 +98,6 @@
     <Folder Include="src\states\" />
     <Folder Include="src\containers\" />
     <Folder Include="src\logic\" />
+    <Folder Include="src\graphics\" />
   </ItemGroup>
 </Project>

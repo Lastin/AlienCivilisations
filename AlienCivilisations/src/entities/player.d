@@ -11,7 +11,7 @@ class Player {
 	private KnowledgeTree knowledgeTree;
 	private bool locked = true;
 
-	this(GameManager gameManager, Planet[] planets, string name, KnowledgeTree knowledgeTree){
+	this(GameManager gameManager, string name, KnowledgeTree knowledgeTree){
 		this.gameManager = gameManager;
 		this.knowledgeTree = knowledgeTree;
 	}
@@ -22,7 +22,13 @@ class Player {
 	public Planet[] getPlanets(){
 		return planets;
 	}
+	public void addPlanet(Planet p){
+		planets ~= p;
+	}
 	public string getName(){
 		return name;
+	}
+	public void makeTurn(){
+
 	}
 }
