@@ -2,25 +2,38 @@
 
 import std.conv;
 import std.random;
+import std.json;
 import src.entities.map;
 import src.entities.player;
 import src.logic.knowledgeTree;
 import src.logic.ai;
+import src.states.state;
+import src.states.menu;
+import src.states.play;
 
 class GameManager {
 	private Map map;
 	private Player[2] players;
 	private int queuePosition;
+	private State state;
 
 	this(){
-		map = new Map(2000, 16);
+		state = new Menu(this);
 	}
 
 	public Map getMap(){
 		return map;
 	}
 
+	public State getState(){
+		return state;
+	}
+	public void setState(State state){
+		this.state = state;
+	}
+
 	public void startNewGame(string pname){
+		map = new Map(2000, 16);
 		uint start_pop = to!int(map.getPlanets[0].getCapacity() / 4);
 		players[0] = new Player(this, pname, new KnowledgeTree());
 		players[0].addPlanet(map.getPlanets[0]);

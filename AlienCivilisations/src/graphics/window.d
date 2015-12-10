@@ -6,15 +6,15 @@ import std.exception;
 import derelict.opengl3.gl3;
 import derelict.opengl3.gl;
 import derelict.glfw3.glfw3;
-import src.states.state;
+import src.handlers.gameManager;
 
-class Window : Thread {
+class Window {
 	private GLFWmonitor* primaryMonitor;
 	private const GLFWvidmode* mode;
 	private GLFWwindow* window;
 	private int width;
 	private int height;
-	public static State currState;
+	private static GameManager gm;
 
 	shared static this(){
 		DerelictGL.load();
@@ -22,25 +22,24 @@ class Window : Thread {
 		DerelictGLFW3.load();
 	}
 
-	this(int width, int height, State state) {
-		super(&run);
+	this(int width, int height) {
+		//super(&run);
 		this.width = width;
 		this.height = height;
-		currState = state;
+		//
 		enforce(glfwInit());
-		//set error listener
-		glfwSetErrorCallback(&error_callback);
 		//create context
 		primaryMonitor = glfwGetPrimaryMonitor();
 		mode = glfwGetVideoMode(primaryMonitor);
 		window = glfwCreateWindow(width, height, "Alien Civilisations v0.001", null, null);
-		//set key listener
+		//set listeners
+		glfwSetErrorCallback(&error_callback);
 		glfwSetKeyCallback(window, &key_callback);
 		glfwSetMouseButtonCallback(window, &mouse_callback);
-	}
-
-	public static void setState(State nstate){
-		this.currState = nstate;
+		glfwSetCharCallback(window, &character_callback);
+		//
+		gm = new GameManager();
+		run();
 	}
 
 	private void run(){
@@ -82,22 +81,34 @@ class Window : Thread {
 		DerelictGL3.unload();
 	}
 
-	extern(C) {
-		static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) nothrow{
-			printf("%d", key);
-			//this.currState.interact(window, key, scancode, action, mods);
-		}
-		static void mouse_callback(GLFWwindow* window, int a, int b, int c) nothrow {
+	extern(C) static {
+		void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) nothrow{
 			try{
-				if(currState !is null){
-					currState.interact(window, a, b, c, 0);
-				}
-			} catch (Exception e){
-				printf("%s", e);
+				this.gm.getState().defaultKeyCallback(key, action);
+			}
+			catch(Exception e){
+
+			}
+
+		}
+		void character_callback(GLFWwindow* window, uint codepoints) nothrow {
+			try{
+				this.gm.getState().defaultCharCallback(codepoints);
+			}
+			catch(Exception e){
+				
 			}
 		}
-		static void error_callback(int error, const(char)* description) nothrow {
-			//printf("%s %s", error, description);
+		void mouse_callback(GLFWwindow* window, int button, int action, int mods) nothrow {
+			try{
+				this.gm.getState().mouseInteract(window, button, action, mods);
+			}
+			catch(Exception e){
+				
+			}
+		}
+		void error_callback(int error, const(char)* description) nothrow {
+			printf("%s %s", error, description);
 		}
 	}
 }

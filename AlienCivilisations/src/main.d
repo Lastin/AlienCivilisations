@@ -13,9 +13,7 @@ void main(string[] args) {
 	//Map map = new Map(1000.0);
 	//GameManager gameManager = new GameManager(map);
 	//createPlanets(gameManager, map);
-	Window window = new Window(1280, 720, new Menu());
-	window.start();
-	//window.setState(new Play());
+	Window window = new Window(1280, 720);
 	//window.join();
 
 	//window.setState(new Menu());
