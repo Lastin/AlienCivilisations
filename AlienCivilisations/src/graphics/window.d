@@ -22,12 +22,11 @@ class Window : Thread {
 		DerelictGLFW3.load();
 	}
 
-	this(int width, int height, State defState) {
+	this(int width, int height, State state) {
 		super(&run);
 		this.width = width;
 		this.height = height;
-		currState = defState;
-
+		currState = state;
 		enforce(glfwInit());
 		//set error listener
 		glfwSetErrorCallback(&error_callback);
@@ -36,15 +35,12 @@ class Window : Thread {
 		mode = glfwGetVideoMode(primaryMonitor);
 		window = glfwCreateWindow(width, height, "Alien Civilisations v0.001", null, null);
 		//set key listener
-		//glfwSetKeyCallback(window, &key_callback);
+		glfwSetKeyCallback(window, &key_callback);
 		glfwSetMouseButtonCallback(window, &mouse_callback);
 	}
 
-	extern (C) static void mouse_callback(GLFWwindow* window, int a, int b, int c) nothrow {
-		try{
-			currState.interact(window, a, b, c, 0);
-		} catch (Exception e){}
-
+	public static void setState(State nstate){
+		this.currState = nstate;
 	}
 
 	private void run(){
@@ -87,13 +83,22 @@ class Window : Thread {
 	}
 
 	extern(C) {
-		void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) nothrow{
+		static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) nothrow{
 			printf("%d", key);
 			//this.currState.interact(window, key, scancode, action, mods);
 		}
-	}
-	extern(C) static void error_callback(int error, const(char)* description) nothrow {
-		printf("%s %s", error, description);
+		static void mouse_callback(GLFWwindow* window, int a, int b, int c) nothrow {
+			try{
+				if(currState !is null){
+					currState.interact(window, a, b, c, 0);
+				}
+			} catch (Exception e){
+				printf("%s", e);
+			}
+		}
+		static void error_callback(int error, const(char)* description) nothrow {
+			//printf("%s %s", error, description);
+		}
 	}
 }
 
