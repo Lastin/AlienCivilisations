@@ -15,13 +15,12 @@ void main(string[] args) {
 	//createPlanets(gameManager, map);
 	Window window = new Window(1280, 720);
 	//window.join();
-
 	//window.setState(new Menu());
 
 	//KnowledgeTree kt = new KnowledgeTree();
 	//writeln(kt.pointsToLevel(2*50000));
 	//CommandParser cp = new CommandParser();
-	GameManager gm = new GameManager();
+	//GameManager gm = new GameManager();
 
 }
 

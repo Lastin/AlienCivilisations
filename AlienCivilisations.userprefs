@@ -2,29 +2,12 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/states/state.d">
     <Files>
-      <File FileName="AlienCivilisations/src/main.d" Line="16" Column="18" />
+      <File FileName="AlienCivilisations/src/main.d" Line="16" Column="2" />
       <File FileName="AlienCivilisations/src/graphics/window.d" Line="36" Column="23" />
       <File FileName="AlienCivilisations/src/states/menu.d" Line="4" Column="29" />
       <File FileName="AlienCivilisations/src/states/play.d" Line="20" Column="3" />
-      <File FileName="AlienCivilisations/src/states/state.d" Line="24" Column="33" />
+      <File FileName="AlienCivilisations/src/states/state.d" Line="26" Column="15" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State name="__root__">
-          <Node name="AlienCivilisations" expanded="True">
-            <Node name="AlienCivilisations" expanded="True">
-              <Node name="src" expanded="True">
-                <Node name="graphics" expanded="True" />
-                <Node name="handlers" expanded="True" />
-                <Node name="states" expanded="True">
-                  <Node name="state.d" selected="True" />
-                </Node>
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
