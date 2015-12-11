@@ -51,7 +51,7 @@ public class KnowledgeTree {
 		}
 	}
 
-	public void develop(int civil_units){
+	public int develop(int civil_units){
 		int points_left = civil_units;
 		while(!queue.empty() || points_left <= 0){
 			Order frnt = queue.front;
@@ -62,6 +62,7 @@ public class KnowledgeTree {
 				queue = queue[1..$];
 			}
 		}
+		return points_left;
 	}
 
 	private double getBonus(Order i){

@@ -90,6 +90,7 @@
     <Compile Include="src\containers\hypotheticalWorld.d" />
     <Compile Include="src\graphics\window.d" />
     <Compile Include="src\states\state.d" />
+    <Compile Include="src\entities\ship.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

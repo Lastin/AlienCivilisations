@@ -49,8 +49,12 @@ class Planet {
 		return format("X: %s \n Y:%s", vec2d.getX(), vec2d.getY());
 	}
 
-	public void setOwnership(Player player, int population){
+	public void setOwner(Player player, int population){
 		this.owner = player;
+	}
+
+	public Player getOwner(){
+		return owner;
 	}
 
 	public void step(){
@@ -89,6 +93,15 @@ class Planet {
 		}
 		int reproductive_units = population[2] + population[3];
 		population[0] = to!int(reproductive_units / 2 * 2.5 * getPopulationSum / food * opf);
+	}
+
+	public int militarise(uint percent){
+		int p = min(percent, 100);
+		int g1 = to!int(p/100 * population[2]);
+		int g2 = to!int(p/100 * population[3]);
+		population[2] -= g1;
+		population[2] -= g2;
+		return g1 + g2;
 	}
 }
 
