@@ -1,12 +1,6 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/containers/hypotheticalWorld.d">
-    <Files>
-      <File FileName="AlienCivilisations/src/entities/player.d" Line="7" Column="25" />
-      <File FileName="AlienCivilisations/src/handlers/gameManager.d" Line="31" Column="19" />
-      <File FileName="AlienCivilisations/src/containers/hypotheticalWorld.d" Line="19" Column="1" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

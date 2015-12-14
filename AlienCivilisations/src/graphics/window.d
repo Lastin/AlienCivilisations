@@ -6,7 +6,9 @@ import std.exception;
 import derelict.opengl3.gl3;
 import derelict.opengl3.gl;
 import derelict.glfw3.glfw3;
+import derelict.freetype.ft;
 import src.handlers.gameManager;
+import src.graphics.fontRenderer;
 
 class Window {
 	private GLFWmonitor* primaryMonitor;
@@ -15,11 +17,13 @@ class Window {
 	private int width;
 	private int height;
 	private static GameManager gm;
+	private static FontRenderer fr;
 
 	shared static this(){
 		DerelictGL.load();
 		DerelictGL3.load();
 		DerelictGLFW3.load();
+		DerelictFT.load();
 	}
 
 	this(int width, int height) {
@@ -38,7 +42,12 @@ class Window {
 		glfwSetMouseButtonCallback(window, &mouse_callback);
 		glfwSetCharCallback(window, &character_callback);
 		//
-		gm = new GameManager();
+		int widthMM, heightMM;
+		glfwGetMonitorPhysicalSize(primaryMonitor, &widthMM, &heightMM);
+		int wdpi = std.conv.to!int(mode.width / (widthMM / 25.4));
+		int hdpi = std.conv.to!int(mode.height / (heightMM / 25.4));
+		fr = new FontRenderer(wdpi, hdpi, 16);
+		gm = new GameManager(fr);
 		run();
 	}
 
@@ -64,21 +73,28 @@ class Window {
 			glOrtho(-ratio, ratio, -1.0f, 1.0f, 1.0f, -1.0f);
 			glMatrixMode(GL_PROJECTION_MATRIX);
 			glLoadIdentity();
-			glRotatef(glfwGetTime() * 50.0f, 0.0f, 0.0f, 1.0f);
-			glBegin(GL_TRIANGLES);
-			glColor3f(1.0f, 0.0f, 0.0f);
-			glVertex3f(-0.6f, -0.4f, 0.0f);
-			glColor3f(0.0f, 1.0f, 0.0f);
-			glVertex3f(0.6f, -0.4f, 0.0f);
-			glColor3f(0.0f, 0.0f, 1.0f);
-			glVertex3f(0.0f, 0.6f, 0.0f);
-			glEnd();
+			drawTriangle();
+			this.gm.getState.renderConsole(window, width, height);
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		DerelictGL3.unload();
+	}
+
+	private void drawTriangle(){
+		glPushMatrix();
+		glRotatef(glfwGetTime() * 50.0f, 0.0f, 0.0f, 1.0f);
+		glBegin(GL_TRIANGLES);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glVertex3f(-0.6f, -0.4f, 0.0f);
+		glColor3f(0.0f, 1.0f, 0.0f);
+		glVertex3f(0.6f, -0.4f, 0.0f);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		glVertex3f(0.0f, 0.6f, 0.0f);
+		glEnd();
+		glPopMatrix();
 	}
 
 	extern(C) static {

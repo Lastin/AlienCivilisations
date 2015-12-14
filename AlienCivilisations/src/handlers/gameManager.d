@@ -10,14 +10,17 @@ import src.logic.ai;
 import src.states.state;
 import src.states.menu;
 import src.states.play;
+import src.graphics.fontRenderer;
 
 class GameManager {
+	private FontRenderer fontRenderer;
 	private Map map;
 	private Player[2] players;
 	private int queuePosition;
 	private State state;
 
-	this(){
+	this(FontRenderer fr){
+		this.fontRenderer = fr;
 		state = new Menu(this);
 	}
 
@@ -46,5 +49,9 @@ class GameManager {
 		players[1].addPlanet(map.getPlanets[1]);
 		map.getPlanets[0].setOwner(players[1], start_pop);
 		queuePosition = to!int(dice(0.5, 0.5));
+	}
+
+	public FontRenderer getFontRenderer(){
+		return fontRenderer;
 	}
 }

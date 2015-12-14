@@ -12,7 +12,7 @@ class Play : State {
 	public void render(){
 
 	}
-	public void keyInteract(GLFWwindow* window, int key, int scancode, int action, int mods){
+	public void keyInteract(int key, int action){
 		writeln("key in play");
 	}
 	public void mouseInteract(GLFWwindow* window, int button, int action, int mods){

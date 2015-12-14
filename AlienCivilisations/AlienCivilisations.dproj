@@ -22,6 +22,7 @@
 -Llib/derelict/DerelictGL3/lib/libDerelictGL3.a
 -Llib/derelict/DerelictGLFW3/lib/libDerelictGLFW3.a
 -Llib/derelict/DerelictUtil/lib/libDerelictUtil.a
+-Llib/derelict/DerelictFT/lib/libDerelictFT.a
 -L-ldl -lglfw3
 </ExtraLinkerArguments>
     <Libs>
@@ -30,6 +31,7 @@
         <Lib>-Ilib/derelict/DerelictGL3/source</Lib>
         <Lib>-Ilib/derelict/DerelictUtil/source</Lib>
         <Lib>-Ilib/derelict/DerelictGLFW3/source</Lib>
+        <Lib>-Ilib/derelict/DerelictFT/source</Lib>
       </Libs>
     </Libs>
     <Externalconsole>true</Externalconsole>
@@ -91,6 +93,7 @@
     <Compile Include="src\graphics\window.d" />
     <Compile Include="src\states\state.d" />
     <Compile Include="src\entities\ship.d" />
+    <Compile Include="src\graphics\fontRenderer.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
