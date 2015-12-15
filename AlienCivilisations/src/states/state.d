@@ -41,6 +41,7 @@ class State {
 			keyInteract(key, action);
 		}
 	}
+
 	public void defaultCharCallback(uint codepoint){
 		if(consoleEnabled && codepoint != GLFW_KEY_GRAVE_ACCENT){
 			write(to!char(codepoint));
@@ -60,7 +61,7 @@ class State {
 		glVertex2f(0.5, -0.5);
 		glVertex2f(0.5, 1);
 		glEnd();
-		//gm.getFontRenderer.render_text(accChars, 0, 0);
+		gm.getFontRenderer.render_text("test", 0, 0);
 	}
 }
 

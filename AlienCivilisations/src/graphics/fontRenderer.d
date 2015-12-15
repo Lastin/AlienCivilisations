@@ -36,11 +36,10 @@ class FontRenderer {
 					horizontal_dpi, //horizontal device resolution
 					vertical_dpi  	//vertical device resolution
 				);
-
 		//error = FT_Select_Charmap(face,FT_ENCODING_BIG5);
 	}
 
-	public void render_text(const uint[] codepoints, float x, float y){
+	public void render_text(uint[] codepoints, float x, float y){
 		string s = cast(string)codepoints;
 		render_text(s, x, y);
 	}
@@ -64,6 +63,7 @@ class FontRenderer {
 				[x2+w, -y2,   1, 1],
 			];
 			glBufferData(GL_ARRAY_BUFFER, box.sizeof, &box, GL_DYNAMIC_DRAW);
+			//glBufferSubData(GL_ARRAY_BUFFER, 0, box.sizeof, &box);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 			x += (glyph.advance.x >> 6) * sx;
 			y += (glyph.advance.y >> 6) * sy;

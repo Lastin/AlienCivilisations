@@ -123,6 +123,7 @@ class Window {
 			}
 		}
 		void error_callback(int error, const(char)* description) nothrow {
+			printf("Error");
 			printf("%s %s", error, description);
 		}
 	}
