@@ -59,9 +59,8 @@ class State {
 		glVertex2f(-1, -0.5);
 		glVertex2f(0.5, -0.5);
 		glVertex2f(0.5, 1);
-		gm.getFontRenderer().render_text2(cast(string)accChars,30,30, 10, 10);
 		glEnd();
-
+		//gm.getFontRenderer.render_text(accChars, 0, 0);
 	}
 }
 

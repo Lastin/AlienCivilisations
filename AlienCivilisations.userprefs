@@ -1,6 +1,13 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/states/state.d">
+    <Files>
+      <File FileName="AlienCivilisations/src/graphics/fontRenderer.d" Line="41" Column="3" />
+      <File FileName="AlienCivilisations/src/states/state.d" Line="63" Column="52" />
+      <File FileName="AlienCivilisations/src/graphics/window.d" Line="77" Column="28" />
+      <File FileName="AlienCivilisations/lib/derelict/DerelictGL3/source/derelict/opengl3/functions.d" Line="199" Column="49" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

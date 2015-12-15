@@ -44,9 +44,8 @@ class Window {
 		//
 		int widthMM, heightMM;
 		glfwGetMonitorPhysicalSize(primaryMonitor, &widthMM, &heightMM);
-		int wdpi = std.conv.to!int(mode.width / (widthMM / 25.4));
-		int hdpi = std.conv.to!int(mode.height / (heightMM / 25.4));
-		fr = new FontRenderer(wdpi, hdpi, 16);
+
+		fr = new FontRenderer(16, width, height, widthMM, heightMM);
 		gm = new GameManager(fr);
 		run();
 	}
