@@ -15,13 +15,13 @@
     </DependentProjectIds>
     <Includes>
       <Includes>
-        <Path>AlienCivilisations/lib/dlangui/src</Path>
-        <Path>AlienCivilisations/lib/dlangui/deps/gl3n</Path>
-        <Path>AlienCivilisations/lib/dlangui/deps/DerelictSDL2/source</Path>
-        <Path>AlienCivilisations/lib/dlangui/deps/DerelictFT/source</Path>
-        <Path>AlienCivilisations/lib/dlangui/deps/DerelictGL3/source</Path>
-        <Path>AlienCivilisations/lib/dlangui/deps/DerelictUtil/source</Path>
-        <Path>AlienCivilisations/lib/dlangui/3rdparty</Path>
+        <Path>lib/dlangui/src</Path>
+        <Path>lib/dlangui/deps/gl3n</Path>
+        <Path>lib/dlangui/deps/DerelictSDL2/source</Path>
+        <Path>lib/dlangui/deps/DerelictFT/source</Path>
+        <Path>lib/dlangui/deps/DerelictGL3/source</Path>
+        <Path>lib/dlangui/deps/DerelictUtil/source</Path>
+        <Path>lib/dlangui/3rdparty</Path>
       </Includes>
     </Includes>
   </PropertyGroup>
@@ -69,6 +69,11 @@
       </Libs>
     </Libs>
     <Externalconsole>true</Externalconsole>
+    <ExtraCompilerArguments>-Jviews
+-Jviews/res
+-Jviews/res/i18n
+-Jviews/res/mdpi
+-Jviews/res/hdpi</ExtraCompilerArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Unittest|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -89,6 +94,11 @@
       </Libs>
     </Libs>
     <Externalconsole>true</Externalconsole>
+    <ExtraCompilerArguments>-Jviews
+-Jviews/res
+-Jviews/res/i18n
+-Jviews/res/mdpi
+-Jviews/res/hdpi</ExtraCompilerArguments>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\main.d" />
