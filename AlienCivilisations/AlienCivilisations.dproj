@@ -8,33 +8,48 @@
     <PreferOneStepBuild>true</PreferOneStepBuild>
     <UseDefaultCompiler>true</UseDefaultCompiler>
     <IncrementalLinking>true</IncrementalLinking>
+    <DependentProjectIds>
+      <DependentProjectIds>
+        <String>{A38BEF21-AAFE-4115-A978-63B7C8C2FBD1}</String>
+      </DependentProjectIds>
+    </DependentProjectIds>
+    <Includes>
+      <Includes>
+        <Path>AlienCivilisations/lib/dlangui/src</Path>
+        <Path>AlienCivilisations/lib/dlangui/deps/gl3n</Path>
+        <Path>AlienCivilisations/lib/dlangui/deps/DerelictSDL2/source</Path>
+        <Path>AlienCivilisations/lib/dlangui/deps/DerelictFT/source</Path>
+        <Path>AlienCivilisations/lib/dlangui/deps/DerelictGL3/source</Path>
+        <Path>AlienCivilisations/lib/dlangui/deps/DerelictUtil/source</Path>
+        <Path>AlienCivilisations/lib/dlangui/3rdparty</Path>
+      </Includes>
+    </Includes>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug</OutputPath>
     <ObjectsDirectory>obj/Debug</ObjectsDirectory>
-    <LinkinThirdPartyLibraries>false</LinkinThirdPartyLibraries>
+    <LinkinThirdPartyLibraries>true</LinkinThirdPartyLibraries>
     <UnittestMode>false</UnittestMode>
     <OutputName>AlienCivilisations</OutputName>
     <Target>Executable</Target>
     <DebugLevel>0</DebugLevel>
-    <ExtraLinkerArguments>lib/derelict/DerelictSDL2/lib/libDerelictSDL2.a
--Llib/derelict/DerelictGL3/lib/libDerelictGL3.a
--Llib/derelict/DerelictGLFW3/lib/libDerelictGLFW3.a
--Llib/derelict/DerelictUtil/lib/libDerelictUtil.a
--Llib/derelict/DerelictFT/lib/libDerelictFT.a
--L-ldl -lglfw3
+    <ExtraLinkerArguments>-L-ldl
 </ExtraLinkerArguments>
-    <Libs>
-      <Libs>
-        <Lib>-Ilib/derelict/DerelictSDL2/source</Lib>
-        <Lib>-Ilib/derelict/DerelictGL3/source</Lib>
-        <Lib>-Ilib/derelict/DerelictUtil/source</Lib>
-        <Lib>-Ilib/derelict/DerelictGLFW3/source</Lib>
-        <Lib>-Ilib/derelict/DerelictFT/source</Lib>
-      </Libs>
-    </Libs>
     <Externalconsole>true</Externalconsole>
+    <ExtraCompilerArguments>-Jviews
+-Jviews/res
+-Jviews/res/i18n
+-Jviews/res/mdpi
+-Jviews/res/hdpi</ExtraCompilerArguments>
+    <VersionIds>
+      <VersionIds>
+        <String>USE_OPENGL</String>
+        <String>USE_SDL</String>
+        <String>USE_FREETYPE</String>
+        <String>EmbedStandardResources</String>
+      </VersionIds>
+    </VersionIds>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release</OutputPath>
@@ -90,10 +105,8 @@
     <Compile Include="src\logic\ai.d" />
     <Compile Include="src\containers\kdTree.d" />
     <Compile Include="src\containers\hypotheticalWorld.d" />
-    <Compile Include="src\graphics\window.d" />
     <Compile Include="src\states\state.d" />
     <Compile Include="src\entities\ship.d" />
-    <Compile Include="src\graphics\fontRenderer.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
@@ -102,6 +115,5 @@
     <Folder Include="src\states\" />
     <Folder Include="src\containers\" />
     <Folder Include="src\logic\" />
-    <Folder Include="src\graphics\" />
   </ItemGroup>
 </Project>

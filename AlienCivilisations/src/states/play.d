@@ -1,7 +1,6 @@
 ﻿module src.states.play;
 
 import std.stdio;
-import derelict.glfw3.glfw3;
 import src.states.state;
 import src.handlers.gameManager;
 
@@ -15,7 +14,7 @@ class Play : State {
 	public void keyInteract(int key, int action){
 		writeln("key in play");
 	}
-	public void mouseInteract(GLFWwindow* window, int button, int action, int mods){
+	public void mouseInteract(int button, int action, int mods){
 		writeln("mouse in play");
 	}
 }
