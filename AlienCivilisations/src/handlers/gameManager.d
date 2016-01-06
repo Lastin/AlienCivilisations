@@ -7,7 +7,6 @@ import src.entities.map;
 import src.entities.player;
 import src.logic.knowledgeTree;
 import src.logic.ai;
-import src.states.gameState;
 import src.states.menu;
 import src.states.play;
 
@@ -15,17 +14,9 @@ class GameManager {
 	private Map map;
 	private Player[2] players;
 	private int queuePosition;
-	private GameState state;
 
 	public Map getMap(){
 		return map;
-	}
-
-	public GameState getState(){
-		return state;
-	}
-	public void setState(GameState state){
-		this.state = state;
 	}
 
 	public Player getCurrentPlayer(){

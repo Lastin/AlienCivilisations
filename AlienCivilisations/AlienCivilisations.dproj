@@ -116,7 +116,7 @@
     <Compile Include="src\containers\kdTree.d" />
     <Compile Include="src\containers\hypotheticalWorld.d" />
     <Compile Include="src\entities\ship.d" />
-    <Compile Include="src\states\gameState.d" />
+    <Compile Include="src\states\gameFrame.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

@@ -1,10 +1,11 @@
 ﻿module src.main;
 
 import dlangui;
+import std.stdio;
 import src.states.menu;
 import src.states.play;
-import src.states.gameState;
 import src.handlers.gameManager;
+import src.states.gameFrame;
 
 mixin APP_ENTRY_POINT;
 
@@ -32,8 +33,9 @@ extern (C) int UIAppMain(string[] args){
 		window.close();
 		return true;
 	};*/
+	bool console_enabled = false;
 	GameManager gm = new GameManager();
-	window.mainWidget = new Menu(gm);
+	window.mainWidget = new GameFrame(gm);
 	window.show();
 	return Platform.instance.enterMessageLoop();
 }
