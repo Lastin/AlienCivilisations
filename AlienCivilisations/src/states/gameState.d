@@ -1,11 +1,12 @@
-﻿module src.states.state;
+﻿module src.states.gameState;
 
 import std.stdio;
 import std.range;
 import std.conv;
 import src.handlers.gameManager;
+import dlangui;
 
-class State {
+class GameState : VerticalLayout {
 	GameManager gm;
 	bool consoleEnabled = false;
 	uint[] accChars;

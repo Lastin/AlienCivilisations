@@ -1,10 +1,10 @@
 ﻿module src.states.play;
 
 import std.stdio;
-import src.states.state;
+import src.states.gameState;
 import src.handlers.gameManager;
 
-class Play : State {
+class Play : GameState {
 	this(GameManager gm){
 		super(gm);
 	}
