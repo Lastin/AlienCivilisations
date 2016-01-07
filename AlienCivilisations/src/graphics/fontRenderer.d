@@ -21,7 +21,9 @@ class FontRenderer {
 		sy = 2.0 / height;
 		//
 		auto error = FT_Init_FreeType(&library);
-		if(error){}
+		if(error){
+			writeln("Library not initialised");
+		}
 		error = FT_New_Face(library, "/etc/alternatives/fonts-japanese-gothic.ttf", 0, &face);
 		if(error == FT_Err_Unknown_File_Format){
 			writeln("Unknown font file format");
@@ -39,34 +41,31 @@ class FontRenderer {
 		//error = FT_Select_Charmap(face,FT_ENCODING_BIG5);
 	}
 
-	public void render_text(uint[] codepoints, float x, float y){
+	public void render_text(uint[] codepoints, int x, int y){
 		string s = cast(string)codepoints;
 		render_text(s, x, y);
 	}
 
-	public void render_text(string str, float x, float y){
-		//writeln(str);
-		FT_GlyphSlot glyph = face.glyph;
-		ulong p;
-		for(int i=0; i<str.length; i++){
-			if(FT_Load_Char(face, p, FT_LOAD_RENDER))
-				continue;
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, glyph.bitmap.width, glyph.bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, glyph.bitmap.buffer);
-			float x2 = x + glyph.bitmap_left * sx;
-			float y2 = -y - face.glyph.bitmap_top * sy;
-			float w = glyph.bitmap.width * sx;
-			float h = glyph.bitmap.rows * sy;
-			GLfloat[4][4] box = [
-				[x2,   -y2,   0, 0],
-				[x2+w, -y2,   1, 0],
-				[x2,   -y2-h, 0, 1],
-				[x2+w, -y2,   1, 1],
-			];
-			glBufferData(GL_ARRAY_BUFFER, box.sizeof, &box, GL_DYNAMIC_DRAW);
-			//glBufferSubData(GL_ARRAY_BUFFER, 0, box.sizeof, &box);
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-			x += (glyph.advance.x >> 6) * sx;
-			y += (glyph.advance.y >> 6) * sy;
+	public void render_text(string str, int pen_x, int pen_y){
+		writeln("rendering :" ~ str);
+		FT_GlyphSlot slot = face.glyph;
+		FT_UInt glyph_index;
+		foreach(char c; str){
+			glyph_index = FT_Get_Char_Index(face, c);
+			auto error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
+			if(error){ continue; }
+			drawBitmap(
+				&slot.bitmap,
+				pen_x + slot.bitmap_left,
+				pen_y + slot.bitmap_top);
+			pen_x += slot.advance.x >> 6;
 		}
+	}
+
+	public void drawBitmap(FT_Bitmap* slot, int x, int y){
+		writeln(slot);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glColor3f(1.0, 1.0, 1.0);
+		glRasterPos2d(x, y);
 	}
 }

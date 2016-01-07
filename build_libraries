@@ -1,0 +1,12 @@
+#!/bin/bash
+# Handy script for cloning repositories
+cd AlienCivilisations/lib/derelict/DerelictFT
+dub build
+cd ../DerelictGL3
+dub build
+cd ../DerelictGLFW3
+dub build
+cd ../DerelictSDL2
+dub build
+cd ../DerelictUtil
+dub build
