@@ -10,7 +10,7 @@ class HypotheticalWorld {
 	private Planet[] pplanets;
 	private Map map;
 	this(KnowledgeTree kt, Planet[] pplanets, Map map){
-		this.kt = kt.dup;
+		this.kt = kt.dup();
 		this.pplanets = pplanets.dup();
 		this.map = map.dup();
 	}

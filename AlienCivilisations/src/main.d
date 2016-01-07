@@ -4,14 +4,16 @@ import dlangui;
 import std.stdio;
 import src.states.menu;
 import src.states.play;
-import src.states.gameFrame;
+import src.gameFrame;
 
 mixin APP_ENTRY_POINT;
 
 extern (C) int UIAppMain(string[] args){
-	Window window = Platform.instance.createWindow("Alien Civilisations", null, WindowFlag.Resizable, 1024, 768);
+	int width = 1024;
+	int height = 768;
+	Window window = Platform.instance.createWindow("Alien Civilisations", null, WindowFlag.Resizable, width, height);
 	GameFrame gameframe = new GameFrame();
-	gameframe.setState(new Menu(false, gameframe));
+	gameframe.setState(new Menu(gameframe));
 	window.mainWidget = gameframe;
 	window.show();
 	return Platform.instance.enterMessageLoop();
