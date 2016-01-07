@@ -2,7 +2,6 @@
 
 import src.containers.vector2d;
 import std.conv;
-import src.handlers.gameManager;
 import src.entities.player;
 import src.logic.knowledgeTree;
 import std.algorithm;

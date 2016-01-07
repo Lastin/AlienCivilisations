@@ -1,26 +1,24 @@
 ﻿module src.states.gameFrame;
 
 import std.stdio;
-import src.handlers.gameManager;
 import src.states.menu;
 import dlangui;
 
 class GameFrame : AppFrame {
-	GameManager gm;
 	FrameLayout fl;
 	VerticalLayout console;
-	this(GameManager gm){
-		this.gm = gm;
+	Menu menu;
+	this(){
 		backgroundColor("#004d4d");
 		fl = new FrameLayout();
-		fl.addChild(new Menu(gm, false));
-		initialiseConsole();
+		console = initialiseConsole();
+		fl.addChild(console);
 		addChild(fl);
 		keyEvent = delegate (Widget source, KeyEvent event) => showConsole(source, event);
 	}
 
-	private void initialiseConsole(){
-		console = new VerticalLayout();
+	private VerticalLayout initialiseConsole(){
+		VerticalLayout console = new VerticalLayout();
 		console.backgroundColor("#173636");
 		console.textColor("#ffffff");
 		EditBox c_output = new EditBox("c_output", "asdas"d);
@@ -32,8 +30,8 @@ class GameFrame : AppFrame {
 		console.addChild(c_output);
 		console.addChild(c_input);
 		console.visibility = Visibility.Invisible;
-		fl.addChild(console);
 		c_input.keyEvent = delegate (Widget source, KeyEvent event) => handleCommand(source, event);
+		return console;
 	}
 
 	bool showConsole(Widget source, KeyEvent event){
@@ -61,5 +59,11 @@ class GameFrame : AppFrame {
 			return true;
 		}
 		return false;
+	}
+
+	public void setState(Widget widget){
+		//fl.removeAllChildren();
+		fl.addChild(console);
+		fl.addChild(widget);
 	}
 }

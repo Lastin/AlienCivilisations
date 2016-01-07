@@ -1,6 +1,5 @@
 ﻿module src.logic.branch;
 
-import src.handlers.gameManager;
 import std.algorithm;
 import src.logic.knowledgeTree;
 

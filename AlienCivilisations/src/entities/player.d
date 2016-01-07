@@ -2,7 +2,6 @@
 
 import src.entities.planet;
 import src.entities.ship;
-import src.handlers.gameManager;
 import src.logic.knowledgeTree;
 import src.logic.branch;
 
@@ -11,11 +10,9 @@ class Player {
 	private Ship[] ships;
 	private uint military_units = 0;
 	private string name;
-	private GameManager gameManager;
 	private KnowledgeTree knowledgeTree;
 
-	this(GameManager gameManager, string name, KnowledgeTree knowledgeTree){
-		this.gameManager = gameManager;
+	this(string name, KnowledgeTree knowledgeTree){
 		this.knowledgeTree = knowledgeTree;
 	}
 

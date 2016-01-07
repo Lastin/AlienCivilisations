@@ -103,7 +103,6 @@
   <ItemGroup>
     <Compile Include="src\main.d" />
     <Compile Include="src\entities\planet.d" />
-    <Compile Include="src\handlers\gameManager.d" />
     <Compile Include="src\entities\player.d" />
     <Compile Include="src\handlers\commandParser.d" />
     <Compile Include="src\entities\map.d" />
