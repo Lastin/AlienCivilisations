@@ -1,10 +1,11 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/graphics/fontRenderer.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/states/play.d">
     <Files>
-      <File FileName="AlienCivilisations/src/graphics/fontRenderer.d" Line="58" Column="16" />
-      <File FileName="AlienCivilisations/src/states/state.d" Line="64" Column="39" />
-      <File FileName="AlienCivilisations/src/graphics/window.d" Line="99" Column="15" />
+      <File FileName="AlienCivilisations/src/states/play.d" Line="79" Column="79" />
+      <File FileName="AlienCivilisations/src/states/menu.d" Line="1" Column="1" />
+      <File FileName="AlienCivilisations/src/containers/hypotheticalWorld.d" Line="1" Column="1" />
+      <File FileName="AlienCivilisations/src/entities/map.d" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
