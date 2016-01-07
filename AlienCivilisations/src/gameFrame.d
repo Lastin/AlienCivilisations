@@ -3,6 +3,8 @@
 import std.stdio;
 import src.states.menu;
 import dlangui;
+import src.entities.map;
+import src.states.play;
 
 class GameFrame : AppFrame {
 	FrameLayout fl;
@@ -10,7 +12,6 @@ class GameFrame : AppFrame {
 
 	this(){
 		super();
-		backgroundColor("#004d4d");
 		fl = new FrameLayout();
 		layoutHeight = FILL_PARENT;
 		fl.layoutHeight = FILL_PARENT;
@@ -60,7 +61,6 @@ class GameFrame : AppFrame {
 			return true;
 		}
 		else {
-
 		}
 		return false;
 	}

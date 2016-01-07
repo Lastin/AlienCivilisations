@@ -22,6 +22,10 @@ class Map : CanvasWidget{
 		this(size);
 		planets ~= new Planet(getFreeLocation(10), 10, true);
 		planets ~= new Planet(getFreeLocation(10), 10, true);
+		for(int i=2; i<planetCount; i++){
+			float radius = uniform(1, 20);
+			planets ~= new Planet(getFreeLocation(radius), radius, dice(0.5, 0.5)>0);
+		}
 	}
 
 	this(float size, Planet[] planets){

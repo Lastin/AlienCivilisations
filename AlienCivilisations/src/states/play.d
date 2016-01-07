@@ -13,8 +13,9 @@ import src.states.menu;
 import src.states.play;
 import src.states.gameState;
 import src.gameFrame;
+import src.entities.planet;
 
-class Play : TableLayout, GameState{
+class Play : HorizontalLayout, GameState{
 	private Map map;
 	private Player[2] players;
 	private int queuePosition;
@@ -22,37 +23,58 @@ class Play : TableLayout, GameState{
 
 	this(GameFrame gameFrame){
 		this.gameFrame = gameFrame;
-		auto btn = new Button(null, "Test Button");
-		btn.click = delegate(Widget src){
-			writeln("test");
-			return true;
-		};
-		VerticalLayout vl = new VerticalLayout();
-		//vl.addChild(btn);
-		//addChild(vl);
 		startNewGame("HUMAN");
+		Planet[] planets = map.getPlanets();
+		VerticalLayout col1 = new VerticalLayout();
+		col1.addChild(new TextWidget("currentPlayer", players[queuePosition].getName()));
+		TableLayout table = new TableLayout();
+		col1.padding = 10;
+		table.padding = 10;
+		Button inhabit = new Button("inhabit", "Inhabit"d);
+		for(int i=0; i<planets.length; i++){
+			Button btn = new Button(to!string(i), "Planet " ~ to!dstring(i));
+			btn.click = delegate (Widget src){
+				auto p = planets[to!int(src.id)];
+				table.childById("breathable").text = p.isBreathable ? "true" : "false";
+				dstring capacity = to!dstring(p.getCapacity);
+				table.childById("capacity").text = capacity;
+				dstring population = to!dstring(p.getPopulationSum);
+				table.childById("population").text = population;
+				dstring radius = to!dstring(p.getRadius);
+				table.childById("radius").text = radius;
+				Player owner = p.getOwner;
+				table.childById("owner").text = owner ? to!dstring(owner.getName) : "No owner";
+				if(!owner){
+					inhabit.visibility = Visibility.Visible;
+					inhabit.click = delegate (Widget src){
+						//TODO: inhabit option
+						writeln("inhabit button for planet" ~ to!string(i));
+						return true;
+					};
+				} else {
+					table.childById("inhabit").visibility = Visibility.Gone;
+				}
+				return true;
+			};
+			col1.addChild(btn);
+		}
 
-		CanvasWidget canvas = new CanvasWidget("canvas");
-		canvas.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
-		canvas.onDrawListener = delegate(CanvasWidget canvas, DrawBuf buf, Rect rc) {
-			buf.fill(0xFFFFFF);
-			int x = rc.left;
-			int y = rc.top;
-			buf.fillRect(Rect(x+20, y+20, x+150, y+200), 0x80FF80);
-			buf.fillRect(Rect(x+90, y+80, x+250, y+250), 0x80FF80FF);
-			canvas.font.drawText(buf, x + 40, y + 50, "fillRect()"d, 0xC080C0);
-			buf.drawFrame(Rect(x + 400, y + 30, x + 550, y + 150), 0x204060, Rect(2,3,4,5), 0x80704020);
-			canvas.font.drawText(buf, x + 400, y + 5, "drawFrame()"d, 0x208020);
-			canvas.font.drawText(buf, x + 300, y + 100, "drawPixel()"d, 0x000080);
-			for (int i = 0; i < 80; i++)
-				buf.drawPixel(x+300 + i * 4, y+140 + i * 3 % 100, 0xFF0000 + i * 2);
-			canvas.font.drawText(buf, x + 200, y + 250, "drawLine()"d, 0x800020);
-			for (int i = 0; i < 40; i+=3)
-				buf.drawLine(Point(x+200 + i * 4, y+290), Point(x+150 + i * 7, y+420 + i * 2), 0x008000 + i * 5);
-		};
-		//addChild(canvas);
-		addChild(new Button(null, "test"));
+		table.colCount = 2;
+		table.addChild(new TextWidget(null, "breathable:"d).fontSize(16));
+		table.addChild(new TextWidget("breathable", ""d).fontSize(16));
+		table.addChild(new TextWidget(null, "capacity:"d).fontSize(16));
+		table.addChild(new TextWidget("capacity", ""d).fontSize(16));
+		table.addChild(new TextWidget(null, "population:"d).fontSize(16));
+		table.addChild(new TextWidget("population", ""d).fontSize(16));
+		table.addChild(new TextWidget(null, "radius:"d).fontSize(16));
+		table.addChild(new TextWidget("radius", ""d).fontSize(16));
+		table.addChild(new TextWidget(null, "owner:"d).fontSize(16));
+		table.addChild(new TextWidget("owner", ""d).fontSize(16));
+		table.addChild(inhabit).visibility = Visibility.Gone;
+		addChild(col1);
+		addChild(table);
 	}
+
 	this(GameFrame gameFrame, Map map, Player[] players, int qpos){
 		this(gameFrame);
 		//TODO: constructor reading from json
@@ -77,7 +99,7 @@ class Play : TableLayout, GameState{
 		map.getPlanets[0].setOwner(players[0], start_pop);
 		players[1] = new AI(new KnowledgeTree);
 		players[1].addPlanet(map.getPlanets[1]);
-		map.getPlanets[0].setOwner(players[1], start_pop);
+		map.getPlanets[1].setOwner(players[1], start_pop);
 		queuePosition = to!int(dice(0.5, 0.5));
 	}
 

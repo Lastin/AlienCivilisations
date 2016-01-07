@@ -14,6 +14,7 @@ class Player {
 
 	this(string name, KnowledgeTree knowledgeTree){
 		this.knowledgeTree = knowledgeTree;
+		this.name = name;
 	}
 
 	public KnowledgeTree getKnowledgeTree(){
