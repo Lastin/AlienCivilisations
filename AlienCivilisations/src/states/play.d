@@ -1,19 +1,18 @@
 ﻿module src.states.play;
 
 import dlangui;
-import std.stdio;
-import std.conv;
-import std.random;
-import std.json;
 import src.entities.map;
+import src.entities.planet;
 import src.entities.player;
-import src.logic.knowledgeTree;
+import src.gameFrame;
 import src.logic.ai;
+import src.logic.knowledgeTree;
+import src.states.gameState;
 import src.states.menu;
 import src.states.play;
-import src.states.gameState;
-import src.gameFrame;
-import src.entities.planet;
+import std.conv;
+import std.random;
+import std.stdio;
 
 class Play : HorizontalLayout, GameState{
 	private Map map;
@@ -31,6 +30,7 @@ class Play : HorizontalLayout, GameState{
 		col1.padding = 10;
 		table.padding = 10;
 		Button inhabit = new Button("inhabit", "Inhabit"d);
+
 		for(int i=0; i<planets.length; i++){
 			Button btn = new Button(to!string(i), "Planet " ~ to!dstring(i));
 			btn.click = delegate (Widget src){
@@ -94,12 +94,16 @@ class Play : HorizontalLayout, GameState{
 	public void startNewGame(string pname){
 		map = new Map(2000, 16);
 		uint start_pop = to!int(map.getPlanets[0].getCapacity() / 4);
+		uint[8] population = new uint[8];
+		for(int i=0; i<population.length; i++){
+			population[i] = to!int(start_pop/8);
+		}
 		players[0] = new Player(pname, new KnowledgeTree());
 		players[0].addPlanet(map.getPlanets[0]);
-		map.getPlanets[0].setOwner(players[0], start_pop);
+		map.getPlanets[0].setOwner(players[0], population);
 		players[1] = new AI(new KnowledgeTree);
 		players[1].addPlanet(map.getPlanets[1]);
-		map.getPlanets[1].setOwner(players[1], start_pop);
+		map.getPlanets[1].setOwner(players[1], population);
 		queuePosition = to!int(dice(0.5, 0.5));
 	}
 

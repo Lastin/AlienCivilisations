@@ -33,10 +33,10 @@ class Player {
 		//int
 	}
 	public void makeShip(){
-		int sci = knowledgeTree.getBranch("Science").getBranchLevel();
-		int eng = knowledgeTree.getBranch("Energy").getBranchLevel();
-		int mil = knowledgeTree.getBranch("Military").getBranchLevel();
-		Ship s = new Ship(sci, eng, mil);
+		uint sci = knowledgeTree.getBranch("Science").getBranchLevel();
+		uint eng = knowledgeTree.getBranch("Energy").getBranchLevel();
+		uint mil = knowledgeTree.getBranch("Military").getBranchLevel();
+		Ship s = new Ship(this, sci, eng, mil);
 		military_units -= s.addUnits(military_units);
 		if(!s.empty()){
 			ships ~= s;
