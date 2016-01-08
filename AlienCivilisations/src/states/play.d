@@ -19,13 +19,14 @@ class Play : VerticalLayout, GameState{
 	private Map map;
 	private Player[2] players;
 	private int queuePosition;
-	static GameFrame* gameFrame;
+	static GameFrame gameFrame;
 	private ListWidget planetsList;
 	private WidgetListAdapter planetsListAdapter;
 	private HorizontalLayout horizontalPanel;
 	private TableLayout planetInfo;
 
-	this(GameFrame* gameFrame){
+	this(GameFrame gameFrame){
+		super("play");
 		this.gameFrame = gameFrame;
 		startNewGame("HUMAN");
 		backgroundColor(0x00254d7D);
@@ -60,9 +61,10 @@ class Play : VerticalLayout, GameState{
 			planetsListAdapter.add(btn);
 		}
 		planetsList.itemSelected = delegate(Widget source, int index) => onPlanetSelect(source, index, inhabitBtn);
+		keyEvent = delegate (Widget source, KeyEvent event) => handleKeyInput(source, event);
 	}
 
-	this(GameFrame* gameFrame, Map map, Player[] players, int qpos){
+	this(GameFrame gameFrame, Map map, Player[] players, int qpos){
 		this(gameFrame);
 		//TODO: constructor reading from json
 		this.map = map;
@@ -105,9 +107,9 @@ class Play : VerticalLayout, GameState{
 	}
 
 	public bool handleKeyInput(Widget source, KeyEvent event){
-		writeln("action");
 		if(event.action == KeyAction.KeyDown && event.keyCode == KeyCode.ESCAPE){
-			gameFrame.setState(new Menu(gameFrame, this));
+			//gameFrame.setState(new Menu(gameFrame, this));
+
 		}
 		return true;
 	}
@@ -132,7 +134,7 @@ class Play : VerticalLayout, GameState{
 				if(selectedPlanet){
 					selectedPlanet.setOwner(players[queuePosition]);
 					inhabitBtn.visibility = Visibility.Gone;
-					//gameFrame.needDraw();
+					gameFrame.needDraw();
 				}
 				return true;
 			};

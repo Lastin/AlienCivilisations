@@ -7,14 +7,18 @@ import src.states.gameState;
 import src.gameFrame;
 
 class Menu : VerticalLayout, GameState {
-	static GameFrame* gameFrame;
-	this(GameFrame* gameFrame){
+	static GameFrame gameFrame;
+	this(GameFrame gameFrame, string title="menu"){
 		//start menu
+		super(title);
 		this.gameFrame = gameFrame;
-		auto title = new TextWidget(null, "Alien Civilisations"d);
-		title.fontSize = 30;
-		title.padding = Rect(30, 30, 30, 30);
-		title.margins = Rect(5, 5, 5, 200);
+		//layoutWeight(FILL_PARENT);
+		//layoutHeight(FILL_PARENT).layoutWidth(FILL_PARENT);
+		//backgroundColor(0xC0002966);
+		auto heading = new TextWidget(null, "Alien Civilisations"d);
+		heading.fontSize = 30;
+		heading.padding = Rect(30, 30, 30, 30);
+		heading.margins = Rect(5, 5, 5, 200);
 		auto playButton = new Button("playButton", "Start new"d);
 		auto loadButton = new Button("loadButton", "Load save"d);
 		auto exitButton = new Button("exitButton", "Exit"d);
@@ -22,26 +26,22 @@ class Menu : VerticalLayout, GameState {
 		loadButton.padding = Rect(10, 10, 10, 10);
 		exitButton.padding = Rect(10, 10, 10, 10);
 		margins = Rect(200,20,200,20);
-		title.alignment(Align.Right | Align.Center);
-		addChild(title);
+		heading.alignment(Align.Right | Align.Center);
+		addChild(heading);
 		addChild(playButton);
 		addChild(loadButton);
 		addChild(exitButton);
-		exitButton.click = delegate (Widget src){
+		exitButton.click = delegate (Widget source){
 			window.close();
 			return true;
 		};
-		playButton.click = delegate (Widget src){
-			if(gameFrame !is null){
-				gameFrame.setState(new Play(gameFrame));
-			} else {
-				writeln("Game frame is not initialised");
-			}
+		playButton.click = delegate (Widget source){
+			gameFrame.setState(new Play(gameFrame));
 			return true;
 		};
 	}
 
-	this(GameFrame* gameFrame, Play play){
+	this(GameFrame gameFrame, Play play){
 		//pause menu
 		this(gameFrame);
 		auto contButton = new Button("contButton", "Continue"d);
@@ -50,6 +50,10 @@ class Menu : VerticalLayout, GameState {
 		saveButton.padding = Rect(10, 10, 10, 10);
 		addChild(contButton);
 		addChild(saveButton);
+		contButton.click = delegate (Widget source){
+			//gameFrame.setState(play);
+			return true;
+		};
 	}
 
 	public void enableButtons(bool b){
@@ -61,5 +65,4 @@ class Menu : VerticalLayout, GameState {
 	public bool handleKeyInput(Widget source, KeyEvent event){
 		return false;
 	}
-
 }

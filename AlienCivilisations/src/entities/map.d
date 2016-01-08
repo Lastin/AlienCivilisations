@@ -7,7 +7,7 @@ import std.stdio;
 import std.random;
 import dlangui;
 
-class Map : CanvasWidget{
+class Map : CanvasWidget {
 	private immutable float endX;
 	private immutable float endY;
 	private immutable float size;
