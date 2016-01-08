@@ -13,7 +13,7 @@ extern (C) int UIAppMain(string[] args){
 	int height = 768;
 	Window window = Platform.instance.createWindow("Alien Civilisations", null, WindowFlag.Resizable, width, height);
 	GameFrame gameframe = new GameFrame();
-	gameframe.setState(new Menu(gameframe));
+	gameframe.setState(new Menu(&gameframe));
 	window.mainWidget = gameframe;
 	window.show();
 	return Platform.instance.enterMessageLoop();

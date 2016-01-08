@@ -15,8 +15,6 @@ class GameFrame : AppFrame {
 		fl = new FrameLayout();
 		layoutHeight = FILL_PARENT;
 		fl.layoutHeight = FILL_PARENT;
-		//console = initialiseConsole();
-		//fl.addChild(console);
 		addChild(fl);
 		keyEvent = delegate (Widget source, KeyEvent event) => showConsole(source, event);
 	}
@@ -28,6 +26,7 @@ class GameFrame : AppFrame {
 		EditBox c_output = new EditBox("c_output", ">Alien Civilisations console<"d);
 		c_output.showLineNumbers(true);
 		c_output.enabled = false;
+		c_output.layoutWeight = FILL_PARENT;
 		EditLine c_input = new EditLine("c_input", ""d);
 		console.addChild(c_output);
 		console.addChild(c_input);

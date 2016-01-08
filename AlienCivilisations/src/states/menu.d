@@ -7,8 +7,8 @@ import src.states.gameState;
 import src.gameFrame;
 
 class Menu : VerticalLayout, GameState {
-	static GameFrame gameFrame;
-	this(GameFrame gameframe){
+	static GameFrame* gameFrame;
+	this(GameFrame* gameFrame){
 		//start menu
 		this.gameFrame = gameFrame;
 		auto title = new TextWidget(null, "Alien Civilisations"d);
@@ -32,8 +32,8 @@ class Menu : VerticalLayout, GameState {
 			return true;
 		};
 		playButton.click = delegate (Widget src){
-			if(gameframe !is null){
-				gameframe.setState(new Play(gameFrame));
+			if(gameFrame !is null){
+				gameFrame.setState(new Play(gameFrame));
 			} else {
 				writeln("Game frame is not initialised");
 			}
@@ -41,7 +41,7 @@ class Menu : VerticalLayout, GameState {
 		};
 	}
 
-	this(GameFrame gameFrame, Play play){
+	this(GameFrame* gameFrame, Play play){
 		//pause menu
 		this(gameFrame);
 		auto contButton = new Button("contButton", "Continue"d);

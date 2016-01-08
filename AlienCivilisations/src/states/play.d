@@ -15,80 +15,74 @@ import std.random;
 import std.stdio;
 import std.algorithm;
 
-class Play : HorizontalLayout, GameState{
+class Play : VerticalLayout, GameState{
 	private Map map;
 	private Player[2] players;
 	private int queuePosition;
-	static GameFrame gameFrame;
+	static GameFrame* gameFrame;
+	private ListWidget planetsList;
+	private WidgetListAdapter planetsListAdapter;
+	private HorizontalLayout horizontalPanel;
+	private TableLayout planetInfo;
 
-
-	this(GameFrame gameFrame){
+	this(GameFrame* gameFrame){
 		this.gameFrame = gameFrame;
 		startNewGame("HUMAN");
+		backgroundColor(0x00254d7D);
+		//planetsList =  new ListWidget("planetsButtons", Orientation.Vertical);
+		//planetsButtonsAdapter = new WidgetListAdapter();
+		//planetsList.ownAdapter = planetsButtonsAdapter;
+		//
+		planetsList = new ListWidget();
+		planetsListAdapter = new WidgetListAdapter();
+		horizontalPanel = new HorizontalLayout();
+		planetInfo = new TableLayout();
+		Button inhabitBtn = new Button("inhabit", "Inhabit"d);
+		//add elements
+		addChild(new TextWidget("currentPlayer", "Current player: " ~ to!dstring(players[queuePosition].getName())).fontSize(25).fontWeight(FontWeight.Bold));
+		addChild(horizontalPanel);
+		horizontalPanel.addChild(planetsList);
+		planetsList.adapter = planetsListAdapter;
+		horizontalPanel.addChild(planetInfo);
+		addPlanetInfoElements();
+		planetInfo.addChild(inhabitBtn);
+		//set properties
+		layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
+		horizontalPanel.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
+		planetInfo.padding = 10;
+		padding = 10;
+		inhabitBtn.visibility = Visibility.Gone;
+		planetInfo.colCount = 2;
+		//add button for each planet
 		Planet[] planets = map.getPlanets();
-		VerticalLayout col1 = new VerticalLayout();
-		col1.addChild(new TextWidget("currentPlayer", players[queuePosition].getName()));
-		TableLayout table = new TableLayout();
-		col1.padding = 10;
-		table.padding = 10;
-		Button inhabit = new Button("inhabit", "Inhabit"d);
-
 		for(int i=0; i<planets.length; i++){
 			Button btn = new Button(to!string(i), "Planet " ~ to!dstring(i));
-			btn.click = delegate (Widget src){
-				Planet selectedPlanet = planets[to!int(src.id)];
-				table.childById("planet name").text = to!dstring(selectedPlanet.getName);
-				table.childById("breathable").text = selectedPlanet.isBreathable ? "true" : "false";
-				dstring capacity = to!dstring(selectedPlanet.getCapacity);
-				table.childById("capacity").text = capacity;
-				table.childById("population").text = to!dstring(selectedPlanet.getPopulationSum);
-				writeln(to!dstring(selectedPlanet.getPopulationSum));
-				dstring radius = to!dstring(selectedPlanet.getRadius);
-				table.childById("radius").text = radius;
-				Player owner = selectedPlanet.getOwner;
-				table.childById("owner").text = owner ? to!dstring(owner.getName) : "No owner";
-				if(!owner){
-					inhabit.visibility = Visibility.Visible;
-					inhabit.click = delegate (Widget src){
-						//TODO: inhabit option
-						if(selectedPlanet){
-							uint[8] test_population = [100,100,100,100,100,100,100,100];
-							selectedPlanet.setOwner(players[queuePosition], test_population);
-						}
-						return true;
-					};
-				} else {
-					table.childById("inhabit").visibility = Visibility.Gone;
-				}
-				return true;
-			};
-			col1.addChild(btn);
+			planetsListAdapter.add(btn);
 		}
-
-		table.colCount = 2;
-		table.addChild(new TextWidget(null, "Planet name:"d).fontSize(16));
-		table.addChild(new TextWidget("planet name", ""d).fontSize(16));
-		table.addChild(new TextWidget(null, "Breathable:"d).fontSize(16));
-		table.addChild(new TextWidget("breathable", ""d).fontSize(16));
-		table.addChild(new TextWidget(null, "Capacity:"d).fontSize(16));
-		table.addChild(new TextWidget("capacity", ""d).fontSize(16));
-		table.addChild(new TextWidget(null, "Population:"d).fontSize(16));
-		table.addChild(new TextWidget("population", ""d).fontSize(16));
-		table.addChild(new TextWidget(null, "Radius:"d).fontSize(16));
-		table.addChild(new TextWidget("radius", ""d).fontSize(16));
-		table.addChild(new TextWidget(null, "Owner:"d).fontSize(16));
-		table.addChild(new TextWidget("owner", ""d).fontSize(16));
-		table.addChild(inhabit).visibility = Visibility.Gone;
-		addChild(col1);
-		addChild(table);
+		planetsList.itemSelected = delegate(Widget source, int index) => onPlanetSelect(source, index, inhabitBtn);
 	}
 
-	this(GameFrame gameFrame, Map map, Player[] players, int qpos){
+	this(GameFrame* gameFrame, Map map, Player[] players, int qpos){
 		this(gameFrame);
 		//TODO: constructor reading from json
 		this.map = map;
 		this.players = players;
 		this.queuePosition = qpos;
+	}
+
+	private void addPlanetInfoElements(){
+		planetInfo.addChild(new TextWidget(null, "Planet name:"d).fontSize(16));
+		planetInfo.addChild(new TextWidget("planet name", ""d).fontSize(16));
+		planetInfo.addChild(new TextWidget(null, "Breathable:"d).fontSize(16));
+		planetInfo.addChild(new TextWidget("breathable", ""d).fontSize(16));
+		planetInfo.addChild(new TextWidget(null, "Capacity:"d).fontSize(16));
+		planetInfo.addChild(new TextWidget("capacity", ""d).fontSize(16));
+		planetInfo.addChild(new TextWidget(null, "Population:"d).fontSize(16));
+		planetInfo.addChild(new TextWidget("population", ""d).fontSize(16));
+		planetInfo.addChild(new TextWidget(null, "Radius:"d).fontSize(16));
+		planetInfo.addChild(new TextWidget("radius", ""d).fontSize(16));
+		planetInfo.addChild(new TextWidget(null, "Owner:"d).fontSize(16));
+		planetInfo.addChild(new TextWidget("owner", ""d).fontSize(16));
 	}
 
 	public Map getMap(){
@@ -101,17 +95,12 @@ class Play : HorizontalLayout, GameState{
 	
 	public void startNewGame(string pname){
 		map = new Map(2000, 16);
-		uint start_pop = to!int(map.getPlanets[0].getCapacity() / 4);
-		uint[8] population = new uint[8];
-		for(int i=0; i<population.length; i++){
-			population[i] = to!int(start_pop/8);
-		}
 		players[0] = new Player(pname, new KnowledgeTree());
 		players[0].addPlanet(map.getPlanets[0]);
-		map.getPlanets[0].setOwner(players[0], population);
+		map.getPlanets[0].setOwner(players[0]);
 		players[1] = new AI(new KnowledgeTree);
 		players[1].addPlanet(map.getPlanets[1]);
-		map.getPlanets[1].setOwner(players[1], population);
+		map.getPlanets[1].setOwner(players[1]);
 		queuePosition = to!int(dice(0.5, 0.5));
 	}
 
@@ -119,6 +108,36 @@ class Play : HorizontalLayout, GameState{
 		writeln("action");
 		if(event.action == KeyAction.KeyDown && event.keyCode == KeyCode.ESCAPE){
 			gameFrame.setState(new Menu(gameFrame, this));
+		}
+		return true;
+	}
+
+	private bool onPlanetSelect(Widget src, int index, Button inhabitBtn){
+		Planet[] planets = map.getPlanets();
+		Planet selectedPlanet = planets[index];
+		writeln("delegate called");
+		planetInfo.childById("planet name").text = to!dstring(selectedPlanet.getName);
+		planetInfo.childById("breathable").text = selectedPlanet.isBreathable ? "true" : "false";
+		dstring capacity = to!dstring(selectedPlanet.getCapacity);
+		planetInfo.childById("capacity").text = capacity;
+		planetInfo.childById("population").text = to!dstring(selectedPlanet.getPopulationSum);
+		dstring radius = to!dstring(selectedPlanet.getRadius);
+		planetInfo.childById("radius").text = radius;
+		Player owner = selectedPlanet.getOwner;
+		planetInfo.childById("owner").text = owner ? to!dstring(owner.getName) : "No owner";
+		if(!owner){
+			inhabitBtn.visibility = Visibility.Visible;
+			inhabitBtn.click = delegate (Widget src){
+				//TODO: inhabit option
+				if(selectedPlanet){
+					selectedPlanet.setOwner(players[queuePosition]);
+					inhabitBtn.visibility = Visibility.Gone;
+					//gameFrame.needDraw();
+				}
+				return true;
+			};
+		} else {
+			planetInfo.childById("inhabit").visibility = Visibility.Gone;
 		}
 		return true;
 	}

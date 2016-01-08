@@ -12,7 +12,7 @@ class Planet {
 	private Vector2D vec2d;
 	private float radius;
 	private int capacity;
-	private uint[] population = [0,0,0,0,0,0,0,0];
+	private uint[8] population = [0,0,0,0,0,0,0,0];
 	private int food;
 	private bool breathable_atmosphere;
 	private Player owner;
@@ -55,19 +55,6 @@ class Planet {
 		return format("X: %s \n Y:%s", vec2d.getX(), vec2d.getY());
 	}
 
-	/*deprecated public uint addPopulation(uint[8] units){
-		uint free_space = capacity - population[].sum;
-		if(units[].sum <= free_space){
-			
-		}
-		/*if(units + population >= capacity.sum){
-			population = capacity;
-			return units - free_space;
-		}
-		population += units;
-		return 0;
-	}*/
-
 	public uint attack(uint force){
 		if(force >= capacity){
 			owner = null;
@@ -77,11 +64,12 @@ class Planet {
 		return 0;
 	}
 
-	public void setOwner(Player player, uint[8] population){
+	public void setOwner(Player player){
 		this.owner = player;
 		this.population = population;
-		writeln("Population check:" ~ to!string(getPopulationSum));
-		assert(getPopulationSum() == population[].sum);
+		for(int i=0; i<population.length; i++){
+			population[i] = to!uint(capacity / 8 / population.length);
+		}
 	}
 
 	public Player getOwner(){
