@@ -13,12 +13,14 @@ import src.states.play;
 import std.conv;
 import std.random;
 import std.stdio;
+import std.algorithm;
 
 class Play : HorizontalLayout, GameState{
 	private Map map;
 	private Player[2] players;
 	private int queuePosition;
 	static GameFrame gameFrame;
+
 
 	this(GameFrame gameFrame){
 		this.gameFrame = gameFrame;
@@ -34,21 +36,25 @@ class Play : HorizontalLayout, GameState{
 		for(int i=0; i<planets.length; i++){
 			Button btn = new Button(to!string(i), "Planet " ~ to!dstring(i));
 			btn.click = delegate (Widget src){
-				auto p = planets[to!int(src.id)];
-				table.childById("breathable").text = p.isBreathable ? "true" : "false";
-				dstring capacity = to!dstring(p.getCapacity);
+				Planet selectedPlanet = planets[to!int(src.id)];
+				table.childById("planet name").text = to!dstring(selectedPlanet.getName);
+				table.childById("breathable").text = selectedPlanet.isBreathable ? "true" : "false";
+				dstring capacity = to!dstring(selectedPlanet.getCapacity);
 				table.childById("capacity").text = capacity;
-				dstring population = to!dstring(p.getPopulationSum);
-				table.childById("population").text = population;
-				dstring radius = to!dstring(p.getRadius);
+				table.childById("population").text = to!dstring(selectedPlanet.getPopulationSum);
+				writeln(to!dstring(selectedPlanet.getPopulationSum));
+				dstring radius = to!dstring(selectedPlanet.getRadius);
 				table.childById("radius").text = radius;
-				Player owner = p.getOwner;
+				Player owner = selectedPlanet.getOwner;
 				table.childById("owner").text = owner ? to!dstring(owner.getName) : "No owner";
 				if(!owner){
 					inhabit.visibility = Visibility.Visible;
 					inhabit.click = delegate (Widget src){
 						//TODO: inhabit option
-						writeln("inhabit button for planet" ~ to!string(i));
+						if(selectedPlanet){
+							uint[8] test_population = [100,100,100,100,100,100,100,100];
+							selectedPlanet.setOwner(players[queuePosition], test_population);
+						}
 						return true;
 					};
 				} else {
@@ -60,15 +66,17 @@ class Play : HorizontalLayout, GameState{
 		}
 
 		table.colCount = 2;
-		table.addChild(new TextWidget(null, "breathable:"d).fontSize(16));
+		table.addChild(new TextWidget(null, "Planet name:"d).fontSize(16));
+		table.addChild(new TextWidget("planet name", ""d).fontSize(16));
+		table.addChild(new TextWidget(null, "Breathable:"d).fontSize(16));
 		table.addChild(new TextWidget("breathable", ""d).fontSize(16));
-		table.addChild(new TextWidget(null, "capacity:"d).fontSize(16));
+		table.addChild(new TextWidget(null, "Capacity:"d).fontSize(16));
 		table.addChild(new TextWidget("capacity", ""d).fontSize(16));
-		table.addChild(new TextWidget(null, "population:"d).fontSize(16));
+		table.addChild(new TextWidget(null, "Population:"d).fontSize(16));
 		table.addChild(new TextWidget("population", ""d).fontSize(16));
-		table.addChild(new TextWidget(null, "radius:"d).fontSize(16));
+		table.addChild(new TextWidget(null, "Radius:"d).fontSize(16));
 		table.addChild(new TextWidget("radius", ""d).fontSize(16));
-		table.addChild(new TextWidget(null, "owner:"d).fontSize(16));
+		table.addChild(new TextWidget(null, "Owner:"d).fontSize(16));
 		table.addChild(new TextWidget("owner", ""d).fontSize(16));
 		table.addChild(inhabit).visibility = Visibility.Gone;
 		addChild(col1);

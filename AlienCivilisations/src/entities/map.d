@@ -20,11 +20,11 @@ class Map : CanvasWidget{
 
 	this(float size, int planetCount){
 		this(size);
-		planets ~= new Planet(getFreeLocation(10), 10, true);
-		planets ~= new Planet(getFreeLocation(10), 10, true);
+		planets ~= new Planet(getFreeLocation(10), 10, true, "Human Planet");
+		planets ~= new Planet(getFreeLocation(10), 10, true, "AI planet");
 		for(int i=2; i<planetCount; i++){
 			float radius = uniform(1, 20);
-			planets ~= new Planet(getFreeLocation(radius), radius, dice(0.5, 0.5)>0);
+			planets ~= new Planet(getFreeLocation(radius), radius, dice(0.5, 0.5)>0, "Planet "~ to!string(i));
 		}
 	}
 

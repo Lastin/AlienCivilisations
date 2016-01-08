@@ -6,21 +6,24 @@ import src.entities.player;
 import src.logic.knowledgeTree;
 import std.algorithm;
 import src.logic.branch;
+import std.stdio;
 
 class Planet {
 	private Vector2D vec2d;
 	private float radius;
 	private int capacity;
-	private uint[] population = new uint[8];
+	private uint[] population = [0,0,0,0,0,0,0,0];
 	private int food;
 	private bool breathable_atmosphere;
 	private Player owner;
+	private immutable string name;
 
-	this(Vector2D vec2d, float radius, bool breathable_atmosphere){
+	this(Vector2D vec2d, float radius, bool breathable_atmosphere, string name){
 		this.vec2d = vec2d;
 		this.radius = radius;
 		this.capacity = to!int(radius * 10000);
 		this.breathable_atmosphere = breathable_atmosphere;
+		this.name = name;
 	}
 
 	public Vector2D getVec2d(){
@@ -35,12 +38,16 @@ class Planet {
 		return capacity;
 	}
 
-	public int getPopulationSum(){
-		return sum(population);
+	public uint getPopulationSum(){
+		return population[].sum;
 	}
 
 	public float getRadius(){
 		return radius;
+	}
+
+	public string getName(){
+		return name;
 	}
 
 	override public string toString(){
@@ -48,15 +55,18 @@ class Planet {
 		return format("X: %s \n Y:%s", vec2d.getX(), vec2d.getY());
 	}
 
-	public uint addPopulation(uint[8] units){
-		uint free_space = capacity - population.sum;
+	/*deprecated public uint addPopulation(uint[8] units){
+		uint free_space = capacity - population[].sum;
+		if(units[].sum <= free_space){
+			
+		}
 		/*if(units + population >= capacity.sum){
 			population = capacity;
 			return units - free_space;
 		}
-		population += units;*/
+		population += units;
 		return 0;
-	}
+	}*/
 
 	public uint attack(uint force){
 		if(force >= capacity){
@@ -70,6 +80,8 @@ class Planet {
 	public void setOwner(Player player, uint[8] population){
 		this.owner = player;
 		this.population = population;
+		writeln("Population check:" ~ to!string(getPopulationSum));
+		assert(getPopulationSum() == population[].sum);
 	}
 
 	public Player getOwner(){
