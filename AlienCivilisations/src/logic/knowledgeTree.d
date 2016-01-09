@@ -14,7 +14,7 @@ private struct Order {
 
 public class KnowledgeTree {
 
-	enum leafNames : string[]{
+	enum LEAF_NAMES : string[]{
 		Food = ["Agricultural Economics", "Agricultural Engineering", "Argonomy", "Animal Science", "Horticulture"],
 		Science = ["Automation", "Biology", "Chemistry", "Mathematics", "Physics"],
 		Military = ["Defence", "Offence", "Enervating", "Spying", "Intimidation"],
@@ -27,10 +27,10 @@ public class KnowledgeTree {
 
 	this(){
 		int[5] points = [0,0,0,0,0];
-		food = new Branch("Food", leafNames.Food, points);
-		science = new Branch("Science", leafNames.Science, points);
-		military = new Branch("Military", leafNames.Military, points);
-		energy = new Branch("Energy", leafNames.Energy, points);
+		food = new Branch("Food", LEAF_NAMES.Food, points);
+		science = new Branch("Science", LEAF_NAMES.Science, points);
+		military = new Branch("Military", LEAF_NAMES.Military, points);
+		energy = new Branch("Energy", LEAF_NAMES.Energy, points);
 	}
 
 	this(Branch[4] branches, Order[] queue){
@@ -51,14 +51,14 @@ public class KnowledgeTree {
 		}
 	}
 
-	public int develop(int civil_units){
-		int points_left = civil_units;
+	public uint develop(uint civil_units){
+		uint points_left = civil_units;
 		while(!queue.empty() || points_left <= 0){
 			Order frnt = queue.front;
 			double bonus = getBonus(frnt);
-			points_left = frnt.branch.develop(to!int(points_left * bonus), frnt.leaf);
+			points_left = frnt.branch.develop(to!uint(points_left * bonus), frnt.leaf);
 			if(points_left >= 0){
-				points_left = to!int(points_left/bonus);
+				points_left = to!uint(points_left/bonus);
 				queue = queue[1..$];
 			}
 		}

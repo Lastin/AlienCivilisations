@@ -1,9 +1,8 @@
 ﻿module src.main;
 
-import dlangui;
-import std.stdio;
+public import dlangui;
+public import std.stdio;
 import src.states.menu;
-import src.states.play;
 import src.gameFrame;
 
 mixin APP_ENTRY_POINT;

@@ -6,7 +6,7 @@ import src.logic.knowledgeTree;
 import src.containers.hypotheticalWorld;
 
 class AI : Player{
-	this(KnowledgeTree knowledgeTree){
+	this(KnowledgeTree knowledgeTree, Map map){
 		super("AI", knowledgeTree);
 		//HypotheticalWorld hw = new HypotheticalWorld(knowledgeTree, planets, map);
 	}

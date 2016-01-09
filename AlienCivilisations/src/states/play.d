@@ -100,7 +100,7 @@ class Play : VerticalLayout, GameState{
 		players[0] = new Player(pname, new KnowledgeTree());
 		players[0].addPlanet(map.getPlanets[0]);
 		map.getPlanets[0].setOwner(players[0]);
-		players[1] = new AI(new KnowledgeTree);
+		players[1] = new AI(new KnowledgeTree(), map);
 		players[1].addPlanet(map.getPlanets[1]);
 		map.getPlanets[1].setOwner(players[1]);
 		queuePosition = to!int(dice(0.5, 0.5));

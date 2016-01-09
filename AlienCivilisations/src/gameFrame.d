@@ -1,9 +1,8 @@
 ﻿module src.gameFrame;
 
-import std.stdio;
-import src.states.menu;
 import dlangui;
 import src.entities.map;
+import src.states.menu;
 import src.states.play;
 
 class GameFrame : AppFrame {
