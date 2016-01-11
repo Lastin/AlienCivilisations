@@ -68,9 +68,9 @@ class GameFrame : AppFrame {
 
 	public Widget setState(Widget widget){
 		currentState = widget;
-		fl.removeAllChildren();
+		fl.removeAllChildren(false);
 		fl.addChild(widget);
-		console = initialiseConsole();
+		//console = initialiseConsole();
 		fl.addChild(console);
 		return widget;
 	}

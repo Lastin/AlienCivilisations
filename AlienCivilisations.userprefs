@@ -1,6 +1,14 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/lib/dlangui/src/dlangui/widgets/widget.d">
+    <Files>
+      <File FileName="AlienCivilisations/src/gameFrame.d" Line="1" Column="1" />
+      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/widgets/widget.d" Line="30" Column="30" />
+      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/widgets/tree.d" Line="1" Column="1" />
+      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/graphics/ftfonts.d" Line="1" Column="1" />
+      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/widgets/combobox.d" Line="30" Column="30" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
