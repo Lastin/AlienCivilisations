@@ -1,28 +1,26 @@
 ﻿module src.containers.vector2d;
 
-class Vector2D {
-	private float x;
-	private float y;
+import std.math;
+
+class Vector2d {
+	private immutable float _x;
+	private immutable float _y;
 
 	this(float x, float y){
-		this.x = x;
-		this.y = y;
+		_x = x;
+		_y = y;
 	}
 
-	public float getX(){
-		return x;
+	@property float x() {
+		return _x;
 	}
-	public float getY(){
-		return y;
-	}
-
-	public float getEuclidDist(Vector2D vec){
-		import std.math;
-		return sqrt((x-vec.getX())^^2 + (y+vec.getY())^^2);
+	@property float y(){
+		return _y;
 	}
 
-	public static getEucliDist(Vector2D vecA, Vector2D vecB){
-		import std.math;
-		return sqrt((vecA.getX() - vecB.getX())^^2 + (vecA.getY() - vecB.getY())^^2);
+	float getEuclideanDistance(Vector2d vecA){
+		auto xdiff = vecA.x - _x;
+		auto ydiff = vecA.y - _y;
+		return sqrt(xdiff^^2 + ydiff^^2);
 	}
 }

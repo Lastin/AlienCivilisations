@@ -1,95 +1,85 @@
 ﻿module src.entities.map;
 
-import std.container: SList;
-import src.entities.planet;
-import src.containers.vector2d;
-import std.stdio;
-import std.random;
 import dlangui;
+import src.containers.vector2d;
+import src.entities.planet;
+import src.entities.player;
+import std.random;
+import std.stdio;
 
 class Map : CanvasWidget {
-	private immutable float endX;
-	private immutable float endY;
-	private immutable float size;
-	private immutable float minDistance = 30;
-	private Planet[] planets;
+	private immutable float _size;
+	private immutable float _minDistance = 30;
+	private Planet[] _planets;
 
-	this(float size){
-		this.size = endX = endY = size;
-	}
-
-	this(float size, int planetCount){
-		this(size);
-		planets ~= new Planet(getFreeLocation(10), 10, true, "Human Planet");
-		planets ~= new Planet(getFreeLocation(10), 10, true, "AI planet");
-		for(int i=2; i<planetCount; i++){
+	this(float size, int planetCount, Player[] players){
+		_size = size;
+		foreach(Player player; players){
+			addPlanet(new Planet(getFreeLocation(10), 10, true, player.getName ~ "'s planet")).setOwner(player);
+		}
+		for(size_t i=players.length; i<planetCount; i++){
 			float radius = uniform(1, 20);
-			planets ~= new Planet(getFreeLocation(radius), radius, dice(0.5, 0.5)>0, "Planet "~ to!string(i));
+			addPlanet(new Planet(getFreeLocation(radius), radius, dice(0.5, 0.5)>0, "Planet "~ to!string(i)));
 		}
 	}
 
-	this(float size, Planet[] planets){
-		this(size);
-		this.planets = planets;
+	this(float size, Planet[] planets) {
+		_size = size;
+		_planets = planets;
 	}
 
-	public void addPlanet(Planet planet){
-		planets ~= planet;
+	Planet addPlanet(Planet planet) nothrow {
+		_planets ~= planet;
+		return planet;
 	}
 
-	public void addPlanets(Planet[] newPlanets){
-		planets ~= newPlanets;
+	void addPlanets(Planet[] newPlanets){
+		_planets ~= newPlanets;
 	}
 
-	public bool collides(Planet planetA){
-		Vector2D vecA = planetA.getVec2d();
-		float radA = planetA.getRadius();
-		return collides(vecA, radA);
+	bool collides(Planet p){
+		return collides(p.position, p.radius);
 	}
 
-	public bool collides(Vector2D vector, float radius){
-		foreach(Planet planet; planets){
-			float distance = Vector2D.getEucliDist(vector, planet.getVec2d()) - radius - planet.getRadius();
-			if(distance < minDistance){
+	bool collides(Vector2d vector, float radius){
+		foreach(Planet planet; _planets){
+			auto distance = vector.getEuclideanDistance(planet.position) - radius - planet.radius;
+			if(distance < _minDistance){
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public Vector2D getFreeLocation(float radius){
-		Vector2D vector;
+	Vector2d getFreeLocation(float radius){
+		Vector2d vector;
 		do {
-			float x = uniform(0.0, endX);
-			float y = uniform(0.0, endY);
-			vector = new Vector2D(x, y);
+			float x = uniform(0.0, _size-radius);
+			float y = uniform(0.0, _size-radius);
+			vector = new Vector2d(x, y);
 		} while(collides(vector, radius));
 		return vector;
 	}
 
-	public Planet[] getPlanets(){
-		return planets;
-	}
-
-	public Planet getPlanetAt(Vector2D vec2d){
-		foreach(Planet planet; planets){
-			if(vec2d == planet.getVec2d()){
+	Planet planetAt(Vector2d vector){
+		foreach(Planet planet; _planets){
+			if(vector.getEuclideanDistance(planet.position) <= planet.radius){
 				return planet;
 			}
 		}
 		return null;
 	}
 
-	public float getEndX(){
-		return endX;
+	@property Planet[] planets() nothrow {
+		return _planets;
+	}
+	
+	@property float size(){
+		return _size;
 	}
 
-	public float getEndY(){
-		return endY;
-	}
-
-	public Map dup(){
-		return new Map(size, planets);
+	public Map dup() {
+		return new Map(_size, planets.dup);
 	}
 
 	public void render(){

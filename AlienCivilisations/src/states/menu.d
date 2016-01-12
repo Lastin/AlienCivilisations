@@ -8,26 +8,38 @@ import src.gameFrame;
 
 class Menu : VerticalLayout, GameState {
 	static GameFrame gameFrame;
-	this(GameFrame gameFrame, string title="menu"){
-		//start menu
+	this(GameFrame gameFrame, string title="menu", Play play = null){
 		super(title);
 		this.gameFrame = gameFrame;
-		//layoutWeight(FILL_PARENT);
-		//layoutHeight(FILL_PARENT).layoutWidth(FILL_PARENT);
-		//backgroundColor(0xC0002966);
 		auto heading = new TextWidget(null, "Alien Civilisations"d);
 		heading.fontSize = 30;
 		heading.padding = Rect(30, 30, 30, 30);
 		heading.margins = Rect(5, 5, 5, 200);
+		margins = Rect(200,20,200,20);
+		heading.alignment(Align.Right | Align.Center);
+		addChild(heading);
+		addButtons(play);
+	}
+
+	private void addButtons(Play play){
+		if(play){
+			auto contButton = new Button("contButton", "Continue"d);
+			auto saveButton = new Button("saveButton", "Save game"d);
+			contButton.padding = Rect(10, 10, 10, 10);
+			saveButton.padding = Rect(10, 10, 10, 10);
+			addChild(contButton);
+			addChild(saveButton);
+			contButton.click = delegate (Widget source){
+				gameFrame.setState(play);
+				return true;
+			};
+		}
 		auto playButton = new Button("playButton", "Start new"d);
 		auto loadButton = new Button("loadButton", "Load save"d);
 		auto exitButton = new Button("exitButton", "Exit"d);
 		playButton.padding = Rect(10, 10, 10, 10);
 		loadButton.padding = Rect(10, 10, 10, 10);
 		exitButton.padding = Rect(10, 10, 10, 10);
-		margins = Rect(200,20,200,20);
-		heading.alignment(Align.Right | Align.Center);
-		addChild(heading);
 		addChild(playButton);
 		addChild(loadButton);
 		addChild(exitButton);
@@ -37,21 +49,6 @@ class Menu : VerticalLayout, GameState {
 		};
 		playButton.click = delegate (Widget source){
 			gameFrame.setState(new Play(gameFrame));
-			return true;
-		};
-	}
-
-	this(GameFrame gameFrame, Play play){
-		//pause menu
-		this(gameFrame);
-		auto contButton = new Button("contButton", "Continue"d);
-		auto saveButton = new Button("saveButton", "Save game"d);
-		contButton.padding = Rect(10, 10, 10, 10);
-		saveButton.padding = Rect(10, 10, 10, 10);
-		addChild(contButton);
-		addChild(saveButton);
-		contButton.click = delegate (Widget source){
-			//gameFrame.setState(play);
 			return true;
 		};
 	}
