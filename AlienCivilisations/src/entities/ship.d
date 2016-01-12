@@ -5,17 +5,34 @@ import src.entities.player;
 import std.algorithm;
 
 class Ship {
-	private uint onboard = 0;
-	private immutable uint capacity;
-	private immutable uint military_level;
-	private Player ship_owner;
+	private immutable uint _capacity;
+	private Player _owner;
 
-	this(Player ship_owner, uint sciencel, uint energyl, uint military_level){
-		this.ship_owner = ship_owner;
-		capacity = 1000 * (sciencel + energyl);
-		this.military_level = military_level;
+	this(Player owner, uint sciencel, uint energyl){
+		_owner = owner;
+		_capacity = 1000 * (sciencel + energyl);
 	}
-	public int addUnits(uint units) {
+
+	@property bool empty(){
+		return (onboard == 0);
+	}
+}
+
+class MilitaryShip : Ship {
+	private uint _onboard = 0;
+	private immutable uint _militaryLevel;
+
+	this(uint militaryLevel){
+		_militaryLevel = militaryLevel;
+	}
+
+	void attack(Planet p){
+		if(p.getOwner && p.getOwner != ship_owner){
+			p.attack(military_level * onboard);
+		}
+	}
+
+	int addUnits(uint units) {
 		uint free_spaces = capacity - onboard;
 		if(free_spaces >= units){
 			onboard += units;
@@ -24,18 +41,18 @@ class Ship {
 		onboard = capacity;
 		return units - free_spaces;
 	}
+}
 
-	public void attack(Planet p){
-		if(p.getOwner && p.getOwner != ship_owner){
-			p.attack(military_level * onboard);
+class InhabitationShip : Ship {
+	private uint[8] _onboard = [0,0,0,0,0,0,0,0];
+
+	this(uint[8] population){
+		_onboard = population;
+	}
+
+	void inhabit(Planet p){
+		if(p.owner == _owner && !empty){
+			p.setOwner(_owner, _onboard);
 		}
-	}
-
-	public bool empty(){
-		return (onboard == 0);
-	}
-
-	unittest{
-
 	}
 }

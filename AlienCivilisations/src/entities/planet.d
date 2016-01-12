@@ -50,6 +50,10 @@ class Planet {
 		return _name;
 	}
 
+	@property Player owner(){
+		return _owner;
+	}
+
 	override public string toString(){
 		import std.format;
 		return format("X: %s \n Y:%s", _position.x, _position.y);
@@ -64,14 +68,11 @@ class Planet {
 		return 0;
 	}
 
-	void setOwner(Player player){
+	Planet setOwner(Player player, uint[8] population){
 		_owner = player;
-		auto x = to!int(capacity / _population.length / 10);
-		_population = [x,x,x,x,x,x,x,x];
-	}
-
-	Player getOwner(){
-		return _owner;
+		//auto x = to!int(capacity / _population.length / 10);
+		_population = population;//[x,x,x,x,x,x,x,x];
+		return this;
 	}
 
 	void step(){
@@ -140,6 +141,15 @@ class Planet {
 					}
 				}
 			}
+		}
+	}
+
+	void produceShip(string type){
+		if(type == "military"){
+
+		}
+		else if(type == "inhabitation"){
+
 		}
 	}
 }

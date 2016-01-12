@@ -6,45 +6,34 @@ import src.logic.knowledgeTree;
 import src.logic.branch;
 
 class Player {
-	private Planet[] planets;
-	private Ship[] ships;
-	private uint military_units = 0;
-	private string name;
-	private KnowledgeTree knowledgeTree;
+	private Planet[] _planets;
+	private Ship[] _ships;
+	private uint _military_units = 0;
+	private string _name;
+	private KnowledgeTree _knowledgeTree;
 
 	this(string name, KnowledgeTree knowledgeTree){
 		this.knowledgeTree = knowledgeTree;
 		this.name = name;
 	}
 
-	public KnowledgeTree getKnowledgeTree(){
-		return knowledgeTree;
+	@property KnowledgeTree knowledgeTree(){
+		return _knowledgeTree;
 	}
-	public Planet[] getPlanets(){
-		return planets;
+
+	@property Planet[] planets(){
+		return _planets;
 	}
-	public void addPlanet(Planet p){
-		planets ~= p;
+
+	@property string name(){
+		return _name;
 	}
-	public string getName(){
-		return name;
+
+	void addPlanet(Planet p){
+		_planets ~= p;
 	}
-	public void finishTurn(){
+
+	void finishTurn(){
 		//int
-	}
-	public void makeShip(){
-		uint sci = knowledgeTree.getBranch("Science").getBranchLevel();
-		uint eng = knowledgeTree.getBranch("Energy").getBranchLevel();
-		uint mil = knowledgeTree.getBranch("Military").getBranchLevel();
-		Ship s = new Ship(this, sci, eng, mil);
-		military_units -= s.addUnits(military_units);
-		if(!s.empty()){
-			ships ~= s;
-		}
-	}
-	public void callUp(uint percent, Planet p){
-		if(p.getOwner == this){
-			military_units += p.militarise(percent);
-		}
 	}
 }
