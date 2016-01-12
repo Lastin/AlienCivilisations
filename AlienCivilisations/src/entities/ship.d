@@ -2,15 +2,25 @@
 
 import src.entities.planet;
 import src.entities.player;
+import src.logic.knowledgeTree;
 import std.algorithm;
 
+enum ShipType : ubyte {
+	Military,
+	Inhabitation
+}
+
+enum int MULTIPLIER = 1000;
+
 class Ship {
+
 	private immutable uint _capacity;
 	private Player _owner;
 
-	this(Player owner, uint sciencel, uint energyl){
+
+	this(Player owner){
 		_owner = owner;
-		_capacity = 1000 * (sciencel + energyl);
+		_capacity = MULTIPLIER * (_owner.knowledgeTree.effectiveness(BranchName.Energy + _owner.knowledgeTree.effectiveness(BranchName.Science)));
 	}
 
 	@property bool empty(){

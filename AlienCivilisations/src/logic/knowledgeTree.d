@@ -5,67 +5,54 @@ import std.range;
 import std.algorithm.searching;
 import src.logic.branch;
 import std.conv;
+import std.container.dlist;
 
-private struct Order {
+struct Order {
 	Branch branch;
 	int leaf;
+}
+
+enum BranchName : ubyte {
+	Energy,
+	Food,
+	Military,
+	Science
+}
+
+enum LEAF_NAMES : string[]{
+	Food = ["Agricultural Economics", "Agricultural Engineering", "Argonomy", "Animal Science", "Horticulture"],
+	Science = ["Automation", "Biology", "Chemistry", "Mathematics", "Physics"],
+	Military = ["Defence", "Offence", "Enervating", "Spying", "Intimidation"],
+	Energy = ["Fossil Fuels", "Hydro Power", "Nuclear", "Solar Power", "Wind"]
 }
 
 
 public class KnowledgeTree {
 
-	enum LEAF_NAMES : string[]{
-		Food = ["Agricultural Economics", "Agricultural Engineering", "Argonomy", "Animal Science", "Horticulture"],
-		Science = ["Automation", "Biology", "Chemistry", "Mathematics", "Physics"],
-		Military = ["Defence", "Offence", "Enervating", "Spying", "Intimidation"],
-		Energy = ["Fossil Fuels", "Hydro Power", "Nuclear", "Solar Power", "Wind"]
-	}
-	private Branch food, science, military, energy;
-	private double branchEffect = 0.04;
-	private double leafEffect = 0.1;
-	Order[] queue;
+	private Branch _food, _science, _military, _energy;
+	private enum double _branchEffect = 0.04;
+	private enum double _leafEffect = 0.1;
+	DList!Order _queue;
 
-	this(){
-		int[5] points = [0,0,0,0,0];
-		food = new Branch("Food", LEAF_NAMES.Food, points);
-		science = new Branch("Science", LEAF_NAMES.Science, points);
-		military = new Branch("Military", LEAF_NAMES.Military, points);
-		energy = new Branch("Energy", LEAF_NAMES.Energy, points);
+	this(int[5] points = [0,0,0,0,0], DList!Order queue = make!(DList!Order)()){
+		_food = new Branch(points);
+		_science = new Branch(points);
+		_military = new Branch(points);
+		_energy = new Branch(points);
+		_queue = queue;
 	}
 
-	this(Branch[4] branches, Order[] queue){
-		food = branches[0];
-		science = branches[1];
-		military = branches[2];
-		energy = branches[3];
-		this.queue = queue;
-	}
-
-	public Branch getBranch(string branchName){
-		switch(branchName){
-			case "Food": return food;
-			case "Science": return science;
-			case "Military": return military;
-			case "Energy": return energy;
-			default: throw new Exception("Unknown branch name");
+	@property Branch branch(BranchName branch){
+		switch(branch){
+			case BranchName.Energy: return _energy;
+			case BranchName.Food: return _food;
+			case BranchName.Military: return _military;
+			case BranchName.Science: return _science;
+			default: throw new Exception("Unknown branch");
 		}
 	}
 
-	public uint develop(uint civil_units){
-		uint points_left = civil_units;
-		while(!queue.empty() || points_left <= 0){
-			Order frnt = queue.front;
-			double bonus = getBonus(frnt);
-			points_left = frnt.branch.develop(to!uint(points_left * bonus), frnt.leaf);
-			if(points_left >= 0){
-				points_left = to!uint(points_left/bonus);
-				queue = queue[1..$];
-			}
-		}
-		return points_left;
-	}
-
-	private double getBonus(Order i){
+	@property double effectiveness(BranchName branch){
 	/*
 	 * Food <- Science
 	 * Food <- Energy
@@ -122,47 +109,12 @@ public class KnowledgeTree {
 		return total;
 	}
 
-	public KnowledgeTree dup(){
-		//creates duplicate of the object
-		Branch[4] bclone = [food.dup(), science.dup(), military.dup(), energy.dup()];
-		return new KnowledgeTree(bclone, queue.dup());
+
+	public uint develop(uint civil_units){
 	}
 
-	//QUEUE FUNCTIONS
-	void addToQueue(Branch branch, int leaf){
-		Order newOrder;
-		newOrder.branch = branch;
-		newOrder.leaf = leaf;
-		int levels_left = 5;
-		synchronized {
-			foreach(Order order; queue){
-				if(newOrder == order){
-					--levels_left;
-				}
-			}
-			if(levels_left > 0){
-				queue ~= newOrder;
-			}
-		}
-	}
-
-	void removeFromQueue(Branch branch, int leaf){
-		Order tbr;
-		tbr.branch = branch;
-		tbr.leaf = leaf;
-		Order[] newQueue;
-		newQueue.reserve(queue.capacity); //reserve to avoid reallocation
-		int found = 0;
-		synchronized {
-			foreach_reverse(Order order; queue){
-				if(found==0 && order == tbr){
-					++found;
-				} 
-				else {
-					newQueue = order ~ newQueue;
-				}
-			}
-			queue = newQueue;
-		}
+	//Returns duplicate of the current object, without references to original
+	KnowledgeTree dup(){
+		return new KnowledgeTree([food.dup, science.dup, military.dup, energy.dup], _queue.dup);
 	}
 }

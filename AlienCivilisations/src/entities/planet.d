@@ -8,6 +8,7 @@ import src.logic.knowledgeTree;
 import std.algorithm;
 import src.logic.branch;
 import std.stdio;
+import src.entities.ship;
 
 class Planet {
 	private immutable int _populationConstant = 10000;
@@ -17,6 +18,7 @@ class Planet {
 	private uint[8] _population = [0,0,0,0,0,0,0,0];
 	private uint _food;
 	private bool _breathableAtmosphere;
+	private uint _militaryUnits = 0;
 	private Player _owner;
 
 	this(Vector2d position, float radius, bool breathableAtmosphere, string name){
@@ -84,7 +86,7 @@ class Planet {
 	}
 
 	private void affectFood(){
-		//don't hesitate to contact me if you think of a better name for this function
+		//TODO
 		//food supply at best increases at arythmetic rate
 		//1 > 2 > 3 > 4 > 5
 		_food -= populationSum;
@@ -111,12 +113,13 @@ class Planet {
 		_population[0] = to!int(reproductivePairs * childPerPair * foodFactor / overPopulationFactor);
 	}
 
-	int militarise(int percent){
-		int p = min(percent, 100);
-		int g1 = to!int(p/100 * _population[2]);
-		int g2 = to!int(p/100 * _population[3]);
+	uint militarise(int percent){
+		uint p = min(percent, 100);
+		uint g1 = to!int(p/100 * _population[2]);
+		uint g2 = to!int(p/100 * _population[3]);
 		_population[2] -= g1;
-		_population[2] -= g2;
+		_population[3] -= g2;
+		_militaryUnits += g1 + g2;
 		return g1 + g2;
 	}
 
@@ -126,8 +129,11 @@ class Planet {
 			_population = [0,0,0,0,0,0,0,0];
 		}
 		else {
-			while(value >= 1){
-				auto x = value / _population.length;
+			while(value >= 0){
+				uint x = floor(value / _population.length);
+				if(x == 0){
+					x = ceil(abs(x * _population.length - value));
+				}
 				for(int i=0; i < _population.length; i++){
 					if(_population[i] == 0)
 						continue;
@@ -144,13 +150,15 @@ class Planet {
 		}
 	}
 
-	void produceShip(string type){
-		if(type == "military"){
+	Ship produceShip(ShipType type){
+
+		if(type == ShipType.Military){
 
 		}
-		else if(type == "inhabitation"){
+		if(type == ShipType.Inhabitation){
 
 		}
+		return null;
 	}
 }
 

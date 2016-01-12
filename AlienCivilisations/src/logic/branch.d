@@ -3,36 +3,47 @@
 import std.algorithm;
 import src.logic.knowledgeTree;
 
-class Branch {
-	private immutable string name;
-	private immutable string[] leafsNames;
-	private immutable int[] multipliers = [2,4,8,16,32];
-	private immutable int pop_const = 50000;
-	private immutable int maxLevel = 5;
-	private int[] points;
+struct Dependency {
+	Branch branch;
+	int dependant;
+	int prerequisite;
+}
 
-	pure this(immutable string name, immutable string[] leafsNames, int[] points){
-		this.name = name;
-		this.leafsNames = leafsNames;
-		this.points = points;
+class Branch {
+
+	enum int[5] MULTIPLIERS = [2,4,8,16,32];
+	enum int POPULATION_CONSTANT = 50000;
+	enum int MAX_LEVEL = 5;
+	uint[5] _leafsPoints;
+	Dependency[] dependencies;
+
+	this(uint[5] leafsPoints){
+		_leafsPoints = leafsPoints;
 	}
 
-	public int[] getLevels(){
-		int[] levels = new int[points.length];
-		foreach(int i, int each; points){
-			levels[i] = pointsToLevel(points[i]);
+	//Returns levels of the leafs of current branch
+	@property int[5] leafsLevels(){
+		int[5] levels = new int[5];
+		foreach(size_t i, uint points; _leafsPoints){
+			levels[i] = pointsToLevel(points);
 		}
 		return levels;
 	}
 
-	public int getBranchLevel(){
-		return sum(getLevels());
+	//Returns level of the branch
+	@property int level(){
+		return leafsLevels[].sum;
 	}
 
-	public int pointsToLevel(int points){
-		int level = maxLevel;
-		foreach_reverse(int multiplier; multipliers){
-			if(points >= multiplier*pop_const){
+	@property double effectiveness(){
+
+	}
+
+	//Converts raw leaf points to leaf level
+	int pointsToLevel(int points){
+		int level = MAX_LEVEL;
+		foreach_reverse(int multiplier; MULTIPLIERS){
+			if(points >= multiplier * POPULATION_CONSTANT){
 				return level;
 			}
 			level--;
@@ -40,25 +51,22 @@ class Branch {
 		return level;
 	}
 
-	public int develop(int usable_points, int leafId){
-		int nextLevel = pointsToLevel(points[leafId]) + 1;
-		int nextLevelPoints = (multipliers[nextLevel] * pop_const);
-		if(nextLevel > 5){
-			return usable_points;
+	//Increases the number of points within selected leaf
+	int develop(uint points, int leaf){
+		int leafLevel = leafsLevels[leaf];
+		if(leafLevel >= MAX_LEVEL){
+			return points;
 		}
-		int pointsNeeded = nextLevelPoints - points[leafId];
-		if(pointsNeeded <= usable_points){
-			points[leafId] += pointsNeeded;
-			usable_points -= pointsNeeded;
+		int pointsNeeded = MULTIPLIERS[leafLevel + 1] * POPULATION_CONSTANT - _leafsPoints[leaf];
+		if(points <= pointsNeeded){
+			_leafsPoints[leaf] += points;
+			return 0;
 		}
-		else {
-			points[leafId] += usable_points;
-			usable_points = -1;
-		}
-		return usable_points;
+		_leafsPoints[leaf] += pointsNeeded;
+		return points -= pointsNeeded;
 	}
 
-	public Branch dup() const {
-		return new Branch(name, leafsNames, points.dup());
+	Branch dup() {
+		return new Branch(_leafsPoints.dup);
 	}
 }

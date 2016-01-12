@@ -8,7 +8,6 @@ import src.logic.branch;
 class Player {
 	private Planet[] _planets;
 	private Ship[] _ships;
-	private uint _military_units = 0;
 	private string _name;
 	private KnowledgeTree _knowledgeTree;
 
