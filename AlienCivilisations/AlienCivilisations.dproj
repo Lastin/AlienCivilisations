@@ -108,16 +108,16 @@
     <Compile Include="src\entities\map.d" />
     <Compile Include="src\states\play.d" />
     <Compile Include="src\states\menu.d" />
-    <Compile Include="src\logic\branch.d" />
-    <Compile Include="src\logic\knowledgeTree.d" />
     <Compile Include="src\containers\vector2d.d" />
     <Compile Include="src\logic\ai.d" />
-    <Compile Include="src\containers\kdTree.d" />
-    <Compile Include="src\containers\hypotheticalWorld.d" />
     <Compile Include="src\entities\ship.d" />
     <Compile Include="src\gameFrame.d" />
     <Compile Include="src\states\gameState.d" />
     <Compile Include="src\handlers\jsonParser.d" />
+    <Compile Include="src\entities\knowledgeTree.d" />
+    <Compile Include="src\entities\branch.d" />
+    <Compile Include="src\logic\hypotheticalWorld.d" />
+    <Compile Include="src\logic\order.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

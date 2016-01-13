@@ -1,14 +1,13 @@
 ﻿module src.entities.planet;
 
-import std.math;
 import src.containers.vector2d;
-import std.conv;
+import src.entities.branch;
+import src.entities.knowledgeTree;
 import src.entities.player;
-import src.logic.knowledgeTree;
-import std.algorithm;
-import src.logic.branch;
-import std.stdio;
 import src.entities.ship;
+import std.algorithm;
+import std.conv;
+import std.stdio;
 
 class Planet {
 	private immutable int _populationConstant = 10000;
@@ -89,9 +88,9 @@ class Planet {
 		//food supply at best increases at arythmetic rate
 		//1 > 2 > 3 > 4 > 5
 		_food -= populationSum;
-		int foodBranchLevel = _owner.knowledgeTree.branch(BranchName.Food).level;
+		double foodB = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
 		uint workingUnits = _population[2 .. 6].sum;//population[2] + population[3] + population[4] + population[5] + population[6];
-		_food += to!int(workingUnits * foodBranchLevel / 0.5);
+		_food += to!int(workingUnits * foodB);
 	}
 	private void growPopulation(){
 		double overPopulationFactor = 1;
@@ -129,20 +128,20 @@ class Planet {
 		}
 		else {
 			while(value >= 0){
-				uint x = cast(uint)floor(cast(double)value / _population.length);
-				if(x == 0){
-					x = cast(uint)ceil(abs!double(x * _population.length - value));
+				uint perGroup = to!uint(value / _population.length);
+				if(perGroup == 0){
+					perGroup = 1;
 				}
 				for(int i=0; i < _population.length; i++){
 					if(_population[i] == 0)
 						continue;
-					if(_population[i] < x){
+					if(_population[i] < perGroup){
 						_population[i] = 0;
 						value -= _population[i];
 					}
 					else {
-						_population[i] -= x;
-						value -= x;
+						_population[i] -= perGroup;
+						value -= perGroup;
 					}
 				}
 			}

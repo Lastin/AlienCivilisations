@@ -1,9 +1,9 @@
 ﻿module src.entities.ship;
 
+import src.entities.knowledgeTree;
 import src.entities.planet;
 import src.entities.player;
-import src.logic.knowledgeTree;
-import std.algorithm;
+import std.conv;
 
 enum ShipType : ubyte {
 	Military,
@@ -13,15 +13,15 @@ enum ShipType : ubyte {
 enum int MULTIPLIER = 1000;
 
 class Ship {
-
 	private immutable uint _capacity;
 	private Player _owner;
 
 
 	this(Player owner){
 		_owner = owner;
-		_capacity = 
-		//TODO: add capacity initialiser
+		double energy = _owner.knowledgeTree.branch(BranchName.Energy).effectiveness;
+		double science = _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
+		_capacity = cast(int)(MULTIPLIER * energy * science);
 	}
 
 	abstract @property bool empty();
@@ -29,16 +29,14 @@ class Ship {
 
 class MilitaryShip : Ship {
 	private uint _onboard = 0;
-	private immutable uint _militaryLevel;
 
-	this(Player player, uint militaryLevel){
+	this(Player player){
 		super(player);
-		_militaryLevel = militaryLevel;
 	}
 
 	void attack(Planet p){
 		if(p.owner && p.owner != _owner){
-			p.attack(_militaryLevel * _onboard);
+			p.attack(to!int(_owner.knowledgeTree.branch(BranchName.Military).effectiveness * _onboard));
 		}
 	}
 

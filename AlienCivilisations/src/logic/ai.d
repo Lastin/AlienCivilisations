@@ -1,13 +1,17 @@
 ﻿module src.logic.ai;
-import src.entities.player;
-import src.entities.planet;
+
+import src.entities.knowledgeTree;
 import src.entities.map;
-import src.logic.knowledgeTree;
-import src.containers.hypotheticalWorld;
+import src.entities.planet;
+import src.entities.player;
+import src.logic.hypotheticalWorld;
 
 class AI : Player{
-	this(KnowledgeTree knowledgeTree, Map map){
+	private HypotheticalWorld _hypoWorld;
+	private Player[] _players;
+	private Map map;
+	this(KnowledgeTree knowledgeTree, Map map, Player[] players){
 		super("AI", knowledgeTree);
-		//HypotheticalWorld hw = new HypotheticalWorld(knowledgeTree, planets, map);
+		_hypoWorld = new HypotheticalWorld(map, _players);
 	}
 }

@@ -1,12 +1,12 @@
 ﻿module src.states.play;
 
 import dlangui;
+import src.entities.knowledgeTree;
 import src.entities.map;
 import src.entities.planet;
 import src.entities.player;
 import src.gameFrame;
 import src.logic.ai;
-import src.logic.knowledgeTree;
 import src.states.gameState;
 import src.states.menu;
 import src.states.play;
@@ -88,7 +88,7 @@ class Play : VerticalLayout, GameState{
 	
 	void startNewGame(string pname){
 		_players ~= new Player(pname, new KnowledgeTree());
-		_players ~= new AI(new KnowledgeTree(), _map);
+		_players ~= new AI(new KnowledgeTree(), _map, _players);
 		_queuePosition = uniform(0, _players.length);
 		_map = new Map(2000, 16, _players);
 	}

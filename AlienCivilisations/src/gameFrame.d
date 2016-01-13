@@ -16,6 +16,7 @@ class GameFrame : AppFrame {
 		_fl = new FrameLayout();
 		_fl.layoutHeight(FILL_PARENT).layoutWidth(FILL_PARENT);
 		_console = initialiseConsole();
+		_fl.addChild(_console);
 		addChild(_fl);
 		keyEvent = delegate (Widget source, KeyEvent event) => handleKeyInput(source, event);
 	}
@@ -65,13 +66,11 @@ class GameFrame : AppFrame {
 		return _currentState.onKeyEvent(event);
 	}
 
-	public Widget setState(Widget widget){
+	Widget setState(Widget widget){
 		_fl.removeChild(_currentState);
+		_currentState.destroy;
 		_currentState = widget;
 		_fl.addChild(widget);
-		_fl.addChild(_console);
-		needDraw();
-		_fl.needDraw();
 		return widget;
 	}
 }
