@@ -15,8 +15,8 @@ class Map : CanvasWidget {
 	this(float size, int planetCount, Player[] players){
 		_size = size;
 		foreach(Player player; players){
-			auto p = new Planet(getFreeLocation(10), 10, true, player.getName ~ "'s planet");
-			p.setOwner(player, new uint[8]);
+			auto p = new Planet(getFreeLocation(10), 10, true, player.name ~ "'s planet");
+			p.setOwner(player);
 			addPlanet(p);
 		}
 		for(size_t i=players.length; i<planetCount; i++){

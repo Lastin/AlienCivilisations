@@ -36,7 +36,7 @@ class Play : VerticalLayout, GameState{
 		_planetInfo = new TableLayout();
 		auto inhabitBtn = new Button("inhabitButton", "Inhabit"d);
 		//add elements
-		addChild(new TextWidget("currentPlayer", "Current player: " ~ to!dstring(getCurrentPlayer().getName())).fontSize(25).fontWeight(FontWeight.Bold));
+		addChild(new TextWidget("currentPlayer", "Current player: " ~ to!dstring(currentPlayer.name)).fontSize(25).fontWeight(FontWeight.Bold));
 		addChild(_horizontalPanel);
 		_horizontalPanel.addChild(_planetsList);
 		_planetsList.adapter = _planetsListAdapter;
@@ -82,7 +82,7 @@ class Play : VerticalLayout, GameState{
 		_planetInfo.addChild(new TextWidget("owner", ""d).fontSize(16));
 	}
 	
-	public Player getCurrentPlayer(){
+	@property Player currentPlayer(){
 		return _players[_queuePosition];
 	}
 	
@@ -112,8 +112,8 @@ class Play : VerticalLayout, GameState{
 		_planetInfo.childById("population").text = to!dstring(selectedPlanet.populationSum);
 		auto radius = to!dstring(selectedPlanet.radius);
 		_planetInfo.childById("radius").text = radius;
-		auto owner = selectedPlanet.getOwner;
-		_planetInfo.childById("owner").text = owner ? to!dstring(owner.getName) : "No owner";
+		auto owner = selectedPlanet.owner;
+		_planetInfo.childById("owner").text = owner ? to!dstring(owner.name) : "No owner";
 		if(!owner){
 			_planetInfo.addChild(inhabitBtn);
 			inhabitBtn.click = delegate (Widget src){

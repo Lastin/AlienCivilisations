@@ -70,10 +70,9 @@ class Planet {
 		return 0;
 	}
 
-	Planet setOwner(Player player, uint[8] population){
+	Planet setOwner(Player player, uint[8] population = [1000,1000,1000,1000,1000,1000,1000,1000]){
 		_owner = player;
-		//auto x = to!int(capacity / _population.length / 10);
-		_population = population;//[x,x,x,x,x,x,x,x];
+		_population = population;
 		return this;
 	}
 
@@ -90,7 +89,7 @@ class Planet {
 		//food supply at best increases at arythmetic rate
 		//1 > 2 > 3 > 4 > 5
 		_food -= populationSum;
-		int foodBranchLevel = _owner.getKnowledgeTree().getBranch("Food").getBranchLevel();
+		int foodBranchLevel = _owner.knowledgeTree.branch(BranchName.Food).level;
 		uint workingUnits = _population[2 .. 6].sum;//population[2] + population[3] + population[4] + population[5] + population[6];
 		_food += to!int(workingUnits * foodBranchLevel / 0.5);
 	}
@@ -130,9 +129,9 @@ class Planet {
 		}
 		else {
 			while(value >= 0){
-				uint x = floor(value / _population.length);
+				uint x = cast(uint)floor(cast(double)value / _population.length);
 				if(x == 0){
-					x = ceil(abs(x * _population.length - value));
+					x = cast(uint)ceil(abs!double(x * _population.length - value));
 				}
 				for(int i=0; i < _population.length; i++){
 					if(_population[i] == 0)

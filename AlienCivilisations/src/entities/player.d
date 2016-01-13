@@ -12,8 +12,8 @@ class Player {
 	private KnowledgeTree _knowledgeTree;
 
 	this(string name, KnowledgeTree knowledgeTree){
-		this.knowledgeTree = knowledgeTree;
-		this.name = name;
+		_name = name;
+		_knowledgeTree = knowledgeTree;
 	}
 
 	@property KnowledgeTree knowledgeTree(){

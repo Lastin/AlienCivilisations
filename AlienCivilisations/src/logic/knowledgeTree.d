@@ -29,30 +29,35 @@ enum LEAF_NAMES : string[]{
 
 public class KnowledgeTree {
 
-	private Branch _food, _science, _military, _energy;
 	private enum double _branchEffect = 0.04;
 	private enum double _leafEffect = 0.1;
+	private Branch _energy, _food, _military, _science;
 	DList!Order _queue;
 
-	this(int[5] points = [0,0,0,0,0], DList!Order queue = make!(DList!Order)()){
-		_food = new Branch(points);
-		_science = new Branch(points);
-		_military = new Branch(points);
-		_energy = new Branch(points);
+	this(uint[5][4] points = [
+			[0,0,0,0,0],
+			[0,0,0,0,0],
+			[0,0,0,0,0],
+			[0,0,0,0,0],
+		], DList!Order queue = make!(DList!Order)()){
+		_energy = 	new Branch(points[0]);
+		_food = 	new Branch(points[1]);
+		_military = new Branch(points[2]);
+		_science = 	new Branch(points[3]);
 		_queue = queue;
 	}
 
 	@property Branch branch(BranchName branch){
 		switch(branch){
-			case BranchName.Energy: return _energy;
-			case BranchName.Food: return _food;
-			case BranchName.Military: return _military;
-			case BranchName.Science: return _science;
-			default: throw new Exception("Unknown branch");
+			case BranchName.Energy: 	return _energy;
+			case BranchName.Food: 		return _food;
+			case BranchName.Military: 	return _military;
+			case BranchName.Science: 	return _science;
+			default: 					throw new Exception("Unknown branch");
 		}
 	}
 
-	@property double effectiveness(BranchName branch){
+	//@property double effectiveness(BranchName branch){
 	/*
 	 * Food <- Science
 	 * Food <- Energy
@@ -76,7 +81,7 @@ public class KnowledgeTree {
 	 * Energy[0] <- Science[0]
 	 * Energy[1] <- Science[0]
 	 */
-		double total = 1.0;
+	/*	double total = 1.0;
 		if(i.branch == food){
 			total += branchEffect * getBranch("Science").getBranchLevel();
 			total += branchEffect * getBranch("Energy").getBranchLevel();
@@ -107,14 +112,16 @@ public class KnowledgeTree {
 			}
 		}
 		return total;
-	}
-
-
-	public uint develop(uint civil_units){
-	}
+	}*/
 
 	//Returns duplicate of the current object, without references to original
 	KnowledgeTree dup(){
-		return new KnowledgeTree([food.dup, science.dup, military.dup, energy.dup], _queue.dup);
+		uint[5][4] pointsCopy = [
+			_energy.leafsLevels,
+			_food.leafsLevels,
+			_military.leafsLevels,
+			_science.leafsLevels
+		];
+		return new KnowledgeTree(pointsCopy, _queue.dup);
 	}
 }
