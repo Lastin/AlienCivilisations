@@ -7,11 +7,13 @@ interface Orderable {
 }
 
 class KnowledgeOrder : Orderable {
-	Branch branch;
-	int leaf;
-	this(Branch b, int l){
-		branch = b;
+	private Branch _branch;
+	private int _leaf;
+	this(Branch branch, int leaf){
+		_branch = branch;
+		_leaf = leaf;
 	}
+	//Returns true if order has been completed
 	bool execute(){
 		return false;
 	}

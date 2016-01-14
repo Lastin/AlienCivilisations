@@ -87,8 +87,16 @@ class Play : VerticalLayout, GameState{
 	}
 	
 	void startNewGame(string pname){
-		_players ~= new Player(pname, new KnowledgeTree());
-		_players ~= new AI(new KnowledgeTree(), _map, _players);
+		immutable uint[][] points = 
+			[
+				[0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0]
+			];
+		_players ~= new Player(pname, new KnowledgeTree(points.to!(uint[][])));
+		_players ~= new AI(new KnowledgeTree(points.to!(uint[][])), _map, _players);
 		_queuePosition = uniform(0, _players.length);
 		_map = new Map(2000, 16, _players);
 	}

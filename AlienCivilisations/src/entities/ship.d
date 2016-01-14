@@ -15,7 +15,7 @@ enum int MULTIPLIER = 1000;
 class Ship {
 	private immutable uint _capacity;
 	private Player _owner;
-
+	private bool _complete = false;
 
 	this(Player owner){
 		_owner = owner;
@@ -24,7 +24,10 @@ class Ship {
 		_capacity = cast(int)(MULTIPLIER * energy * science);
 	}
 
-	abstract @property bool empty();
+	Ship complete(){
+		_complete = true;
+		return this;
+	}
 }
 
 class MilitaryShip : Ship {
@@ -49,19 +52,19 @@ class MilitaryShip : Ship {
 		_onboard = _capacity;
 		return units - freeSpaces;
 	}
+	@property bool empty(){
+		return _onboard <= 0;
+	}
 }
 
 class InhabitationShip : Ship {
-	private uint[8] _onboard = [0,0,0,0,0,0,0,0];
-
 	this(Player player, uint[8] population){
 		super(player);
-		_onboard = population;
 	}
 
 	void inhabit(Planet p){
-		if(p.owner == _owner && !empty){
-			p.setOwner(_owner, _onboard);
+		if(p.owner == _owner){
+			p.setOwner(_owner);
 		}
 	}
 }

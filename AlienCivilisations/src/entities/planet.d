@@ -9,22 +9,34 @@ import std.algorithm;
 import std.conv;
 import std.stdio;
 
+public enum int POPULATION_CONSTANT = 10000;
+
 class Planet {
-	private immutable int _populationConstant = 10000;
 	private immutable string _name;
-	private Vector2d _position;
-	private float _radius;
-	private uint[8] _population = [0,0,0,0,0,0,0,0];
+	private immutable float _radius;
+	private immutable bool _breathableAtmosphere;
 	private uint _food;
-	private bool _breathableAtmosphere;
 	private uint _militaryUnits = 0;
 	private Player _owner;
+	private Vector2d _position;
+	private uint[8] _population = [0,0,0,0,0,0,0,0];
+	private uint _workForce = 0;
 
 	this(Vector2d position, float radius, bool breathableAtmosphere, string name){
 		_position = position;
 		_radius = radius;
 		_breathableAtmosphere = breathableAtmosphere;
 		_name = name;
+	}
+
+	this(Vector2d position, float radius, bool breathableAtmosphere, string name,
+		uint food, uint militaryUnits, Player owner, uint[8] population){
+		//constructor for creating the planet from existing properties
+			this(position, radius, breathableAtmosphere, name);
+			_food = food;
+			_militaryUnits = militaryUnits;
+			_owner = owner;
+			_population = population;
 	}
 
 	@property Vector2d position(){
@@ -36,7 +48,7 @@ class Planet {
 	}
 
 	@property int capacity(){
-		return to!int(_radius * _populationConstant);
+		return to!int(_radius * POPULATION_CONSTANT);
 	}
 
 	@property uint populationSum(){
@@ -69,9 +81,9 @@ class Planet {
 		return 0;
 	}
 
-	Planet setOwner(Player player, uint[8] population = [1000,1000,1000,1000,1000,1000,1000,1000]){
+	Planet setOwner(Player player){
 		_owner = player;
-		_population = population;
+		_population = [1000,1000,1000,1000,1000,1000,1000,1000];
 		return this;
 	}
 
@@ -79,6 +91,7 @@ class Planet {
 		//this function ends turn of the player affecting planet attributes
 		if(_owner !is null){
 			growPopulation();
+			_workForce = to!uint(_population[2 .. 6].sum * _owner.knowledgeTree.branch(BranchName.Energy).effectiveness);
 			affectFood();
 		}
 	}
@@ -88,9 +101,9 @@ class Planet {
 		//food supply at best increases at arythmetic rate
 		//1 > 2 > 3 > 4 > 5
 		_food -= populationSum;
-		double foodB = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
-		uint workingUnits = _population[2 .. 6].sum;//population[2] + population[3] + population[4] + population[5] + population[6];
-		_food += to!int(workingUnits * foodB);
+		//fpe - food production effectiveness
+		double fpe = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
+		_food += to!int(_workForce * fpe);
 	}
 	private void growPopulation(){
 		double overPopulationFactor = 1;
@@ -148,15 +161,18 @@ class Planet {
 		}
 	}
 
-	Ship produceShip(ShipType type){
-
-		if(type == ShipType.Military){
-
+	private Planet produceShips(Ship ship){
+		double productionCost = POPULATION_CONSTANT / 4;
+		if(_workForce >= productionCost){
+			_workForce -= to!int(productionCost);
+			ship.complete;
 		}
-		if(type == ShipType.Inhabitation){
+		return this;
+	}
 
-		}
-		return null;
+	Planet dup(){
+		Planet copy = new Planet(_position, _radius, _breathableAtmosphere, _name, _food, _militaryUnits, _owner.dup, _population.dup[0..8]);
+		return copy;
 	}
 }
 

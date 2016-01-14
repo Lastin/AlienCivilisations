@@ -1,12 +1,13 @@
 ﻿module src.entities.branch;
 
 import src.entities.knowledgeTree;
+import src.entities.planet;
 import std.algorithm;
 
 class Branch {
 	private enum double DEPENDENCY_EFFECT = 0.2;
 	enum int[5] MULTIPLIERS = [2,4,8,16,32];
-	enum int POPULATION_CONSTANT = 50000;
+	//enum int POPULATION_CONSTANT = 10000;
 	enum int MAX_LEVEL = 5;
 	private uint[] _leafsPoints;
 	private immutable BranchName _name;
@@ -36,11 +37,22 @@ class Branch {
 	}
 
 	@property double effectiveness(){
-		double level = level;
+		double branchLevel = level + 1;
 		foreach(Branch dependency; _dependencies){
-			level *= dependency.level;
+			branchLevel += dependency.level * DEPENDENCY_EFFECT;
 		}
-		return level;
+		return branchLevel;
+	}
+
+	@property int[] undevelopedLeafs(){
+		auto ll = leafsLevels;
+		int[] undeveloped;
+		for(int i=0; i<ll.length; i++){
+			if(ll[i] < 5){
+				undeveloped ~= i;
+			}
+		}
+		return undeveloped;
 	}
 
 	//Converts raw leaf points to leaf level
@@ -76,6 +88,6 @@ class Branch {
 	}
 
 	Branch dup() {
-		return new Branch(_name, _leafsPoints.dup[0 .. 5]);
+		return new Branch(_name, _leafsPoints.dup);
 	}
 }

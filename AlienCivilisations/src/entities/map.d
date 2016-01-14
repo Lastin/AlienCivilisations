@@ -81,6 +81,10 @@ class Map : CanvasWidget {
 	}
 
 	public Map dup() {
+		Planet[] planetsCopy;
+		foreach(Planet p; planets){
+			planetsCopy ~= p.dup;
+		}
 		return new Map(_size, planets.dup);
 	}
 

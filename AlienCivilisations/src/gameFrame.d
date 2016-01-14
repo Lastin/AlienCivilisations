@@ -68,7 +68,7 @@ class GameFrame : AppFrame {
 
 	Widget setState(Widget widget){
 		_fl.removeChild(_currentState);
-		_currentState.destroy;
+		//_currentState.destroy;
 		_currentState = widget;
 		_fl.addChild(widget);
 		return widget;

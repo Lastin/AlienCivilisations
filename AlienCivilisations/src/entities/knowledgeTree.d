@@ -24,16 +24,18 @@ enum LEAF_NAMES : string[]{
 public class KnowledgeTree {
 	private Branch _energy, _food, _military, _science;
 
-	this(uint[][] points = [
-			[0,0,0,0,0],
-			[0,0,0,0,0],
-			[0,0,0,0,0],
-			[0,0,0,0,0]])
-	{
+	this(uint[][] points){
 		_energy = 	new Branch(BranchName.Energy,	points[0]);
 		_food = 	new Branch(BranchName.Food, 	points[1]);
 		_military = new Branch(BranchName.Military, points[2]);
 		_science = 	new Branch(BranchName.Science,	points[3]);
+	}
+
+	this(Branch[] branches){
+		_energy =	branches[0];
+		_food =		branches[1];
+		_military = branches[2];
+		_science = 	branches[3];
 	}
 
 	@property Branch branch(BranchName branch){
@@ -46,14 +48,23 @@ public class KnowledgeTree {
 		}
 	}
 
+	@property Tuple!(Branch, int[])[] possibleDevelopments(){
+		Tuple!(Branch, int[])[] possibilities;
+		Tuple!(Branch, int[])[] temp;
+		temp ~= tuple(_energy,	_energy.undevelopedLeafs);
+		temp ~= tuple(_food,	_food.undevelopedLeafs);
+		temp ~= tuple(_military,_military.undevelopedLeafs);
+		temp ~= tuple(_science,	_science.undevelopedLeafs);
+		foreach(Tuple!(Branch, int[]) each; temp){
+			if(each[1].length > 0){
+				possibilities ~= each;
+			}
+		}
+		return possibilities;
+	}
+
 	//Returns duplicate of the current object, without references to original
 	KnowledgeTree dup(){
-		uint[][] pointsCopy = [
-			_energy.leafsPoints.dup,
-			_food.leafsPoints.dup,
-			_military.leafsPoints.dup,
-			_science.leafsPoints.dup
-		];
-		return new KnowledgeTree(pointsCopy);
+		return new KnowledgeTree([_energy.dup, _food.dup, _military.dup, _science.dup]);
 	}
 }
