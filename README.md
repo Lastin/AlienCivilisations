@@ -11,48 +11,33 @@ Using monodevelop requires installation of add-in:
 *Tools > Add-in Manager > Gallery > Languge Bindings > D Language Binding*
 
 =================================================
-Project uses set of Derelict libraries.
-Those are build using "dub" (http://code.dlang.org/download)
-```
-cd $DERELICT
-git clone https://github.com/DerelictOrg/DerelictSDL2.git
-git clone https://github.com/DerelictOrg/DerelictGL3.git
-git clone https://github.com/DerelictOrg/DerelictUtil.git
+Project utilises the Dlang UI
+https://github.com/buggins/dlangui
+which uses Derelict libraries for dynamic binding of OpenGL, SDL and other C++ libraries to D.
 
-cd DerelictSDL2
-dub build
-cd ../DerelictGL3
-dub build
-cd ../DerelictUtil
-dub build
-```
-I have placed them in:
-AlienCivilisations/AlienCivilisations/lib/derelict/
+To clone all needed repositories, run `clone_script` from projects main directory.
 
-=================================================
-Derelict files have to be linked to project:
-*Project > :AlienCivilisations: Options > Build > Compiling*
-Libraries filed contains:
-```
--Ilib/derelict/DerelictSDL2/source
--Ilib/derelict/DerelictGL3/source
--Ilib/derelict/DerelictUtil/source
--Ilib/derelict/DerelictGLFW3/source
-```
+Sources of the Derelict and Dlang UI must be used to `includes`
+*Project Options > Build > Includes > add source folders*
 
-Extra linker options contain:
-```
-lib/derelict/DerelictSDL2/lib/libDerelictSDL2.a
--Llib/derelict/DerelictGL3/lib/libDerelictGL3.a
--Llib/derelict/DerelictGLFW3/lib/libDerelictGLFW3.a
--Llib/derelict/DerelictUtil/lib/libDerelictUtil.a
--L-ldl -lglfw3
-```
+Also add dlangui-monod-linux to project, and set it as dependency to your project
+*Project Options > Build > Project Dependencies*
 
-(all but this first one in linker options must have -L prefix, otherwise it will not be passed as linkerflag refer to: -Llinkerflag)
+In *Project Options > Build > Compiling > Linking* tick `Link in static/shared libraries from nested dependencies`
+
+
+In *Project Options > Build > Compiling > Compiling* add to *Version constants* `USE_OPENGL;USE_SDL;USE_FREETYPE;EmbedStandardResources`
+and in *Extra Compiler Options* add
+```
+-Jviews
+-Jviews/res
+-Jviews/res/i18n
+-Jviews/res/mdpi
+-Jviews/res/hdpi
+```
 
 =================================================
-Library GLFW3 must be installed on the system.
+In older version of the program library GLFW3 had to be installed on the system.
 It can be downloaded from official website: http://www.glfw.org/
 ```
 #Install dependencies
