@@ -137,4 +137,8 @@ class Play : VerticalLayout, GameState{
 		}
 		return true;
 	}
+
+	@property Player[] players(){
+		return _players;
+	}
 }
