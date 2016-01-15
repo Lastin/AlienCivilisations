@@ -1,2 +1,4 @@
 *~
 *.o
+AlienCivilisations/bin/*
+AlienCivilisations/obj/*
