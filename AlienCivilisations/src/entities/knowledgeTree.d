@@ -80,7 +80,7 @@ public class KnowledgeTree {
 	}
 
 	//Necessary way for adding dependencies to duplicate 
-	pure void addDependencies(KnowledgeTree kt, Branch branch){
+	const pure void addDependencies(KnowledgeTree kt, Branch branch){
 		if(branch.name == BranchName.Energy){
 
 		}
@@ -115,7 +115,7 @@ public class KnowledgeTree {
 	}
 
 	//Returns duplicate of the current object, without references to original
-	KnowledgeTree dup() {
+	const KnowledgeTree dup() {
 		auto branches = [_energy.dup, _food.dup, _military.dup, _science.dup];
 		auto copy = new KnowledgeTree(branches);
 		foreach(Branch b; branches){
@@ -124,7 +124,7 @@ public class KnowledgeTree {
 		return copy;
 	}
 
-	string toString(){
+	const string toString(){
 		return
 			"energy:     " 	~ to!string(_energy.leafsLevels) ~
 			"\nfood:     " 	~ to!string(_food.leafsLevels) ~

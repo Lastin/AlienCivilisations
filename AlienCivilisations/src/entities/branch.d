@@ -21,7 +21,7 @@ class Branch {
 	}
 
 	//Returns levels of the leafs of current branch
-	@property uint[] leafsLevels() {
+	const @property uint[] leafsLevels() {
 		uint[] levels;
 		foreach(uint points; _leafsPoints){
 			levels ~= pointsToLevel(points);
@@ -30,23 +30,23 @@ class Branch {
 	}
 
 	//Returns level of the branch
-	@property int level(){
+	const @property int level(){
 		return leafsLevels[].sum;
 	}
 
-	@property uint[] leafsPoints(){
-		return _leafsPoints;
+	const @property uint[] leafsPoints(){
+		return _leafsPoints.dup;
 	}
 
-	@property double effectiveness(){
+	const @property double effectiveness(){
 		double branchLevel = level + 1;
-		foreach(Branch dependency; _dependencies){
+		foreach(const Branch dependency; _dependencies){
 			branchLevel += dependency.level * DEPENDENCY_EFFECT;
 		}
 		return branchLevel;
 	}
 
-	@property int[] undevelopedLeafs() {
+	const @property int[] undevelopedLeafs(){
 		auto ll = leafsLevels;
 		int[] undeveloped;
 		for(int i=0; i<ll.length; i++){
@@ -57,12 +57,12 @@ class Branch {
 		return undeveloped;
 	}
 
-	pure @property BranchName name(){
+	const pure @property BranchName name(){
 		return _name;
 	}
 
 	//Converts raw leaf points to leaf level
-	int pointsToLevel(uint points) nothrow {
+	const pure int pointsToLevel(uint points) {
 		int level = MAX_LEVEL;
 		foreach_reverse(int multiplier; MULTIPLIERS){
 			if(points >= multiplier * POPULATION_CONSTANT){
@@ -94,7 +94,7 @@ class Branch {
 		return this;
 	}
 
-	Branch dup() {
+	const Branch dup() {
 		return new Branch(_name, _leafsPoints.dup);
 	}
 }

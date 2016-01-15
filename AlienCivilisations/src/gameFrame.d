@@ -55,6 +55,7 @@ class GameFrame : AppFrame {
 			else if(_console.visible){
 				auto c_output = _console.childById("c_output");
 				auto c_input = _console.childById("c_input");
+				EditBox x = cast(EditBox)(c_input);
 				if(event.keyCode == KeyCode.RETURN){
 					auto command = c_input.text;
 					if(command.length > 0){
@@ -63,6 +64,7 @@ class GameFrame : AppFrame {
 						auto answer = _commandParser.runCommand(to!string(command));
 						foreach(string line; answer){
 							c_output.text = c_output.text ~ "\n" ~ to!dstring(line);
+							x.pos;
 						}
 					}
 				}
