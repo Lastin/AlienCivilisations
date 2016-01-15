@@ -3,6 +3,8 @@
 import src.entities.knowledgeTree;
 import src.entities.planet;
 import std.algorithm;
+import std.stdio;
+import std.conv;
 
 class Branch {
 	private enum double DEPENDENCY_EFFECT = 0.2;
@@ -19,10 +21,10 @@ class Branch {
 	}
 
 	//Returns levels of the leafs of current branch
-	@property uint[] leafsLevels(){
+	@property uint[] leafsLevels() {
 		uint[] levels;
-		foreach(size_t i, uint points; _leafsPoints){
-			levels[i] = pointsToLevel(points);
+		foreach(uint points; _leafsPoints){
+			levels ~= pointsToLevel(points);
 		}
 		return levels;
 	}
@@ -44,7 +46,7 @@ class Branch {
 		return branchLevel;
 	}
 
-	@property int[] undevelopedLeafs(){
+	@property int[] undevelopedLeafs() {
 		auto ll = leafsLevels;
 		int[] undeveloped;
 		for(int i=0; i<ll.length; i++){
@@ -55,8 +57,12 @@ class Branch {
 		return undeveloped;
 	}
 
+	pure @property BranchName name(){
+		return _name;
+	}
+
 	//Converts raw leaf points to leaf level
-	int pointsToLevel(int points){
+	int pointsToLevel(uint points) nothrow {
 		int level = MAX_LEVEL;
 		foreach_reverse(int multiplier; MULTIPLIERS){
 			if(points >= multiplier * POPULATION_CONSTANT){
@@ -68,12 +74,13 @@ class Branch {
 	}
 
 	//Increases the number of points within selected leaf
-	int addPoints(uint points, int leaf){
+	int addPoints(int points, int leaf){
 		int leafLevel = leafsLevels[leaf];
 		if(leafLevel >= MAX_LEVEL){
 			return points;
 		}
-		int pointsNeeded = MULTIPLIERS[leafLevel + 1] * POPULATION_CONSTANT - _leafsPoints[leaf];
+		int pointsNeeded = MULTIPLIERS[leafLevel] * POPULATION_CONSTANT - _leafsPoints[leaf];
+		debug writeln("Points needed " ~ to!string(pointsNeeded));
 		if(points <= pointsNeeded){
 			_leafsPoints[leaf] += points;
 			return 0;
@@ -82,7 +89,7 @@ class Branch {
 		return points -= pointsNeeded;
 	}
 
-	Branch addDependency(Branch dependency){
+	pure Branch addDependency(Branch dependency){
 		_dependencies ~= dependency;
 		return this;
 	}
