@@ -15,7 +15,6 @@ class Menu : VerticalLayout, GameState {
 		heading.fontSize = 30;
 		heading.padding = Rect(30, 30, 30, 30);
 		heading.margins = Rect(5, 5, 5, 200);
-		margins = Rect(200,20,200,20);
 		heading.alignment(Align.Right | Align.Center);
 		addChild(heading);
 		addButtons(play);

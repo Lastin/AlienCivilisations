@@ -124,7 +124,7 @@ public class KnowledgeTree {
 		return copy;
 	}
 
-	const string toString(){
+	override const string toString(){
 		return
 			"energy:     " 	~ to!string(_energy.leafsLevels) ~
 			"\nfood:     " 	~ to!string(_food.leafsLevels) ~

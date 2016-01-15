@@ -21,6 +21,12 @@ class GameFrame : AppFrame {
 		_fl.addChild(_console);
 		addChild(_fl);
 		keyEvent = delegate (Widget source, KeyEvent event) => handleKeyInput(source, event);
+		mouseEvent = delegate (Widget source, MouseEvent event){
+			if(_console.visible){
+				return true;
+			}
+			return _currentState.onMouseEvent(event);
+		};
 		_commandParser = new CommandParser();
 	}
 
@@ -29,6 +35,7 @@ class GameFrame : AppFrame {
 		console.backgroundColor(0x80173636);
 		console.textColor("#ffffff");
 		EditBox c_output = new EditBox("c_output", "Console"d);
+		c_output.minHeight(300);
 		c_output.showLineNumbers(true);
 		c_output.enabled(false);
 		c_output.layoutWeight = FILL_PARENT;
@@ -43,7 +50,6 @@ class GameFrame : AppFrame {
 	bool handleKeyInput(Widget source, KeyEvent event){
 		if(event.action == KeyAction.KeyDown){
 			if(event.keyCode == KeyCode.F4){
-				writeln(_console ? "not null" : "null");
 				if(_console.visible){
 					_console.visibility = Visibility.Invisible;
 				}
@@ -64,7 +70,6 @@ class GameFrame : AppFrame {
 						auto answer = _commandParser.runCommand(to!string(command));
 						foreach(string line; answer){
 							c_output.text = c_output.text ~ "\n" ~ to!dstring(line);
-							x.pos;
 						}
 					}
 				}

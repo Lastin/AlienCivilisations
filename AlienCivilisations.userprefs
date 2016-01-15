@@ -1,11 +1,6 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/gameFrame.d">
-    <Files>
-      <File FileName="AlienCivilisations/src/gameFrame.d" Line="5" Column="5" />
-      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/widgets/editors.d" Line="52" Column="52" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

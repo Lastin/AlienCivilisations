@@ -45,7 +45,7 @@ class Play : VerticalLayout, GameState{
 		_planetInfo.addChild(inhabitBtn);
 		//set properties
 		layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
-		//padding = 10;
+		padding = 10;
 		_horizontalPanel.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
 		_planetInfo.padding = 10;
 		_planetInfo.colCount = 2;
