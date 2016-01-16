@@ -105,7 +105,6 @@
     <Compile Include="src\entities\planet.d" />
     <Compile Include="src\entities\player.d" />
     <Compile Include="src\handlers\commandParser.d" />
-    <Compile Include="src\entities\map.d" />
     <Compile Include="src\states\play.d" />
     <Compile Include="src\states\menu.d" />
     <Compile Include="src\containers\vector2d.d" />
@@ -118,6 +117,8 @@
     <Compile Include="src\entities\branch.d" />
     <Compile Include="src\logic\hypotheticalWorld.d" />
     <Compile Include="src\logic\order.d" />
+    <Compile Include="src\handlers\gameManager.d" />
+    <Compile Include="src\entities\map.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

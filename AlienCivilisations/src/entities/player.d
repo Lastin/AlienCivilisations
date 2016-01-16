@@ -8,12 +8,12 @@ import src.entities.map;
 
 class Player {
 	private immutable string _name;
+	private GameManager _gm;
 	private KnowledgeTree _knowledgeTree;
 	private Ship[] _ships;
 	private bool _locked = true;
-	private Map _map;
 
-	this(string name, KnowledgeTree knowledgeTree, Map map){
+	this(string name, KnowledgeTree knowledgeTree){
 		_name = name;
 		_knowledgeTree = knowledgeTree;
 		_map = map;
