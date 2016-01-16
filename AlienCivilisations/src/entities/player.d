@@ -4,38 +4,56 @@ import src.entities.planet;
 import src.entities.ship;
 import src.entities.knowledgeTree;
 import src.entities.branch;
+import src.entities.map;
 
 class Player {
-	private Planet[] _planets;
-	private Ship[] _ships;
 	private immutable string _name;
 	private KnowledgeTree _knowledgeTree;
+	private Ship[] _ships;
 	private bool _locked = true;
+	private Map _map;
 
-	this(string name, KnowledgeTree knowledgeTree){
+	this(string name, KnowledgeTree knowledgeTree, Map map){
 		_name = name;
 		_knowledgeTree = knowledgeTree;
+		_map = map;
 	}
 
 	@property KnowledgeTree knowledgeTree(){
 		return _knowledgeTree;
 	}
-
-	@property Planet[] planets(){
-		return _planets;
-	}
-
 	@property string name(){
 		return _name;
 	}
+	@property bool locked() const {
+		return _locked;
+	}
+	@property Planet[] planets() {
+		Planet[] playerPlanets;
+		foreach(Planet p; _map.planets){
+			if(p.owner && p.owner == this){
+				playerPlanets ~= p;
+			}
+		}
+		return playerPlanets;
+	}
+	@property Ship[] availableShips() {
+		Ship[] available;
+		foreach(Ship s; _ships){
+			if(s.complete && !s.used){
+				available ~= s;
+			}
+		}
+		return available;
+	}
 
-	Player addPlanet(Planet p){
-		_planets ~= p;
-		return this;
+	void unlock(){
+		_locked = false;
 	}
 
 	Player finishTurn(){
 		//int
+		_locked = true;
 		return this;
 	}
 
@@ -62,6 +80,6 @@ class Player {
 
 	//created deep copy of variable
 	Player dup(){
-		return new Player(name.dup, _knowledgeTree.dup);
+		return new Player(name.dup, _knowledgeTree.dup, _map.dup);
 	}
 }

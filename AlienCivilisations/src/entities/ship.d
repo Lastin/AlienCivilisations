@@ -16,6 +16,7 @@ class Ship {
 	private immutable uint _capacity;
 	private Player _owner;
 	private bool _complete = false;
+	private bool _used = false;
 
 	this(Player owner){
 		_owner = owner;
@@ -24,9 +25,16 @@ class Ship {
 		_capacity = cast(int)(MULTIPLIER * energy * science);
 	}
 
-	Ship complete(){
+	Ship completeShip(){
 		_complete = true;
 		return this;
+	}
+
+	@property bool complete() const {
+		return _complete;
+	}
+	@property bool used() const {
+		return _used;
 	}
 }
 

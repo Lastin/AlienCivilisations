@@ -95,7 +95,7 @@ class Play : VerticalLayout, GameState{
 				[0, 0, 0, 0, 0],
 				[0, 0, 0, 0, 0]
 			];
-		_players ~= new Player(pname, new KnowledgeTree(points.to!(uint[][])));
+		_players ~= new Player(pname, new KnowledgeTree(points.to!(uint[][])), _map);
 		_players ~= new AI(new KnowledgeTree(points.to!(uint[][])), _map, _players);
 		_queuePosition = uniform(0, _players.length);
 		_map = new Map(2000, 16, _players);
@@ -127,8 +127,14 @@ class Play : VerticalLayout, GameState{
 			inhabitBtn.click = delegate (Widget src){
 				//TODO: inhabit option
 				if(selectedPlanet){
-					selectedPlanet.setOwner(_players[_queuePosition]);
-					_planetInfo.removeChild("inhabitButton");
+					//selectedPlanet.setOwner(_players[_queuePosition]);
+					if(currentPlayer.availableShips.length > 0){
+						currentPlayer.orderInhabit(selectedPlanet);
+						_planetInfo.removeChild("inhabitButton");
+					}
+					else {
+						debug writeln("No ships available");
+					}
 				}
 				return true;
 			};
@@ -136,6 +142,15 @@ class Play : VerticalLayout, GameState{
 			_planetInfo.removeChild("inhabitButton");
 		}
 		return true;
+	}
+
+	void endTurn(){
+		if(_queuePosition == _players.length){
+			_queuePosition = 0;
+		}
+		else {
+			_queuePosition++;
+		}
 	}
 
 	@property Player[] players(){

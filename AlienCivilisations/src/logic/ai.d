@@ -11,7 +11,7 @@ class AI : Player{
 	private Player[] _players;
 	private Map map;
 	this(KnowledgeTree knowledgeTree, Map map, Player[] players){
-		super("AI", knowledgeTree);
+		super("AI", knowledgeTree, map);
 		_hypoWorld = new HypotheticalWorld(map, _players);
 	}
 }
