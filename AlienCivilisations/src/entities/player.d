@@ -1,19 +1,15 @@
 ﻿module src.entities.player;
 
-import src.entities.ship;
 import src.entities.knowledgeTree;
 import src.entities.planet;
 import src.handlers.gameManager;
 
 class Player {
 	private immutable string _name;
-	private State* _state;
 	private KnowledgeTree _knowledgeTree;
-	private Ship[] _ships;
 	private bool _locked = true;
 
-	this(State* state, string name, KnowledgeTree knowledgeTree){
-		_state = state;
+	this(string name, KnowledgeTree knowledgeTree){
 		_name = name;
 		_knowledgeTree = knowledgeTree;
 	}
@@ -21,23 +17,13 @@ class Player {
 	@property KnowledgeTree knowledgeTree(){
 		return _knowledgeTree;
 	}
-	/** Self explanatory **/
+	/** Player's written name **/
 	@property string name(){
 		return _name;
 	}
 	/** Returns true if player moves are locked **/
 	@property bool locked() const {
 		return _locked;
-	}
-
-	@property Ship[] availableShips() {
-		Ship[] available;
-		foreach(Ship s; _ships){
-			if(s.complete && !s.used){
-				available ~= s;
-			}
-		}
-		return available;
 	}
 
 	Player completeTurn(){
