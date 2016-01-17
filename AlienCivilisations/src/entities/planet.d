@@ -12,31 +12,31 @@ import std.stdio;
 public enum int POPULATION_CONSTANT = 10000;
 
 class Planet {
-	private immutable string _name;
-	private immutable float _radius;
 	private immutable bool _breathableAtmosphere;
 	private uint _food = 0;
 	private uint _militaryUnits = 0;
+	private immutable string _name;
 	private Player _owner;
-	private Vector2d _position;
 	private uint[8] _population;
-	private uint _workForce = 0;
+	private Vector2d _position;
+	private immutable float _radius;
 
-	this(Vector2d position, float radius, bool breathableAtmosphere, string name){
-		_position = position;
-		_radius = radius;
+
+
+	this(bool breathableAtmosphere, string name, Vector2d position, float radius){
 		_breathableAtmosphere = breathableAtmosphere;
 		_name = name;
+		_position = position;
+		_radius = radius;
 	}
-
-	this(Vector2d position, float radius, bool breathableAtmosphere, string name,
-		uint food, uint militaryUnits, Player owner, uint[8] population){
-		//constructor for creating the planet from existing properties
-			this(position, radius, breathableAtmosphere, name);
-			_food = food;
-			_militaryUnits = militaryUnits;
-			_owner = owner;
-			_population = population;
+	/** (Cloning) Constructor for creating planet from existing values **/
+	this(bool breathableAtmosphere, string name, Vector2d position, float radius,
+		 uint food, uint militaryUnits, Player owner, uint[8] population){
+		this(breathableAtmosphere, name, position, radius);
+		_food = food;
+		_militaryUnits = militaryUnits;
+		_owner = owner;
+		_population = population;
 	}
 
 	@property Vector2d position(){
@@ -61,6 +61,15 @@ class Planet {
 	@property Player owner(){
 		return _owner;
 	}
+	@property uint food(){
+		return _food;
+	}
+	@property uint militaryUnits(){
+		return _militaryUnits;
+	}
+	@property uint[8] population(){
+		return _population;
+	} 
 
 	override public string toString(){
 		import std.format;
@@ -70,6 +79,7 @@ class Planet {
 	uint attack(uint force){
 		if(force >= populationSum){
 			_owner = null;
+			resetPopulation();
 			return force - capacity;
 		}
 		subtractPopulation(force);
@@ -78,7 +88,6 @@ class Planet {
 
 	Planet setOwner(Player player){
 		_owner = player;
-		resetPopulation();
 		return this;
 	}
 
@@ -86,24 +95,21 @@ class Planet {
 		int ppa = to!int(capacity / 8);
 		_population = [ppa,ppa,ppa,ppa,ppa,ppa,ppa,ppa];
 	}
-
+	/** Function affects planet's attributes. Should be called after player finishes move **/
 	void step(){
-		//this function ends turn of the player affecting planet attributes
-		if(_owner !is null){
-			_workForce = to!uint(_population[2 .. 6].sum * _owner.knowledgeTree.branch(BranchName.Energy).effectiveness);
-			affectFood();
-			growPopulation();
-		}
+		workForce = to!uint(_population[2 .. 6].sum * _owner.knowledgeTree.branch(BranchName.Energy).effectiveness);
+		affectFood();
+		growPopulation();
 	}
 
-	private void affectFood(){
+	private void affectFood(uint workforce){
 		//TODO
 		//food supply at best increases at arythmetic rate
 		//1 > 2 > 3 > 4 > 5
 		_food -= populationSum;
 		//fpe - food production effectiveness
 		double fpe = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
-		_food += to!int(_workForce * fpe);
+		_food += to!int(workForce * fpe);
 	}
 	private void growPopulation(){
 		double overPopulationFactor = 1;
@@ -161,7 +167,7 @@ class Planet {
 		}
 	}
 
-	private Planet produceShips(Ship ship){
+	private void produceShips(Ship ship){
 		double productionCost = POPULATION_CONSTANT / 4;
 		if(_workForce >= productionCost){
 			_workForce -= to!int(productionCost);
