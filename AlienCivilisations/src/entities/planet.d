@@ -11,16 +11,16 @@ import std.stdio;
 
 public enum int POPULATION_CONSTANT = 10000;
 
-class Planet {
+class Planet : Owned{
 	private immutable bool _breathableAtmosphere;
 	private uint _food = 0;
 	private uint _militaryUnits = 0;
 	private immutable string _name;
 	private Player _owner;
-	private uint[8] _population;
+	private uint[8] _population = [0,0,0,0,0,0,0,0];
 	private Vector2d _position;
 	private immutable float _radius;
-
+	private uint _workForce = 0;
 
 
 	this(bool breathableAtmosphere, string name, Vector2d position, float radius){
@@ -31,12 +31,13 @@ class Planet {
 	}
 	/** (Cloning) Constructor for creating planet from existing values **/
 	this(bool breathableAtmosphere, string name, Vector2d position, float radius,
-		 uint food, uint militaryUnits, Player owner, uint[8] population){
+		 uint food, uint militaryUnits, Player owner, uint[8] population, uint workForce){
 		this(breathableAtmosphere, name, position, radius);
 		_food = food;
 		_militaryUnits = militaryUnits;
 		_owner = owner;
 		_population = population;
+		_workForce = workForce;
 	}
 
 	@property Vector2d position(){
@@ -58,7 +59,7 @@ class Planet {
 	@property string name(){
 		return _name;
 	}
-	@property Player owner(){
+	override @property Player owner(){
 		return _owner;
 	}
 	@property uint food(){
@@ -70,6 +71,9 @@ class Planet {
 	@property uint[8] population(){
 		return _population;
 	} 
+	@property uint workForce(){
+		return _workForce;
+	}
 
 	override public string toString(){
 		import std.format;
@@ -97,19 +101,20 @@ class Planet {
 	}
 	/** Function affects planet's attributes. Should be called after player finishes move **/
 	void step(){
-		workForce = to!uint(_population[2 .. 6].sum * _owner.knowledgeTree.branch(BranchName.Energy).effectiveness);
+		_workForce = to!uint(_population[2 .. 6].sum * _owner.knowledgeTree.branch(BranchName.Energy).effectiveness);
 		affectFood();
 		growPopulation();
 	}
 
-	private void affectFood(uint workforce){
+	private void affectFood(){
 		//TODO
 		//food supply at best increases at arythmetic rate
 		//1 > 2 > 3 > 4 > 5
 		_food -= populationSum;
 		//fpe - food production effectiveness
 		double fpe = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
-		_food += to!int(workForce * fpe);
+		_food += to!int(_workForce * fpe);
+		_workForce = 0;
 	}
 	private void growPopulation(){
 		double overPopulationFactor = 1;
