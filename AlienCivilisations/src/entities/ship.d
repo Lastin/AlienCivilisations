@@ -15,18 +15,20 @@ enum int MULTIPLIER = 1000;
 class Ship {
 	private immutable uint _capacity;
 	private Player _owner;
-	private bool _complete = false;
-	private bool _used = false;
+	private bool _completed;
+	private bool _used;
 
-	this(Player owner){
+	this(Player owner, bool completed = false, bool used = false){
 		_owner = owner;
 		double energy = _owner.knowledgeTree.branch(BranchName.Energy).effectiveness;
 		double science = _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
 		_capacity = cast(int)(MULTIPLIER * energy * science);
+		_completed = completed;
+		_used = used;
 	}
 
 	Ship completeShip(){
-		_complete = true;
+		_completed = true;
 		return this;
 	}
 
@@ -35,6 +37,9 @@ class Ship {
 	}
 	@property bool used() const {
 		return _used;
+	}
+	@property Player owner(){
+		return _owner;
 	}
 }
 
@@ -47,7 +52,15 @@ class MilitaryShip : Ship {
 
 	void attack(Planet p){
 		if(p.owner && p.owner != _owner){
-			p.attack(to!int(_owner.knowledgeTree.branch(BranchName.Military).effectiveness * _onboard));
+			double effectiveness = _owner.knowledgeTree.branch(BranchName.Military).effectiveness;
+			uint attackPower = to!int(effectiveness * _onboard);
+			if(double left = p.attack(attackPower) / effectiveness < 1){
+				_onboard = 0;
+				used = true;
+			}
+			else {
+				_onboard = to!int(left);
+			}
 		}
 	}
 
@@ -60,8 +73,12 @@ class MilitaryShip : Ship {
 		_onboard = _capacity;
 		return units - freeSpaces;
 	}
-	@property bool empty(){
+
+	@property bool empty() const {
 		return _onboard <= 0;
+	}
+	@property uint onboard() const {
+		return _onboard;
 	}
 }
 
