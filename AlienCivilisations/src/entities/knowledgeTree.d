@@ -79,24 +79,6 @@ public class KnowledgeTree {
 		return possibilities;
 	}
 
-	//Necessary way for adding dependencies to duplicate 
-	const pure void addDependencies(KnowledgeTree kt, Branch branch){
-		if(branch.name == BranchName.Energy){
-
-		}
-		if(branch.name == BranchName.Food){
-			branch.addDependency(kt.branch(BranchName.Energy));
-			branch.addDependency(kt.branch(BranchName.Science));
-		}
-		if(branch.name == BranchName.Military){
-			branch.addDependency(kt.branch(BranchName.Energy));
-			branch.addDependency(kt.branch(BranchName.Science));
-		}
-		if(branch.name == BranchName.Science){
-			branch.addDependency(kt.branch(BranchName.Energy));
-		}
-	}
-
 	void addDependencies(Branch branch){
 		if(branch.name == BranchName.Energy){
 			
@@ -116,24 +98,18 @@ public class KnowledgeTree {
 
 	//Returns duplicate of the current object, without references to original
 	const KnowledgeTree dup() {
-		auto branches = [_energy.dup, _food.dup, _military.dup, _science.dup];
-		auto copy = new KnowledgeTree(branches);
-		foreach(Branch b; branches){
-			addDependencies(copy, b);
-		}
-		return copy;
+		uint points[][] = 
+		[
+			_energy.leafsPoints.dup,
+			_food.leafsPoints.dup,
+			_military.leafsPoints.dup,
+			_science.leafsPoints.dup
+		];
+		return new KnowledgeTree(points);
 	}
 
 	override const string toString(){
-		return
-			"energy:     " 	~ to!string(_energy.leafsLevels) ~
-			"\nfood:     " 	~ to!string(_food.leafsLevels) ~
-			"\nmilitary: "	~ to!string(_military.leafsLevels) ~
-			"\nscience:  " 	~ to!string(_science.leafsLevels) ~
-			"\npoints: "	~
-			"\n" ~ to!string(_energy.leafsPoints) ~
-			"\n" ~ to!string(_food.leafsPoints) ~
-			"\n" ~ to!string(_military.leafsPoints) ~
-			"\n" ~ to!string(_science.leafsPoints);
+		return format("energy: %s \nfood: %s \nmilitary: %s \nscience: %s",
+				_energy, _food, _military, _science);
 	}
 }
