@@ -43,3 +43,7 @@ class Player {
 		return this;
 	}
 }
+
+interface Owned {
+	@property Player owner();
+}
