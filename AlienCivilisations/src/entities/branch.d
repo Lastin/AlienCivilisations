@@ -1,6 +1,5 @@
 ﻿module src.entities.branch;
 
-import src.entities.knowledgeTree;
 import src.entities.planet;
 import std.algorithm;
 import std.stdio;
@@ -9,7 +8,6 @@ import std.conv;
 class Branch {
 	private enum double DEPENDENCY_EFFECT = 0.2;
 	enum int[5] MULTIPLIERS = [2,4,8,16,32];
-	//enum int POPULATION_CONSTANT = 10000;
 	enum int MAX_LEVEL = 5;
 	private uint[] _leafsPoints;
 	private immutable BranchName _name;
@@ -21,7 +19,7 @@ class Branch {
 	}
 
 	//Returns levels of the leafs of current branch
-	const @property uint[] leafsLevels() {
+	@property uint[] leafsLevels() const {
 		uint[] levels;
 		foreach(uint points; _leafsPoints){
 			levels ~= pointsToLevel(points);
@@ -30,15 +28,15 @@ class Branch {
 	}
 
 	//Returns level of the branch
-	const @property int level(){
+	@property int level() const {
 		return leafsLevels[].sum;
 	}
 
-	const @property uint[] leafsPoints(){
+	@property uint[] leafsPoints() const {
 		return _leafsPoints.dup;
 	}
 
-	const @property double effectiveness(){
+	@property double effectiveness() const {
 		double branchLevel = level + 1;
 		foreach(const Branch dependency; _dependencies){
 			branchLevel += dependency.level * DEPENDENCY_EFFECT;
@@ -46,7 +44,7 @@ class Branch {
 		return branchLevel;
 	}
 
-	const @property int[] undevelopedLeafs(){
+	@property int[] undevelopedLeafs() const {
 		auto ll = leafsLevels;
 		int[] undeveloped;
 		for(int i=0; i<ll.length; i++){
@@ -57,12 +55,12 @@ class Branch {
 		return undeveloped;
 	}
 
-	const pure @property BranchName name(){
+	@property BranchName name() const {
 		return _name;
 	}
 
 	//Converts raw leaf points to leaf level
-	const pure int pointsToLevel(uint points) {
+	pure int pointsToLevel(uint points) const {
 		int level = MAX_LEVEL;
 		foreach_reverse(int multiplier; MULTIPLIERS){
 			if(points >= multiplier * POPULATION_CONSTANT){
@@ -89,12 +87,12 @@ class Branch {
 		return points -= pointsNeeded;
 	}
 
-	pure Branch addDependency(Branch dependency){
+	Branch addDependency(Branch dependency){
 		_dependencies ~= dependency;
 		return this;
 	}
 
-	const Branch dup() {
-		return new Branch(_name, _leafsPoints.dup);
+	override string toString() const {
+		return to!string(_leafsPoints);
 	}
 }
