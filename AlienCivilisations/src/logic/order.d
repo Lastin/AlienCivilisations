@@ -1,19 +1,24 @@
-﻿module src.logic.orderable;
+﻿module src.logic.order;
 
 import src.entities.branch;
 
-interface Orderable {
-	bool execute();
+class Order {
+	private bool _completed = false;
+	/** Tries to complete the order, returns true if completed **/
+	abstract bool execute();
+	@property bool completed(){
+		return _completed;
+	}
 }
 
-class KnowledgeOrder : Orderable {
-	private Branch _branch;
-	private int _leaf;
+class KnowledgeOrder : Order {
+	private immutable Branch _branch;
+	private immutable int _leaf;
 	this(Branch branch, int leaf){
 		_branch = branch;
 		_leaf = leaf;
 	}
-	//Returns true if order has been completed
+
 	bool execute(){
 		return false;
 	}

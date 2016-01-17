@@ -15,11 +15,11 @@ class Planet {
 	private immutable string _name;
 	private immutable float _radius;
 	private immutable bool _breathableAtmosphere;
-	private uint _food;
+	private uint _food = 0;
 	private uint _militaryUnits = 0;
 	private Player _owner;
 	private Vector2d _position;
-	private uint[8] _population = [0,0,0,0,0,0,0,0];
+	private uint[8] _population;
 	private uint _workForce = 0;
 
 	this(Vector2d position, float radius, bool breathableAtmosphere, string name){
@@ -42,7 +42,6 @@ class Planet {
 	@property Vector2d position(){
 		return _position;
 	}
-
 	@property bool breathableAtmosphere(){
 		return _breathableAtmosphere;
 	}
@@ -50,26 +49,22 @@ class Planet {
 	@property int capacity(){
 		return to!int(_radius * POPULATION_CONSTANT);
 	}
-
 	@property uint populationSum(){
 		return _population[].sum;
 	}
-
 	@property float radius(){
 		return _radius;
 	}
-
 	@property string name(){
 		return _name;
 	}
-
 	@property Player owner(){
 		return _owner;
 	}
 
 	override public string toString(){
 		import std.format;
-		return format("X: %s \n Y:%s", _position.x, _position.y);
+		return format(": %s \n Y:%s", );
 	}
 
 	uint attack(uint force){
@@ -83,16 +78,21 @@ class Planet {
 
 	Planet setOwner(Player player){
 		_owner = player;
-		_population = [1000,1000,1000,1000,1000,1000,1000,1000];
+		resetPopulation();
 		return this;
+	}
+
+	void resetPopulation(){
+		int ppa = to!int(capacity / 8);
+		_population = [ppa,ppa,ppa,ppa,ppa,ppa,ppa,ppa];
 	}
 
 	void step(){
 		//this function ends turn of the player affecting planet attributes
 		if(_owner !is null){
-			growPopulation();
 			_workForce = to!uint(_population[2 .. 6].sum * _owner.knowledgeTree.branch(BranchName.Energy).effectiveness);
 			affectFood();
+			growPopulation();
 		}
 	}
 
@@ -169,16 +169,4 @@ class Planet {
 		}
 		return this;
 	}
-
-	Planet dup(){
-		Planet copy = new Planet(_position, _radius, _breathableAtmosphere, _name, _food, _militaryUnits, _owner.dup, _population.dup[0..8]);
-		return copy;
-	}
 }
-
-
-//https://books.google.co.uk/books?id=7GH0KZZthGoC&pg=PA378&lpg=PA378&dq=population+growth+food+curve&source=bl
-//&ots=MgtXbY58zz&sig=B92VL4uN6WEadVu-VjU6c9OJyuk&hl=en&sa=X&ved=0ahUKEwi9sqjN68nJAhWDshQKHeyJCxMQ6AEIRDAI#v=onepage
-//&q=population%20growth%20food%20curve&f=false
-
-

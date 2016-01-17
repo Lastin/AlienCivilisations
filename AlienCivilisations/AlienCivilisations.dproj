@@ -115,7 +115,6 @@
     <Compile Include="src\handlers\jsonParser.d" />
     <Compile Include="src\entities\knowledgeTree.d" />
     <Compile Include="src\entities\branch.d" />
-    <Compile Include="src\logic\hypotheticalWorld.d" />
     <Compile Include="src\logic\order.d" />
     <Compile Include="src\handlers\gameManager.d" />
     <Compile Include="src\entities\map.d" />

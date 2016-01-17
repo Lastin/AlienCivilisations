@@ -11,10 +11,10 @@ class Vector2d {
 		_y = y;
 	}
 
-	@property float x() {
+	@property float x() const {
 		return _x;
 	}
-	@property float y(){
+	@property float y() const {
 		return _y;
 	}
 

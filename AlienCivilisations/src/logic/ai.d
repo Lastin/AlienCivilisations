@@ -7,9 +7,7 @@ import src.entities.player;
 import src.logic.hypotheticalWorld;
 
 class AI : Player{
-	private Player[] _players;
-	private Map map;
-	this(KnowledgeTree knowledgeTree, ){
-		super("AI", knowledgeTree, map);
+	this(State* state, KnowledgeTree knowledgeTree){
+		super(state, "Artificial Player", knowledgeTree);
 	}
 }

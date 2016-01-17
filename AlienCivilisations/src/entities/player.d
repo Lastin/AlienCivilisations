@@ -1,42 +1,35 @@
 ﻿module src.entities.player;
 
-import src.entities.planet;
 import src.entities.ship;
 import src.entities.knowledgeTree;
-import src.entities.branch;
-import src.entities.map;
+import src.entities.planet;
+import src.handlers.gameManager;
 
 class Player {
 	private immutable string _name;
-	private GameManager _gm;
+	private State* _state;
 	private KnowledgeTree _knowledgeTree;
 	private Ship[] _ships;
 	private bool _locked = true;
 
-	this(string name, KnowledgeTree knowledgeTree){
+	this(State* state, string name, KnowledgeTree knowledgeTree){
+		_state = state;
 		_name = name;
 		_knowledgeTree = knowledgeTree;
-		_map = map;
 	}
-
+	/** Returns player's knowledge tree **/
 	@property KnowledgeTree knowledgeTree(){
 		return _knowledgeTree;
 	}
+	/** Self explanatory **/
 	@property string name(){
 		return _name;
 	}
+	/** Returns true if player moves are locked **/
 	@property bool locked() const {
 		return _locked;
 	}
-	@property Planet[] planets() {
-		Planet[] playerPlanets;
-		foreach(Planet p; _map.planets){
-			if(p.owner && p.owner == this){
-				playerPlanets ~= p;
-			}
-		}
-		return playerPlanets;
-	}
+
 	@property Ship[] availableShips() {
 		Ship[] available;
 		foreach(Ship s; _ships){
@@ -47,39 +40,20 @@ class Player {
 		return available;
 	}
 
-	void unlock(){
-		_locked = false;
-	}
+	Player completeTurn(){
 
-	Player finishTurn(){
-		//int
-		_locked = true;
 		return this;
 	}
 
 	Player orderInhabit(Planet planet){
-		if(!_locked){
-
-		}
 		return this;
 	}
 
 	Player orderShip(ShipType type){
-		if(!_locked){
-
-		}
 		return this;
 	}
 
 	Player orderDevelop(Branch branch, int leaf){
-		if(!_locked){
-
-		}
 		return this;
-	}
-
-	//created deep copy of variable
-	Player dup(){
-		return new Player(name.dup, _knowledgeTree.dup, _map.dup);
 	}
 }

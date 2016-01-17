@@ -16,8 +16,7 @@ class Map : CanvasWidget {
 		_size = size;
 		foreach(Player player; players){
 			auto p = new Planet(getFreeLocation(10), 10, true, player.name ~ "'s planet");
-			p.setOwner(player);
-			addPlanet(p);
+			addPlanet(p).setOwner(player);
 		}
 		for(size_t i=players.length; i<planetCount; i++){
 			float radius = uniform(1, 20);
@@ -30,7 +29,7 @@ class Map : CanvasWidget {
 		_planets = planets;
 	}
 
-	Planet addPlanet(Planet planet) nothrow {
+	Planet addPlanet(Planet planet) {
 		_planets ~= planet;
 		return planet;
 	}
@@ -76,7 +75,7 @@ class Map : CanvasWidget {
 		return _planets;
 	}
 	
-	@property float size(){
+	@property float size() const {
 		return _size;
 	}
 
@@ -86,13 +85,5 @@ class Map : CanvasWidget {
 			planetsCopy ~= p.dup;
 		}
 		return new Map(_size, planets.dup);
-	}
-
-	public void render(){
-
-	}
-
-	public void drawPlanets(CanvasWidget canvas, DrawBuf buf, Rect rc){
-
 	}
 }
