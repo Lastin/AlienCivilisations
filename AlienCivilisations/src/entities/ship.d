@@ -12,7 +12,7 @@ enum ShipType : ubyte {
 
 enum int MULTIPLIER = 1000;
 
-class Ship {
+class Ship : Owned {
 	private immutable uint _capacity;
 	private Player _owner;
 	private bool _completed;
@@ -38,7 +38,7 @@ class Ship {
 	@property bool used() const {
 		return _used;
 	}
-	@property Player owner(){
+	override @property Player owner(){
 		return _owner;
 	}
 }
