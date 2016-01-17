@@ -1,7 +1,7 @@
 ﻿module src.entities.map;
 
 import dlangui;
-import src.containers.vector2d;
+import src.handlers.containers;
 import src.entities.planet;
 import src.entities.player;
 import std.random;

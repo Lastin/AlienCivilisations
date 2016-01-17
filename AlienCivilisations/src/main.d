@@ -7,13 +7,16 @@ import src.gameFrame;
 
 mixin APP_ENTRY_POINT;
 
-extern (C) int UIAppMain(string[] args){
-	int width = 1024;
-	int height = 768;
-	Window window = Platform.instance.createWindow("Alien Civilisations", null, WindowFlag.Fullscreen, 1920, 1080);
-	GameFrame gameFrame = new GameFrame();
-	gameFrame.setState(new Menu(gameFrame));
-	window.mainWidget = gameFrame;
+extern (C) int UIAppMain(string[] args)
+{
+	int width = 1920;
+	int height = 1080;
+	Window window = Platform.instance.createWindow("Alien Civilisations", 
+													null,
+													WindowFlag.Resizable,
+													width,
+													height);
+	window.mainWidget = new Menu();
 	window.show();
 	return Platform.instance.enterMessageLoop();
 }

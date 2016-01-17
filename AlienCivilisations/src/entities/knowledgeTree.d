@@ -98,7 +98,7 @@ public class KnowledgeTree {
 
 	//Returns duplicate of the current object, without references to original
 	const KnowledgeTree dup() {
-		uint points[][] = 
+		auto points = 
 		[
 			_energy.leafsPoints.dup,
 			_food.leafsPoints.dup,

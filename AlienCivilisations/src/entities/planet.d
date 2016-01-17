@@ -1,13 +1,9 @@
 ﻿module src.entities.planet;
 
-import src.containers.vector2d;
-import src.entities.branch;
-import src.entities.knowledgeTree;
-import src.entities.player;
-import src.entities.ship;
+import src.handlers.containers;
+import entities;
 import std.algorithm;
 import std.conv;
-import std.stdio;
 
 public enum int POPULATION_CONSTANT = 10000;
 
@@ -76,7 +72,6 @@ class Planet : Owned{
 	}
 
 	override public string toString(){
-		import std.format;
 		return format(": %s \n Y:%s", );
 	}
 

@@ -1,14 +1,9 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/handlers/gameManager.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/gameFrame.d">
     <Files>
-      <File FileName="AlienCivilisations/src/handlers/gameManager.d" Line="11" Column="11" />
-      <File FileName="AlienCivilisations/src/entities/player.d" Line="3" Column="3" />
-      <File FileName="AlienCivilisations/src/entities/ship.d" Line="26" Column="26" />
-      <File FileName="AlienCivilisations/src/logic/ai.d" Line="26" Column="26" />
-      <File FileName="AlienCivilisations/src/entities/map.d" Line="1" Column="1" />
-      <File FileName="AlienCivilisations/src/entities/planet.d" Line="24" Column="24" />
-      <File FileName="AlienCivilisations/src/containers/vector2d.d" Line="11" Column="11" />
+      <File FileName="AlienCivilisations/src/handlers/commandParser.d" Line="2" Column="2" />
+      <File FileName="AlienCivilisations/src/gameFrame.d" Line="41" Column="41" NotebookId="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
