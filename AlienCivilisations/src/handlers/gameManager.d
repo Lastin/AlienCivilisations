@@ -6,6 +6,9 @@ import src.logic.hypotheticalWorld;
 import src.entities.knowledgeTree;
 import std.random;
 import src.logic.ai;
+import src.entities.ship;
+import src.entities.planet;
+import src.containers.vector2d;
 
 class GameManager {
 	//Constant values
@@ -29,13 +32,56 @@ class GameManager {
 	
 	Player[] initialisePlayers(){
 		Player[] players;
-		players ~= new Player(&realState, "Human", new KnowledgeTree(_startPoints));
+		players ~= new Player("Human", new KnowledgeTree(_startPoints));
 		players ~= new AI(&realState, new KnowledgeTree(_startPoints));
 		return players;
 	}
 
 	State createDuplicate(){
-		
+		State duplicateState;
+		Map mapDup;
+		Player[] playersDup;
+		Ship[] shipsDup;
+		Planet[] planetsDup;
+		//duplicate players
+		foreach(Player origin; _realState.players){
+			string name = origin.name;
+			KnowledgeTree ktDup = origin.knowledgeTree.dup;
+			if(cast(AI)origin){
+				playersDup ~= new AI(&duplicateState, ktDup);
+			}
+			else {
+				playersDup ~= new Player(name, ktDup);
+			}
+		}
+		//duplicate planets
+		foreach(Planet origin; _realState.map.planets){
+			immutable string name = origin.name;
+			immutable float radius = origin.radius;
+			immutable bool bA = origin.breathableAtmosphere;
+			uint food = origin.food;
+			uint militaryUnits = origin.militaryUnits;
+			Player owner = {
+				auto ownerIndex = findOwnerIndex(origin, _realState.players);
+				ownerIndex > -1 ? playersDup[ownerIndex] : null;
+			};
+			Vector2d position = origin.position.dup;
+			uint[8] population = origin.population.dup;
+			planetsDup ~= new Planet(bA, name, position, radius, food, militaryUnits, owner, population);
+		}
+		//duplicate ships
+		foreach(Ship origin; _realState.ships){
+
+		}
+	}
+
+	private size_t findOwnerIndex(Planet planet, Player[] players){
+		foreach(size_t index, Player player; players){
+			if(planet.owner && planet.owner == player){
+				return index;
+			}
+		}
+		return -1;
 	}
 }
 
@@ -43,10 +89,12 @@ class GameManager {
 class State {
 	private Map _map;
 	private Player[] _players;
+	private Ship[] _ships;
 	private int _queuePosition;
-	this(Map map, Player[] players, int queuePosition){
+	this(Map map, Player[] players, Ship[] ships, int queuePosition){
 		_map = map;
 		_players = players;
+		_ships = ships;
 		_queuePosition = queuePosition;
 	}
 	@property Map map(){
@@ -57,6 +105,19 @@ class State {
 	}
 	@property Player currentPlayer(){
 		return players[_queuePosition];
+	}
+	@property Ship ships(){
+		return _ships;
+	}
+	/** Returns all complete and not used ships which belong to p**/
+	@property Ship[] availableShips(Player p) {
+		Ship[] available;
+		foreach(Ship s; _ships){
+			if(s.owner == p && s.complete && !s.used){
+				available ~= s;
+			}
+		}
+		return available;
 	}
 	/** Moves queue position to next available position **/
 	void moveQPosition(){
