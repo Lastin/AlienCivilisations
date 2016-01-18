@@ -12,7 +12,7 @@ class Map : CanvasWidget {
 	private immutable float _minDistance = 30;
 	private Planet[] _planets;
 
-	this(float size, int planetCount, Player[] players){
+	this(float size, int planetCount, Player[] players) {
 		_size = size;
 		foreach(Player player; players){
 			auto p = new Planet(getFreeLocation(10), 10, true, player.name ~ "'s planet");
@@ -34,15 +34,15 @@ class Map : CanvasWidget {
 		return planet;
 	}
 
-	void addPlanets(Planet[] newPlanets){
+	void addPlanets(Planet[] newPlanets) {
 		_planets ~= newPlanets;
 	}
 
-	bool collides(Planet p){
+	bool collides(Planet p) {
 		return collides(p.position, p.radius);
 	}
 
-	bool collides(Vector2d vector, float radius){
+	bool collides(Vector2d vector, float radius) {
 		foreach(Planet planet; _planets){
 			auto distance = vector.getEuclideanDistance(planet.position) - radius - planet.radius;
 			if(distance < _minDistance){
@@ -52,7 +52,7 @@ class Map : CanvasWidget {
 		return false;
 	}
 
-	Vector2d getFreeLocation(float radius){
+	Vector2d getFreeLocation(float radius) {
 		Vector2d vector;
 		do {
 			float x = uniform(0.0, _size-radius);
@@ -62,7 +62,7 @@ class Map : CanvasWidget {
 		return vector;
 	}
 
-	Planet planetAt(Vector2d vector){
+	Planet planetAt(Vector2d vector) {
 		foreach(Planet planet; _planets){
 			if(vector.getEuclideanDistance(planet.position) <= planet.radius){
 				return planet;

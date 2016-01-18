@@ -17,14 +17,14 @@ class GameManager {
 	];
 	private State _realState;
 
-	this(){
+	this() {
 		Player[] players = initialisePlayers();
 		Map map = Map(_mapSize, _planetsCount, players);
 		int queuePosition = uniform(0, _players.length);
 		_realState = new State(map, players, queuePosition);
 	}
 	
-	Player[] initialisePlayers(){
+	Player[] initialisePlayers() {
 		Player[] players;
 		players ~= new Player("Human", new KnowledgeTree(_startPoints));
 		players ~= new AI(&realState, new KnowledgeTree(_startPoints));

@@ -6,7 +6,7 @@ import std.conv;
 
 public enum int POPULATION_CONSTANT = 10000;
 
-class Planet : Owned{
+class Planet : Owned {
 	private immutable bool _breathableAtmosphere;
 	private uint _food = 0;
 	private uint _militaryUnits = 0;
@@ -18,7 +18,7 @@ class Planet : Owned{
 	private uint _workForce = 0;
 
 
-	this(bool breathableAtmosphere, string name, Vector2d position, float radius){
+	this(bool breathableAtmosphere, string name, Vector2d position, float radius) {
 		_breathableAtmosphere = breathableAtmosphere;
 		_name = name;
 		_position = position;
@@ -26,7 +26,7 @@ class Planet : Owned{
 	}
 	/** (Cloning) Constructor for creating planet from existing values **/
 	this(bool breathableAtmosphere, string name, Vector2d position, float radius,
-		 uint food, uint militaryUnits, Player owner, uint[8] population, uint workForce){
+		 uint food, uint militaryUnits, Player owner, uint[8] population, uint workForce) {
 		this(breathableAtmosphere, name, position, radius);
 		_food = food;
 		_militaryUnits = militaryUnits;
@@ -35,46 +35,46 @@ class Planet : Owned{
 		_workForce = workForce;
 	}
 
-	@property Vector2d position(){
+	@property Vector2d position() {
 		return _position;
 	}
-	@property bool breathableAtmosphere(){
+	@property bool breathableAtmosphere() {
 		return _breathableAtmosphere;
 	}
 
-	@property int capacity(){
+	@property int capacity() {
 		return to!int(_radius * POPULATION_CONSTANT);
 	}
-	@property uint populationSum(){
+	@property uint populationSum() {
 		return _population[].sum;
 	}
-	@property float radius(){
+	@property float radius() {
 		return _radius;
 	}
-	@property string name(){
+	@property string name() {
 		return _name;
 	}
-	override @property Player owner(){
+	override @property Player owner() {
 		return _owner;
 	}
-	@property uint food(){
+	@property uint food() {
 		return _food;
 	}
-	@property uint militaryUnits(){
+	@property uint militaryUnits() {
 		return _militaryUnits;
 	}
-	@property uint[8] population(){
+	@property uint[8] population() {
 		return _population;
 	} 
-	@property uint workForce(){
+	@property uint workForce() {
 		return _workForce;
 	}
 
-	override public string toString(){
+	override public string toString() {
 		return format(": %s \n Y:%s", );
 	}
 
-	uint attack(uint force){
+	uint attack(uint force) {
 		if(force >= populationSum){
 			_owner = null;
 			resetPopulation();
@@ -84,23 +84,23 @@ class Planet : Owned{
 		return 0;
 	}
 
-	Planet setOwner(Player player){
+	Planet setOwner(Player player) {
 		_owner = player;
 		return this;
 	}
 
-	void resetPopulation(){
+	void resetPopulation() {
 		int ppa = to!int(capacity / 8);
 		_population = [ppa,ppa,ppa,ppa,ppa,ppa,ppa,ppa];
 	}
 	/** Function affects planet's attributes. Should be called after player finishes move **/
-	void step(){
+	void step() {
 		_workForce = to!uint(_population[2 .. 6].sum * _owner.knowledgeTree.branch(BranchName.Energy).effectiveness);
 		affectFood();
 		growPopulation();
 	}
 
-	private void affectFood(){
+	private void affectFood() {
 		//TODO
 		//food supply at best increases at arythmetic rate
 		//1 > 2 > 3 > 4 > 5
@@ -110,7 +110,7 @@ class Planet : Owned{
 		_food += to!int(_workForce * fpe);
 		_workForce = 0;
 	}
-	private void growPopulation(){
+	private void growPopulation() {
 		double overPopulationFactor = 1;
 		if(populationSum > capacity){
 			int overflow =  populationSum - capacity;
@@ -129,7 +129,7 @@ class Planet : Owned{
 		_population[0] = to!int(reproductivePairs * childPerPair * foodFactor / overPopulationFactor);
 	}
 
-	uint militarise(int percent){
+	uint militarise(int percent) {
 		uint p = min(percent, 100);
 		uint g1 = to!int(p/100 * _population[2]);
 		uint g2 = to!int(p/100 * _population[3]);
@@ -139,7 +139,7 @@ class Planet : Owned{
 		return g1 + g2;
 	}
 
-	void subtractPopulation(uint value){
+	void subtractPopulation(uint value) {
 		//TODO: check if function distributes the values as intended
 		if(value > populationSum){
 			_population = [0,0,0,0,0,0,0,0];
@@ -166,7 +166,7 @@ class Planet : Owned{
 		}
 	}
 
-	private void produceShips(Ship ship){
+	private void produceShips(Ship ship) {
 		double productionCost = POPULATION_CONSTANT / 4;
 		if(_workForce >= productionCost){
 			_workForce -= to!int(productionCost);

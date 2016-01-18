@@ -13,7 +13,7 @@ enum BranchName : ubyte {
 	Science
 }
 
-enum LEAF_NAMES : string[]{
+enum LEAF_NAMES : string[] {
 	Energy = ["Fossil Fuels", "Hydro Power", "Nuclear", "Solar Power", "Wind"],
 	Food = ["Agricultural Economics", "Agricultural Engineering", "Argonomy", "Animal Science", "Horticulture"],
 	Military = ["Defence", "Offence", "Enervating", "Spying", "Intimidation"],
@@ -24,7 +24,7 @@ enum LEAF_NAMES : string[]{
 public class KnowledgeTree {
 	private Branch _energy, _food, _military, _science;
 
-	this(uint[][] points){
+	this(uint[][] points) {
 		_energy = 	new Branch(BranchName.Energy,	points[0]);
 		_food = 	new Branch(BranchName.Food, 	points[1]);
 		_military = new Branch(BranchName.Military, points[2]);
@@ -35,14 +35,14 @@ public class KnowledgeTree {
 		addDependencies(_science);
 	}
 
-	this(Branch[] branches){
+	this(Branch[] branches) {
 		_energy =	branches[0];
 		_food =		branches[1];
 		_military = branches[2];
 		_science = 	branches[3];
 	}
 
-	pure @property Branch branch(BranchName branch){
+	pure @property Branch branch(BranchName branch) {
 		switch(branch){
 			case BranchName.Energy: 	return _energy;
 			case BranchName.Food: 		return _food;
@@ -52,7 +52,7 @@ public class KnowledgeTree {
 		}
 	}
 
-	@property Branch branch(string branchName){
+	@property Branch branch(string branchName) {
 		switch(branchName){
 			case "Energy": 		return _energy;
 			case "Food": 		return _food;
@@ -80,18 +80,18 @@ public class KnowledgeTree {
 	}
 
 	void addDependencies(Branch branch){
-		if(branch.name == BranchName.Energy){
+		if(branch.name == BranchName.Energy) {
 			
 		}
-		if(branch.name == BranchName.Food){
+		else if(branch.name == BranchName.Food) {
 			branch.addDependency(_energy);
 			branch.addDependency(_science);
 		}
-		if(branch.name == BranchName.Military){
+		else if(branch.name == BranchName.Military) {
 			branch.addDependency(_energy);
 			branch.addDependency(_science);
 		}
-		if(branch.name == BranchName.Science){
+		else if(branch.name == BranchName.Science) {
 			branch.addDependency(_energy);
 		}
 	}
@@ -108,8 +108,8 @@ public class KnowledgeTree {
 		return new KnowledgeTree(points);
 	}
 
-	override const string toString(){
+	override const string toString() {
 		return format("energy: %s \nfood: %s \nmilitary: %s \nscience: %s",
-				_energy, _food, _military, _science);
+			_energy, _food, _military, _science);
 	}
 }

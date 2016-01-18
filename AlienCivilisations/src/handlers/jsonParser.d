@@ -6,11 +6,11 @@ import std.stdio;
 import src.entities.player;
 
 class JsonParser {
-	this(){
+	this() {
 
 	}
 
-	public void parseFromJson(){
+	public void parseFromJson() {
 		Player[2] players;
 
 	}

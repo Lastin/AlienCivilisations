@@ -6,8 +6,7 @@ import src.states.menu;
 
 mixin APP_ENTRY_POINT;
 
-extern (C) int UIAppMain(string[] args)
-{
+extern (C) int UIAppMain(string[] args) {
 	embeddedResourceList.addResources(embedResourcesFromList!("resources.list")());
 	int width = 1920;
 	int height = 1080;

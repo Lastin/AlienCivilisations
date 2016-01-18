@@ -5,12 +5,12 @@ import std.math;
 struct Vector2d {
 	immutable float x;
 	immutable float y;
-	this(float x_param, float y_param){
+	this(float x_param, float y_param) {
 		x = x_param;
 		y = y_param;
 	}
 
-	float getEuclideanDistance(Vector2d vecA){
+	float getEuclideanDistance(Vector2d vecA) {
 		auto xdiff = vecA.x - x;
 		auto ydiff = vecA.y - y;
 		return sqrt(xdiff^^2 + ydiff^^2);
@@ -26,22 +26,22 @@ class State {
 	private Player[] _players;
 	private Ship[] _ships;
 	private int _queuePosition;
-	this(Map map, Player[] players, Ship[] ships, int queuePosition){
+	this(Map map, Player[] players, Ship[] ships, int queuePosition) {
 		_map = map;
 		_players = players;
 		_ships = ships;
 		_queuePosition = queuePosition;
 	}
-	@property Map map(){
+	@property Map map() {
 		return _map;
 	}
-	@property Player[] players(){
+	@property Player[] players() {
 		return players;
 	}
-	@property Player currentPlayer(){
+	@property Player currentPlayer() {
 		return players[_queuePosition];
 	}
-	@property Ship ships(){
+	@property Ship ships() {
 		return _ships;
 	}
 	/** Returns all complete and not used ships which belong to p**/
@@ -55,7 +55,7 @@ class State {
 		return available;
 	}
 	/** Moves queue position to next available position **/
-	void moveQPosition(){
+	void moveQPosition() {
 		if(++_queuePosition == _players.length){
 			_queuePosition = 0;
 		}
@@ -68,18 +68,17 @@ class State {
 		Planet[] planetsDup;
 		Ship[] shipsDup;
 		//duplicate players
-		foreach(Player origin; players_){
+		foreach(Player origin; players_) {
 			string name = origin.name;
 			KnowledgeTree ktDup = origin.knowledgeTree.dup;
 			if(cast(AI)origin){
 				playersDup ~= new AI(&duplicateState, ktDup);
-			}
-			else {
+			} else {
 				playersDup ~= new Player(name, ktDup);
 			}
 		}
 		//duplicate planets
-		foreach(Planet origin; _map.planets){
+		foreach(Planet origin; _map.planets) {
 			immutable string name = origin.name;
 			immutable float radius = origin.radius;
 			immutable bool bA = origin.breathableAtmosphere;
@@ -94,18 +93,17 @@ class State {
 		//duplicate map
 		mapDup = new Map(_map.size, planetsDup);
 		//duplicate ships
-		foreach(Ship origin; _realState.ships){
+		foreach(Ship origin; _realState.ships) {
 			Player owner = findOwnerIndex(origin, _players, playersDup);
 			shipsDup ~= new Ship(owner, origin.completed, origin.used);
 		}
 		duplicateState = new State(mapDup, playersDup, shipsDup, _queuePosition);
 	}
 	
-	private size_t findOwnerIndex(Owned obj, Player[] origins, Player[] dups){
+	private size_t findOwnerIndex(Owned obj, Player[] origins, Player[] dups) {
 		foreach(size_t index, Player player; players){
-			if(obj.owner && obj.owner == player){
+			if(obj.owner && obj.owner == player)
 				return dups[index];
-			}
 		}
 		return null;
 	}

@@ -13,7 +13,7 @@ class Branch {
 	private immutable BranchName _name;
 	private Branch[] _dependencies;
 
-	this(BranchName name, uint[] leafsPoints){
+	this(BranchName name, uint[] leafsPoints) {
 		_name = name;
 		_leafsPoints = leafsPoints;
 	}
@@ -72,7 +72,7 @@ class Branch {
 	}
 
 	//Increases the number of points within selected leaf
-	int addPoints(int points, int leaf){
+	int addPoints(int points, int leaf) {
 		int leafLevel = leafsLevels[leaf];
 		if(leafLevel >= MAX_LEVEL){
 			return points;
@@ -87,7 +87,7 @@ class Branch {
 		return points -= pointsNeeded;
 	}
 
-	Branch addDependency(Branch dependency){
+	Branch addDependency(Branch dependency) {
 		_dependencies ~= dependency;
 		return this;
 	}

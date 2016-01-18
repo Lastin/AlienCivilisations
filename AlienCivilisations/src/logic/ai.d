@@ -8,7 +8,7 @@ import src.logic.hypotheticalWorld;
 
 class AI : Player{
 	private State* _realState;
-	this(State* realState, KnowledgeTree knowledgeTree){
+	this(State* realState, KnowledgeTree knowledgeTree) {
 		super("Artificial Player", knowledgeTree);
 		_realState = realState;
 	}

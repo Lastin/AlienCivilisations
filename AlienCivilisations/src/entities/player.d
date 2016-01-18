@@ -9,16 +9,16 @@ class Player {
 	private KnowledgeTree _knowledgeTree;
 	private bool _locked = true;
 
-	this(string name, KnowledgeTree knowledgeTree){
+	this(string name, KnowledgeTree knowledgeTree) {
 		_name = name;
 		_knowledgeTree = knowledgeTree;
 	}
 	/** Returns player's knowledge tree **/
-	@property KnowledgeTree knowledgeTree(){
+	@property KnowledgeTree knowledgeTree() {
 		return _knowledgeTree;
 	}
 	/** Player's written name **/
-	@property string name(){
+	@property string name() {
 		return _name;
 	}
 	/** Returns true if player moves are locked **/
@@ -26,20 +26,20 @@ class Player {
 		return _locked;
 	}
 
-	Player completeTurn(){
+	Player completeTurn() {
 
 		return this;
 	}
 
-	Player orderInhabit(Planet planet){
+	Player orderInhabit(Planet planet) {
 		return this;
 	}
 
-	Player orderShip(ShipType type){
+	Player orderShip(ShipType type) {
 		return this;
 	}
 
-	Player orderDevelop(Branch branch, int leaf){
+	Player orderDevelop(Branch branch, int leaf) {
 		return this;
 	}
 }
