@@ -7,8 +7,11 @@ class Menu : VerticalLayout
 {
 	this()
 	{
+		layoutWeight(FILL_PARENT).layoutHeight(FILL_PARENT);
+
 		//layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
 		//alignment(Align.Right | Align.Center);
-		backgroundImageId = "background";
+		//backgroundImageId = "background";
+		backgroundDrawable = DrawableRef(new OpenGLDrawable(
 	}
 }
