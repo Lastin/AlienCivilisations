@@ -1,7 +1,6 @@
 ﻿module src.entities.planet;
 
 import src.handlers.containers;
-import entities;
 import std.algorithm;
 import std.conv;
 

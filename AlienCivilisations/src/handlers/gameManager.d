@@ -1,6 +1,5 @@
 ﻿module src.handlers.gameManager;
 
-import src.entities;
 import std.random;
 import src.logic.ai;
 import src.containers.vector2d;
