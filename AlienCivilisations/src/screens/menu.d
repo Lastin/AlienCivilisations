@@ -1,7 +1,8 @@
-﻿module src.states.menu;
+﻿module src.screens.menu;
 
 import dlangui;
 import std.stdio;
+import src.screens.play;
 
 class Menu : HorizontalLayout {
 	this() {
@@ -33,7 +34,7 @@ class Menu : HorizontalLayout {
 						Button {
 							id: newGameButton
 							text: "NEW GAME"
-							padding: 10
+							padding: Rect { 100 10 100 10 }
 							margins: 10
 						}
 						Button { 
@@ -63,7 +64,8 @@ class Menu : HorizontalLayout {
 		auto load = childById("vl1").childById("hl1").childById("loadButton");
 		auto exit = childById("vl1").childById("hl1").childById("exitButton");
 		play.click = delegate (Widget source) {
-			writeln("clicked");
+			window.mainWidget = new Play();
+			super.destroy;
 			return true;
 		};
 		exit.click = delegate (Widget source) {

@@ -1,6 +1,12 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/screens/play.d">
+    <Files>
+      <File FileName="AlienCivilisations/src/screens/play.d" Line="21" Column="21" />
+      <File FileName="AlienCivilisations/src/screens/menu.d" Line="18" Column="18" />
+      <File FileName="AlienCivilisations/src/handlers/containers.d" Line="7" Column="7" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

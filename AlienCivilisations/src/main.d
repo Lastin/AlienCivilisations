@@ -2,7 +2,7 @@
 
 public import dlangui;
 public import std.stdio;
-import src.states.menu;
+import src.screens.menu;
 
 mixin APP_ENTRY_POINT;
 

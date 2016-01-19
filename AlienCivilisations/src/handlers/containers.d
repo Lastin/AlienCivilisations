@@ -3,8 +3,8 @@
 import std.math;
 
 struct Vector2d {
-	immutable float x;
-	immutable float y;
+	float x;
+	float y;
 	this(float x_param, float y_param) {
 		x = x_param;
 		y = y_param;
@@ -15,6 +15,7 @@ struct Vector2d {
 		auto ydiff = vecA.y - y;
 		return sqrt(xdiff^^2 + ydiff^^2);
 	}
+
 	Vector2d dup() const {
 		return Vector2d(x, y);
 	}
@@ -22,10 +23,13 @@ struct Vector2d {
 
 /** Container for current, or hypothetical game state, holding references to all essential data **/
 class State {
-	private Map _map;
-	private Player[] _players;
-	private Ship[] _ships;
-	private int _queuePosition;
+	private {
+		Map _map;
+		Player[] _players;
+		Ship[] _ships;
+		int _queuePosition;
+	}
+
 	this(Map map, Player[] players, Ship[] ships, int queuePosition) {
 		_map = map;
 		_players = players;

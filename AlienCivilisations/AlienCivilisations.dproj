@@ -104,6 +104,7 @@
   <ItemGroup>
     <Compile Include="src\main.d" />
     <Compile Include="src\screens\menu.d" />
+    <Compile Include="src\screens\play.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
@@ -125,6 +126,5 @@
     <None Include="src\handlers\containers.d" />
     <None Include="src\logic\ai.d" />
     <None Include="src\logic\order.d" />
-    <None Include="src\screens\play.d" />
   </ItemGroup>
 </Project>
