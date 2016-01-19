@@ -1,7 +1,8 @@
 ﻿module src.entities.branch;
 
+import src.entities.knowledgeTree;
+import std.algorithm.iteration;
 import src.entities.planet;
-import std.algorithm;
 import std.stdio;
 import std.conv;
 
@@ -9,19 +10,19 @@ class Branch {
 	private enum double DEPENDENCY_EFFECT = 0.2;
 	enum int[5] MULTIPLIERS = [2,4,8,16,32];
 	enum int MAX_LEVEL = 5;
-	private uint[] _leafsPoints;
+	private int[] _leafsPoints;
 	private immutable BranchName _name;
 	private Branch[] _dependencies;
 
-	this(BranchName name, uint[] leafsPoints) {
+	this(BranchName name, int[] leafsPoints) {
 		_name = name;
 		_leafsPoints = leafsPoints;
 	}
 
 	//Returns levels of the leafs of current branch
-	@property uint[] leafsLevels() const {
-		uint[] levels;
-		foreach(uint points; _leafsPoints){
+	@property int[] leafsLevels() const {
+		int[] levels;
+		foreach(int points; _leafsPoints){
 			levels ~= pointsToLevel(points);
 		}
 		return levels;
@@ -32,7 +33,7 @@ class Branch {
 		return leafsLevels[].sum;
 	}
 
-	@property uint[] leafsPoints() const {
+	@property int[] leafsPoints() const {
 		return _leafsPoints.dup;
 	}
 

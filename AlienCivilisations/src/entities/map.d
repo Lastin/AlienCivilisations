@@ -15,12 +15,13 @@ class Map : CanvasWidget {
 	this(float size, int planetCount, Player[] players) {
 		_size = size;
 		foreach(Player player; players){
-			auto p = new Planet(getFreeLocation(10), 10, true, player.name ~ "'s planet");
+			auto p = new Planet(player.name ~ "'s planet", getFreeLocation(10), 10, true);
 			addPlanet(p).setOwner(player);
 		}
 		for(size_t i=players.length; i<planetCount; i++){
 			float radius = uniform(1, 20);
-			addPlanet(new Planet(getFreeLocation(radius), radius, dice(0.5, 0.5)>0, "Planet "~ to!string(i)));
+			bool breathableAtmosphere = dice(0.5, 0.5)>0;
+			addPlanet(new Planet("Planet "~ to!string(i), getFreeLocation(radius), radius, breathableAtmosphere));
 		}
 	}
 
@@ -57,7 +58,7 @@ class Map : CanvasWidget {
 		do {
 			float x = uniform(0.0, _size-radius);
 			float y = uniform(0.0, _size-radius);
-			vector = new Vector2d(x, y);
+			vector = Vector2d(x, y);
 		} while(collides(vector, radius));
 		return vector;
 	}
@@ -71,19 +72,11 @@ class Map : CanvasWidget {
 		return null;
 	}
 
-	@property Planet[] planets() nothrow {
+	@property Planet[] planets() {
 		return _planets;
 	}
 	
 	@property float size() const {
 		return _size;
-	}
-
-	public Map dup() {
-		Planet[] planetsCopy;
-		foreach(Planet p; planets){
-			planetsCopy ~= p.dup;
-		}
-		return new Map(_size, planets.dup);
 	}
 }

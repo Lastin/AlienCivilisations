@@ -2,7 +2,9 @@
 
 import src.entities.knowledgeTree;
 import src.entities.planet;
+import src.entities.ship;
 import src.handlers.gameManager;
+import src.entities.branch;
 
 class Player {
 	private immutable string _name;
@@ -18,7 +20,7 @@ class Player {
 		return _knowledgeTree;
 	}
 	/** Player's written name **/
-	@property string name() {
+	@property string name() const {
 		return _name;
 	}
 	/** Returns true if player moves are locked **/

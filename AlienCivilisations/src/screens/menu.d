@@ -3,6 +3,7 @@
 import dlangui;
 import std.stdio;
 import src.screens.play;
+import core.thread;
 
 class Menu : HorizontalLayout {
 	this() {
@@ -64,13 +65,18 @@ class Menu : HorizontalLayout {
 		auto load = childById("vl1").childById("hl1").childById("loadButton");
 		auto exit = childById("vl1").childById("hl1").childById("exitButton");
 		play.click = delegate (Widget source) {
-			window.mainWidget = new Play();
-			super.destroy;
+			Thread play = new Thread(&loadPlay).start();
 			return true;
 		};
 		exit.click = delegate (Widget source) {
 			window.close();
 			return true;
 		};
+	}
+
+	void loadPlay(){
+		embeddedResourceList.addResources(embedResourcesFromList!("play_resources.list")());
+		window.mainWidget = new Play();
+		super.destroy();
 	}
 }

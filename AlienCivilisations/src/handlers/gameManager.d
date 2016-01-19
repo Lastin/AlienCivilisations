@@ -1,33 +1,37 @@
 ﻿module src.handlers.gameManager;
 
-import std.random;
+import src.entities.map;
+import src.entities.player;
+import src.handlers.containers;
 import src.logic.ai;
-import src.containers.vector2d;
+import std.random;
+import std.conv;
+import src.entities.knowledgeTree;
 
 class GameManager {
 	//Constant values
 	private immutable float _mapSize = 5000;
 	private immutable int _planetsCount = 16;
-	private immutable int[4][5] _startPoints =
+	private immutable int[][] _startPoints =
 	[
 		[0,0,0,0,0],
 		[0,0,0,0,0],
 		[0,0,0,0,0],
 		[0,0,0,0,0]
 	];
-	private State _realState;
+	private GameState _realState;
 
 	this() {
 		Player[] players = initialisePlayers();
-		Map map = Map(_mapSize, _planetsCount, players);
-		int queuePosition = uniform(0, _players.length);
-		_realState = new State(map, players, queuePosition);
+		Map map = new Map(_mapSize, _planetsCount, players);
+		size_t queuePosition = uniform(0, players.length);
+		_realState = new GameState(map, players, null, queuePosition);
 	}
 	
 	Player[] initialisePlayers() {
 		Player[] players;
-		players ~= new Player("Human", new KnowledgeTree(_startPoints));
-		players ~= new AI(&realState, new KnowledgeTree(_startPoints));
+		players ~= new Player("Human", new KnowledgeTree(_startPoints.to!(int[][])));
+		players ~= new AI(&_realState, new KnowledgeTree(_startPoints.to!(int[][])));
 		return players;
 	}
 }

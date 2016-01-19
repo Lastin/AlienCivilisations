@@ -13,10 +13,12 @@ enum ShipType : ubyte {
 enum int MULTIPLIER = 1000;
 
 class Ship : Owned {
-	private immutable uint _capacity;
-	private Player _owner;
-	private bool _completed;
-	private bool _used;
+	private {
+		Player _owner;
+		immutable uint _capacity;
+		bool _completed;
+		bool _used;
+	}
 
 	this(Player owner, bool completed = false, bool used = false){
 		_owner = owner;
@@ -33,7 +35,7 @@ class Ship : Owned {
 	}
 
 	@property bool complete() const {
-		return _complete;
+		return _completed;
 	}
 	@property bool used() const {
 		return _used;
@@ -54,9 +56,10 @@ class MilitaryShip : Ship {
 		if(p.owner && p.owner != _owner){
 			double effectiveness = _owner.knowledgeTree.branch(BranchName.Military).effectiveness;
 			uint attackPower = to!int(effectiveness * _onboard);
-			if(double left = p.attack(attackPower) / effectiveness < 1){
+			double left = p.attack(attackPower) / effectiveness;
+			if(left < 1){
 				_onboard = 0;
-				used = true;
+				_used = true;
 			}
 			else {
 				_onboard = to!int(left);

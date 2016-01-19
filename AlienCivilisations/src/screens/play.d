@@ -1,14 +1,14 @@
 ﻿module src.screens.play;
 
 import dlangui;
+import src.handlers.containers;
 import std.stdio;
-//import src.handlers.containers;
 
 class Play : AppFrame {
 	private {
 		bool _middleDown = false;
 		CanvasWidget _canvas;
-		//Vector2d cameraPosition;
+		Vector2d cameraPosition;
 	}
 
 	this(){

@@ -1,31 +1,31 @@
 ﻿module src.handlers.commandParser;
 
 import dlangui;
-import src.entities.branch;
+import src.handlers.gameManager;
+import std.format;
+import src.handlers.containers;
 import src.entities.player;
-import src.states.play;
-import std.array;
-import std.conv;
-import std.stdio;
-import std.string;
+import src.entities.branch;
 
 class CommandParser : VerticalLayout {
 	private {
-		auto _commands =
+		string[] _commands =
 		[
 			"commands",
 			"players",
 			"stats player_id",
 			"addPoints player_id branch leaf amount"
 		];
-		Play _play;
-		EditLine input = new EditLine();
-		EditBox output = new EditBox();
+		GameState _currentState;
+		EditLine input;
+		EditBox output;
 	}
 
-	this(Play play) {
+	this(GameState currentState) {
 		super("commandParser");
-		_play = play;
+		_currentState = currentState;
+		input = new EditLine();
+		output = new EditBox();
 		keyEvent.connect(delegate (Widget source, KeyEvent event) => handleKeyInput(source, event));
 	}
 
@@ -35,12 +35,12 @@ class CommandParser : VerticalLayout {
 				auto command = input.text;
 				if(command.length < 1) {
 					input.text = "";
-					dstring result = "";
+					string result = "";
 					foreach(string line; runCommand(command))
 					{
 						result ~= line ~ "\n";
 					}
-					output.text = format("%s\n%s\n%s", output.text, command, result);
+					output.text = to!dstring(format("%s\n%s\n%s", output.text, command, result));
 				}
 			}
 		}
@@ -50,24 +50,24 @@ class CommandParser : VerticalLayout {
 	string[] runCommand(dstring raw) {
 		string[] message;
 		try {
-			auto commandParts = raw.split(" ");
+			auto commandParts = to!string(raw).split(" ");
 			string command = commandParts[0];
 			if(command == "commands")
 				return _commands;
 			if(command == "players") {
-				foreach(int i, Player p; _play.players)
+				foreach(int i, Player p; _currentState.players)
 					message ~= format("[%s]: %s", i, p.name);
 			}
 			else if(command == "stats") {
 				int id = to!int(commandParts[1]);
-				Player player = _play.players[id];
+				Player player = _currentState.players[id];
 				message ~= player.knowledgeTree.toString;
 			}
 			else if(command == "addPoints") {
 				if(commandParts.length < 5)
 					throw new Exception("Insufficient parameters");
 				int id = to!int(commandParts[1]);
-				Player player = _play.players[id];
+				Player player = _currentState.players[id];
 				Branch branch = player.knowledgeTree.branch(commandParts[2]);
 				int leaf = to!int(commandParts[3]);
 				if(leaf < 0 || leaf > 5)

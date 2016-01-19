@@ -3,36 +3,40 @@
 import src.handlers.containers;
 import std.algorithm;
 import std.conv;
+import src.entities.player;
+import src.entities.ship;
+import std.format;
+import src.entities.knowledgeTree;
 
 public enum int POPULATION_CONSTANT = 10000;
 
 class Planet : Owned {
-	private immutable bool _breathableAtmosphere;
-	private uint _food = 0;
-	private uint _militaryUnits = 0;
-	private immutable string _name;
-	private Player _owner;
-	private uint[8] _population = [0,0,0,0,0,0,0,0];
-	private Vector2d _position;
-	private immutable float _radius;
-	private uint _workForce = 0;
+	private {
+		immutable string _name;
+		immutable Vector2d _position;
+		immutable float _radius;
+		immutable bool _breathableAtmosphere;
+		Player _owner;
+		uint[8] _population = [0,0,0,0,0,0,0,0];
+		uint _food = 0;
+		uint _workForce = 0;
+		uint _militaryUnits = 0;
+	}
 
-
-	this(bool breathableAtmosphere, string name, Vector2d position, float radius) {
+	this(string name, Vector2d position, float radius, bool breathableAtmosphere) {
 		_breathableAtmosphere = breathableAtmosphere;
 		_name = name;
 		_position = position;
 		_radius = radius;
 	}
 	/** (Cloning) Constructor for creating planet from existing values **/
-	this(bool breathableAtmosphere, string name, Vector2d position, float radius,
-		 uint food, uint militaryUnits, Player owner, uint[8] population, uint workForce) {
-		this(breathableAtmosphere, name, position, radius);
-		_food = food;
-		_militaryUnits = militaryUnits;
-		_owner = owner;
+	this(string name, Vector2d position, float radius, bool breathableAtmosphere,
+		uint[8] population, uint food, uint workForce, uint militaryUnits) {
+		this(name, position, radius, breathableAtmosphere);
 		_population = population;
+		_food = food;
 		_workForce = workForce;
+		_militaryUnits = militaryUnits;
 	}
 
 	@property Vector2d position() {
@@ -172,6 +176,5 @@ class Planet : Owned {
 			_workForce -= to!int(productionCost);
 			ship.complete;
 		}
-		return this;
 	}
 }

@@ -105,6 +105,18 @@
     <Compile Include="src\main.d" />
     <Compile Include="src\screens\menu.d" />
     <Compile Include="src\screens\play.d" />
+    <Compile Include="src\entities\branch.d" />
+    <Compile Include="src\entities\knowledgeTree.d" />
+    <Compile Include="src\entities\map.d" />
+    <Compile Include="src\entities\planet.d" />
+    <Compile Include="src\entities\player.d" />
+    <Compile Include="src\entities\ship.d" />
+    <Compile Include="src\handlers\commandParser.d" />
+    <Compile Include="src\handlers\containers.d" />
+    <Compile Include="src\handlers\gameManager.d" />
+    <Compile Include="src\handlers\jsonParser.d" />
+    <Compile Include="src\logic\ai.d" />
+    <Compile Include="src\logic\order.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
@@ -112,19 +124,5 @@
     <Folder Include="src\handlers\" />
     <Folder Include="src\logic\" />
     <Folder Include="src\screens\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\entities\planet.d" />
-    <None Include="src\entities\player.d" />
-    <None Include="src\entities\ship.d" />
-    <None Include="src\entities\knowledgeTree.d" />
-    <None Include="src\entities\branch.d" />
-    <None Include="src\entities\map.d" />
-    <None Include="src\handlers\commandParser.d" />
-    <None Include="src\handlers\jsonParser.d" />
-    <None Include="src\handlers\gameManager.d" />
-    <None Include="src\handlers\containers.d" />
-    <None Include="src\logic\ai.d" />
-    <None Include="src\logic\order.d" />
   </ItemGroup>
 </Project>

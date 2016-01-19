@@ -1,13 +1,13 @@
 ﻿module src.main;
 
-public import dlangui;
-public import std.stdio;
+import dlangui;
+import std.stdio;
 import src.screens.menu;
 
 mixin APP_ENTRY_POINT;
 
 extern (C) int UIAppMain(string[] args) {
-	embeddedResourceList.addResources(embedResourcesFromList!("resources.list")());
+	embeddedResourceList.addResources(embedResourcesFromList!("menu_resources.list")());
 	int width = 1920;
 	int height = 1080;
 	Window window = Platform.instance.createWindow("Alien Civilisations", 

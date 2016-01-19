@@ -4,11 +4,11 @@ import src.entities.knowledgeTree;
 import src.entities.map;
 import src.entities.planet;
 import src.entities.player;
-import src.logic.hypotheticalWorld;
+import src.handlers.containers;
 
 class AI : Player{
-	private State* _realState;
-	this(State* realState, KnowledgeTree knowledgeTree) {
+	private GameState* _realState;
+	this(GameState* realState, KnowledgeTree knowledgeTree) {
 		super("Artificial Player", knowledgeTree);
 		_realState = realState;
 	}

@@ -12,8 +12,8 @@ class Order {
 }
 
 class KnowledgeOrder : Order {
-	private immutable Branch _branch;
-	private immutable int _leaf;
+	private Branch _branch;
+	private int _leaf;
 	this(Branch branch, int leaf) {
 		_branch = branch;
 		_leaf = leaf;

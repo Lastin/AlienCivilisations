@@ -1,9 +1,7 @@
 ﻿module src.entities.knowledgeTree;
 
 import src.entities.branch;
-import std.container.dlist;
-import std.conv;
-import std.range;
+import std.format;
 import std.typecons;
 
 enum BranchName : ubyte {
@@ -24,7 +22,7 @@ enum LEAF_NAMES : string[] {
 public class KnowledgeTree {
 	private Branch _energy, _food, _military, _science;
 
-	this(uint[][] points) {
+	this(int[][] points) {
 		_energy = 	new Branch(BranchName.Energy,	points[0]);
 		_food = 	new Branch(BranchName.Food, 	points[1]);
 		_military = new Branch(BranchName.Military, points[2]);
@@ -97,13 +95,13 @@ public class KnowledgeTree {
 	}
 
 	//Returns duplicate of the current object, without references to original
-	const KnowledgeTree dup() {
+	KnowledgeTree dup() const {
 		auto points = 
 		[
-			_energy.leafsPoints.dup,
-			_food.leafsPoints.dup,
-			_military.leafsPoints.dup,
-			_science.leafsPoints.dup
+			_energy.leafsPoints,
+			_food.leafsPoints,
+			_military.leafsPoints,
+			_science.leafsPoints
 		];
 		return new KnowledgeTree(points);
 	}
