@@ -1,21 +1,9 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="AlienCivilisations" expanded="True">
-            <Node name="src" expanded="True">
-              <Node name="entities" expanded="True">
-                <Node name="planet.d" selected="True" />
-              </Node>
-              <Node name="handlers" expanded="True" />
-              <Node name="logic" expanded="True" />
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/screens/play.d">
+    <Files>
+      <File FileName="AlienCivilisations/src/screens/play.d" Line="19" Column="19" />
+    </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

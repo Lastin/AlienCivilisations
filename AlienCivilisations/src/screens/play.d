@@ -9,9 +9,9 @@ import src.entities.planet;
 class Play : AppFrame {
 	private {
 		bool _middleDown = false;
-		Vector2d!float _startPosition;
-		Vector2d!float _endPosition;
-		Vector2d!int _cameraPosition;
+		Vector2d _startPosition;
+		Vector2d _endPosition;
+		Vector2d _cameraPosition;
 		CanvasWidget _canvas;
 		GameManager _gm;
 		AnimatedDrawable _animation;
@@ -22,8 +22,8 @@ class Play : AppFrame {
 	this(){
 		mouseEvent = &handleMouseEvent;
 		_gm = new GameManager();
-		_cameraPosition = Vector2d!int(to!int(_gm.state.map.size/2), to!int(_gm.state.map.size/2));
-		_endPosition = Vector2d!float(_gm.state.map.size/2, _gm.state.map.size/2);
+		_cameraPosition = Vector2d(_gm.state.map.size/2, _gm.state.map.size/2);
+		_endPosition = Vector2d(_gm.state.map.size/2, _gm.state.map.size/2);
 		_animation = new AnimatedDrawable(&_cameraPosition, _gm.state.map.planets);
 		drawableRef = _animation;
 	}
@@ -84,9 +84,9 @@ class Play : AppFrame {
 
 class AnimatedDrawable : Drawable {
 	DrawableRef background;
-	private Vector2d!int* _cameraPosition;
+	private Vector2d* _cameraPosition;
 	private Planet[] _planets;
-	this(Vector2d!int* cameraPosition, Planet[] planets) {
+	this(Vector2d* cameraPosition, Planet[] planets) {
 		_cameraPosition = cameraPosition;
 		_planets = planets;
 		//background = drawableCache.get("tx_fabric.tiled");
@@ -104,8 +104,10 @@ class AnimatedDrawable : Drawable {
 	override void drawTo(DrawBuf buf, Rect rc, uint state = 0, int tilex0 = 0, int tiley0 = 0) {
 		//background.drawTo(buf, rc, state, cast(int)(animationProgress / 695430), cast(int)(animationProgress / 1500000));
 		//drawAnimatedIcon(buf, cast(uint)(animationProgress / 212400) + 200, rc, -2, 1, "earth");
+		int x = to!int(_planets[0].position.x - _cameraPosition.x);
+		int y = to!int(_planets[0].position.y - _cameraPosition.y);
 		DrawBufRef image = drawableCache.getImage("earth");
-		buf.drawImage(_planets[0].position.x - _cameraPosition.x, _planets[0].position.y - _cameraPosition.y, image.get);
+		buf.drawImage(500, 500, image.get);
 	}
 	@property override int width() {
 		return 1;

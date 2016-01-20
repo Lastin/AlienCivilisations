@@ -43,7 +43,7 @@ class Map {
 		return collides(p.position, p.radius);
 	}
 
-	bool collides(Vector2d!float vector, float radius) {
+	bool collides(Vector2d vector, float radius) {
 		foreach(Planet planet; _planets){
 			auto distance = vector.getEuclideanDistance(planet.position) - radius - planet.radius;
 			if(distance < _minDistance){
@@ -53,17 +53,17 @@ class Map {
 		return false;
 	}
 
-	Vector2d!float getFreeLocation(float radius) {
-		Vector2d!float vector;
+	Vector2d getFreeLocation(float radius) {
+		Vector2d vector;
 		do {
 			float x = uniform(0.0, _size-radius);
 			float y = uniform(0.0, _size-radius);
-			vector = Vector2d!float(x, y);
+			vector = Vector2d(x, y);
 		} while(collides(vector, radius));
 		return vector;
 	}
 
-	Planet planetAt(Vector2d!float vector) {
+	Planet planetAt(Vector2d vector) {
 		foreach(Planet planet; _planets){
 			if(vector.getEuclideanDistance(planet.position) <= planet.radius){
 				return planet;
