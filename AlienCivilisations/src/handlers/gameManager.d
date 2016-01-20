@@ -34,4 +34,8 @@ class GameManager {
 		players ~= new AI(&_realState, new KnowledgeTree(_startPoints.to!(int[][])));
 		return players;
 	}
+
+	@property GameState state(){
+		return _realState;
+	}
 }

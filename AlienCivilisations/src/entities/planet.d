@@ -13,7 +13,7 @@ public enum int POPULATION_CONSTANT = 10000;
 class Planet : Owned {
 	private {
 		immutable string _name;
-		immutable Vector2d _position;
+		immutable Vector2d!float _position;
 		immutable float _radius;
 		immutable bool _breathableAtmosphere;
 		Player _owner;
@@ -23,14 +23,14 @@ class Planet : Owned {
 		uint _militaryUnits = 0;
 	}
 
-	this(string name, Vector2d position, float radius, bool breathableAtmosphere) {
+	this(string name, Vector2d!float position, float radius, bool breathableAtmosphere) {
 		_breathableAtmosphere = breathableAtmosphere;
 		_name = name;
 		_position = position;
 		_radius = radius;
 	}
 	/** (Cloning) Constructor for creating planet from existing values **/
-	this(string name, Vector2d position, float radius, bool breathableAtmosphere,
+	this(string name, Vector2d!float position, float radius, bool breathableAtmosphere,
 		uint[8] population, uint food, uint workForce, uint militaryUnits) {
 		this(name, position, radius, breathableAtmosphere);
 		_population = population;
@@ -39,7 +39,7 @@ class Planet : Owned {
 		_militaryUnits = militaryUnits;
 	}
 
-	@property Vector2d position() {
+	@property Vector2d!float position() {
 		return _position;
 	}
 	@property bool breathableAtmosphere() {

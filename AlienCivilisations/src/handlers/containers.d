@@ -7,11 +7,12 @@ import src.entities.ship;
 import src.entities.planet;
 import src.entities.knowledgeTree;
 import src.logic.ai;
+import std.conv;
 
-struct Vector2d {
-	float x;
-	float y;
-	this(float x_param, float y_param) {
+struct Vector2d (T) {
+	T x;
+	T y;
+	this(T x_param, T y_param) {
 		x = x_param;
 		y = y_param;
 	}
@@ -19,7 +20,7 @@ struct Vector2d {
 	float getEuclideanDistance(Vector2d vecA) {
 		auto xdiff = vecA.x - x;
 		auto ydiff = vecA.y - y;
-		return sqrt(xdiff^^2 + ydiff^^2);
+		return to!T(sqrt(to!float(xdiff^^2 + ydiff^^2)));
 	}
 
 	Vector2d dup() const {
@@ -90,7 +91,7 @@ class GameState {
 		//duplicate planets
 		foreach(Planet origin; _map.planets) {
 			string name = origin.name;
-			Vector2d position = origin.position;
+			Vector2d!float position = origin.position;
 			float radius = origin.radius;
 			bool ba = origin.breathableAtmosphere;
 			uint[8] population = origin.population.dup;
