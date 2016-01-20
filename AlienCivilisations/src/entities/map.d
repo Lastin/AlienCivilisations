@@ -9,7 +9,6 @@ import std.stdio;
 
 class Map {
 	private immutable float _size;
-	private immutable float _minDistance = 300;
 	private Planet[] _planets;
 
 	this(float size, int planetCount, Player[] players) {
@@ -51,10 +50,10 @@ class Map {
 		return false;
 	}
 
-	Planet collides(Vector2d vector, float radius) {
+	Planet collides(Vector2d vector, float radius, float minDistance = 700) {
 		foreach(Planet planet; _planets){
 			auto distance = vector.getEuclideanDistance(planet.position) - radius - planet.radius;
-			if(distance < _minDistance){
+			if(distance < minDistance){
 				return planet;
 			}
 		}

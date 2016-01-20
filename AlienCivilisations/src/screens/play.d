@@ -21,6 +21,83 @@ class Play : AppFrame {
 	this(){
 		mouseEvent = &handleMouseEvent;
 		initialise();
+		auto layout =
+		q{
+			VerticalLayout {
+				id: hl1
+				layoutHeight: fill
+				layoutWidth: fill
+				HorizontalLayout {
+					layoutHeight: fill
+					layoutWidth: fill
+					VerticalLayout {
+						HorizontalLayout {
+							backgroundColor: 0x80000000
+							Button {
+								id: newGameButton
+								text: "END TURN"
+								padding: 10
+								margins: 10
+							}
+							Button {
+								id: newGameButton
+								text: "END TURN"
+								padding: 10
+								margins: 10
+							}
+							Button {
+								id: newGameButton
+								text: "END TURN"
+								padding: 10
+								margins: 10
+							}
+						}
+					}
+					HSpacer {}
+					VerticalLayout {
+						layoutHeight: fill
+						VSpacer {}
+						HorizontalLayout {
+							VerticalLayout {
+								backgroundColor: 0x80000000
+								Button {
+									id: newGameButton
+									text: "END TURN"
+									padding: 10
+									margins: 10
+								}
+								Button {
+									id: newGameButton
+									text: "END TURN"
+									padding: 10
+									margins: 10
+								}
+								Button {
+									id: newGameButton
+									text: "END TURN"
+									padding: 10
+									margins: 10
+								}
+							}
+						}
+						VSpacer {}
+					}
+				}
+				VSpacer{}
+				HorizontalLayout {
+					VerticalLayout {
+						backgroundColor: 0x80000000
+						Button {
+							id: knowledgeTreeButton
+							text: "KNOWLEDGE TREE"
+							padding: 20
+							margins: 10
+						}
+					}
+				}
+			}
+		};
+		addChild(parseML(layout));
 	}
 
 	void initialise() {
@@ -40,6 +117,10 @@ class Play : AppFrame {
 					_cameraPosition.x + event.x,
 					_cameraPosition.y + event.y);
 				writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
+				Planet selected = _gm.state.map.collides(relativeMousePosition, 1, 0);
+				if(selected){
+					writeln("Selected planet: " ~ selected.name);
+				}
 			}
 		}
 		if(event.button == MouseButton.Middle){
@@ -95,16 +176,7 @@ class AnimatedDrawable : Drawable {
 		_planets = planets;
 		//background = drawableCache.get("tx_fabric.tiled");
 	}
-	void drawAnimatedIcon(DrawBuf buf, uint p, Rect rc, int speedx, int speedy, string resourceId) {
-		int x = (p * speedx % rc.width);
-		int y = (p * speedy % rc.height);
-		if (x < 0)
-			x += rc.width;
-		if (y < 0)
-			y += rc.height;
-		DrawBufRef image = drawableCache.getImage(resourceId);
-		buf.drawImage(x, y, image.get);
-	}
+
 	override void drawTo(DrawBuf buf, Rect rc, uint state = 0, int tilex0 = 0, int tiley0 = 0) {
 		//background.drawTo(buf, rc, state, cast(int)(animationProgress / 695430), cast(int)(animationProgress / 1500000));
 		//drawAnimatedIcon(buf, cast(uint)(animationProgress / 212400) + 200, rc, -2, 1, "earth");

@@ -15,7 +15,7 @@ class Menu : HorizontalLayout {
 			VerticalLayout {
 				id: vl1
 				alignment: center
-				layoutHeight: fill;
+				layoutHeight: fill
 				VSpacer {}
 				TextWidget {
 					text: "Alien Civilisations"
@@ -65,7 +65,8 @@ class Menu : HorizontalLayout {
 		auto load = childById("vl1").childById("hl1").childById("loadButton");
 		auto exit = childById("vl1").childById("hl1").childById("exitButton");
 		play.click = delegate (Widget source) {
-			Thread play = new Thread(&loadPlay).start();
+			//Thread play = new Thread(&loadPlay).start();
+			loadPlay();
 			return true;
 		};
 		exit.click = delegate (Widget source) {
