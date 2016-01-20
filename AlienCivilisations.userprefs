@@ -2,7 +2,8 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/screens/play.d">
     <Files>
-      <File FileName="AlienCivilisations/src/screens/play.d" Line="19" Column="19" />
+      <File FileName="AlienCivilisations/src/screens/play.d" Line="35" Column="35" />
+      <File FileName="AlienCivilisations/src/entities/map.d" Line="33" Column="33" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

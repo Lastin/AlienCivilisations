@@ -9,19 +9,24 @@ import std.stdio;
 
 class Map {
 	private immutable float _size;
-	private immutable float _minDistance = 30;
+	private immutable float _minDistance = 300;
 	private Planet[] _planets;
 
 	this(float size, int planetCount, Player[] players) {
 		_size = size;
 		foreach(Player player; players){
-			auto p = new Planet(player.name ~ "'s planet", getFreeLocation(10), 10, true);
+			auto p = new Planet(player.name ~ "'s planet", getFreeLocation(10), 150, true);
 			addPlanet(p).setOwner(player);
 		}
 		for(size_t i=players.length; i<planetCount; i++){
-			float radius = uniform(1, 20);
+			float radius = uniform(40, 81);
 			bool breathableAtmosphere = dice(0.5, 0.5)>0;
 			addPlanet(new Planet("Planet "~ to!string(i), getFreeLocation(radius), radius, breathableAtmosphere));
+		}
+		debug {
+			foreach(Planet p; _planets){
+				writefln("X: %s Y: %s Radius: %s", p.position.x, p.position.y, p.radius);
+			}
 		}
 	}
 
@@ -40,17 +45,20 @@ class Map {
 	}
 
 	bool collides(Planet p) {
-		return collides(p.position, p.radius);
+		if(collides(p.position, p.radius)) {
+			return true;
+		}
+		return false;
 	}
 
-	bool collides(Vector2d vector, float radius) {
+	Planet collides(Vector2d vector, float radius) {
 		foreach(Planet planet; _planets){
 			auto distance = vector.getEuclideanDistance(planet.position) - radius - planet.radius;
 			if(distance < _minDistance){
-				return true;
+				return planet;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	Vector2d getFreeLocation(float radius) {
