@@ -2,8 +2,8 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/screens/play.d">
     <Files>
-      <File FileName="AlienCivilisations/src/screens/play.d" Line="15" Column="15" />
-      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/widgets/widget.d" Line="52" Column="52" />
+      <File FileName="AlienCivilisations/src/screens/play.d" Line="17" Column="17" />
+      <File FileName="AlienCivilisations/src/handlers/gameManager.d" Line="22" Column="22" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

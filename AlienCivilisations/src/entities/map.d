@@ -14,8 +14,9 @@ class Map {
 	this(float size, int planetCount, Player[] players) {
 		_size = size;
 		foreach(Player player; players){
-			auto p = new Planet(player.name ~ "'s planet", getFreeLocation(10), 150, true);
+			auto p = new Planet(player.name ~ "'s planet", getFreeLocation(10), 60, true);
 			addPlanet(p).setOwner(player);
+			p.resetPopulation();
 		}
 		for(size_t i=players.length; i<planetCount; i++){
 			float radius = uniform(40, 81);

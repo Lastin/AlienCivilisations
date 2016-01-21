@@ -15,7 +15,8 @@ class Play : AppFrame {
 		short zoom = 1;
 		GameManager _gm;
 		AnimatedDrawable _animation;
-		DrawableRef drawableRef;
+		DrawableRef _drawableRef;
+		Widget _planetInfoContainer;
 	}
 
 
@@ -25,57 +26,93 @@ class Play : AppFrame {
 		auto layout =
 		q{
 			VerticalLayout {
-				id: hl1
+				id: verticalContainer
 				layoutHeight: fill
 				layoutWidth: fill
 				HorizontalLayout {
+					id: horizontalContainer
 					layoutHeight: fill
 					layoutWidth: fill
 					VerticalLayout {
+						id: verticalRestrictor
 						HorizontalLayout {
+							id: horizontalRestrictor
 							backgroundColor: 0x80000000
+							padding: 5
 							Button {
 								id: newGameButton
 								text: "END TURN"
-								padding: 10
-								margins: 10
+								padding: 15
+								margins: Rect { 10 10 30 10}
 							}
-							Button {
-								id: newGameButton
-								text: "END TURN"
-								padding: 10
-								margins: 10
+							TextWidget {
+								fontWeight: 800
+								text: "Total population:"
 							}
-							Button {
-								id: newGameButton
-								text: "END TURN"
-								padding: 10
-								margins: 10
+							TextWidget {
+								id: totalPopulation
+								text: ""
+								padding: Rect {5 10 30 10}
+							}
+							TextWidget {
+								fontWeight: 800
+								text: "Total military units:"
+							}
+							TextWidget {
+								id: totalMilitaryUnits
+								text: ""
+								padding: Rect {5 10 30 10}
 							}
 						}
 					}
 					HSpacer {}
 					VerticalLayout {
+						id: rightVerticalPanel
 						layoutHeight: fill
 						VSpacer {}
 						HorizontalLayout {
+							id: horizontalRestrictor
 							VerticalLayout {
+								id: verticalRestrictor
 								backgroundColor: 0x80000000
+								TextWidget {
+									padding: 10
+									id: planetName
+									text : ""
+									fontWeight: 800
+									fontSize: 20
+								}
+								TableLayout {
+									id: planetInfoTable
+									padding: 10
+									colCount: 2
+									TextWidget {
+										fontWeight: 800
+										text: "Population: "
+									}
+									TextWidget {
+										id: planetPopulation
+										text : ""
+									}
+									TextWidget {
+										fontWeight: 800
+										text: "Military units: "
+										
+									}
+									TextWidget {
+										id: militaryUnits
+										text : ""
+									}
+								}
 								Button {
 									id: newGameButton
-									text: "END TURN"
+									text: "Inhabit"
 									padding: 10
 									margins: 10
 								}
 								Button {
 									id: newGameButton
-									text: "END TURN"
-									padding: 10
-									margins: 10
-								}
-								Button {
-									id: newGameButton
-									text: "END TURN"
+									text: "Convert units"
 									padding: 10
 									margins: 10
 								}
@@ -99,6 +136,9 @@ class Play : AppFrame {
 			}
 		};
 		addChild(parseML(layout));
+		_planetInfoContainer = childById("verticalContainer").childById("horizontalContainer").
+			childById("rightVerticalPanel").childById("horizontalRestrictor").childById("verticalRestrictor");
+		_planetInfoContainer.visibility = Visibility.Invisible;
 	}
 
 	void initialise() {
@@ -107,9 +147,10 @@ class Play : AppFrame {
 		_gm = new GameManager();
 		_cameraPosition = Vector2d(_gm.state.map.size/2, _gm.state.map.size/2);
 		_endPosition = Vector2d(_gm.state.map.size/2, _gm.state.map.size/2);
-		_animation = new AnimatedDrawable(&_cameraPosition, _gm.state.map.planets);
-		drawableRef = _animation;
+		_animation = new AnimatedDrawable(&_cameraPosition, _gm.state);
+		_drawableRef = _animation;
 	}
+
 
 	bool handleMouseEvent(Widget source, MouseEvent event) {
 		if(event.action == MouseAction.ButtonDown) {
@@ -121,8 +162,10 @@ class Play : AppFrame {
 				Planet selected = _gm.state.map.collides(relativeMousePosition, 1, 0);
 				_animation.setSelectedPlanet(selected);
 				if(selected){
-					writeln("Selected planet: " ~ selected.name);
-
+					updatePlanetInfo(selected);
+				}
+				else {
+					_planetInfoContainer.visibility = Visibility.Invisible;
 				}
 			}
 		}
@@ -161,6 +204,14 @@ class Play : AppFrame {
 		}
 		return true;
 	}
+	
+	void updatePlanetInfo(Planet planet){
+		_planetInfoContainer.visibility = Visibility.Visible;
+		_planetInfoContainer.childById("planetPopulation").text = to!dstring(planet.populationSum);
+		_planetInfoContainer.childById("militaryUnits").text = to!dstring(planet.militaryUnits);
+		_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
+		_planetInfoContainer.childById("planetName").textFlags = TextFlag.Underline;
+	}
 
 	override void animate(long interval) {
 		//_animation.animate(interval);
@@ -168,7 +219,7 @@ class Play : AppFrame {
 	}
 	@property override bool animating() { return true; }
 	@property override DrawableRef backgroundDrawable() const {
-		return (cast(Play)this).drawableRef;
+		return (cast(Play)this)._drawableRef;
 	}
 }
 
@@ -177,9 +228,11 @@ class AnimatedDrawable : Drawable {
 	private Vector2d* _cameraPosition;
 	private Planet[] _planets;
 	private Planet _selected;
-	this(Vector2d* cameraPosition, Planet[] planets) {
+	private GameState _state;
+	this(Vector2d* cameraPosition, GameState state) {
 		_cameraPosition = cameraPosition;
-		_planets = planets;
+		_state = state;
+		_planets = _state.map.planets;
 		//background = drawableCache.get("tx_fabric.tiled");
 	}
 
@@ -192,14 +245,18 @@ class AnimatedDrawable : Drawable {
 		//drawAnimatedIcon(buf, cast(uint)(animationProgress / 212400) + 200, rc, -2, 1, "earth");
 		DrawBufRef image = drawableCache.getImage("earth");
 		foreach(Planet planet; _planets) {
-			if(_selected && _selected != planet){
+			if(_selected && _selected != planet) {
 				int relX = to!int(_selected.position.x - _cameraPosition.x);
 				int relY = to!int(_selected.position.y - _cameraPosition.y);
 				int x = to!int(planet.position.x - _cameraPosition.x);
 				int y = to!int(planet.position.y - _cameraPosition.y);
-				buf.drawLine(Point(x-1,y), Point(relX-1, relY), 0x408000);
-				buf.drawLine(Point(x,y-1), Point(relX, relY-1), 0x408000);
-				buf.drawLine(Point(x,y), Point(relX, relY), 0x408000);
+				uint colour = 0x408000;
+				if(planet.owner && planet.owner == _state.currentPlayer) {
+					colour = 0xe60000;
+				}
+				buf.drawLine(Point(x-1,y), Point(relX-1, relY), colour);
+				buf.drawLine(Point(x,y-1), Point(relX, relY-1), colour);
+				buf.drawLine(Point(x,y), Point(relX, relY), colour);
 			}
 		}
 		foreach(Planet planet; _planets) {

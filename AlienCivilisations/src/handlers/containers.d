@@ -46,10 +46,10 @@ class GameState {
 		return _map;
 	}
 	@property Player[] players() {
-		return players;
+		return _players;
 	}
 	@property Player currentPlayer() {
-		return players[_queuePosition];
+		return _players[_queuePosition];
 	}
 	@property Ship[] ships() {
 		return _ships;
