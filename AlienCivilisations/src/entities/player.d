@@ -28,6 +28,15 @@ class Player {
 		return _locked;
 	}
 
+	@property Planet[] planets(Planet[] list){
+		Planet[] owned;
+		foreach(Planet p; list) {
+			if(p.owner == this)
+				owned ~= p;
+		}
+		return owned;
+	}
+
 	Player completeTurn() {
 
 		return this;

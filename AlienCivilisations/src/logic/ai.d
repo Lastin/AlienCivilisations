@@ -9,7 +9,7 @@ import src.handlers.containers;
 class AI : Player{
 	private GameState* _realState;
 	this(GameState* realState, KnowledgeTree knowledgeTree) {
-		super("Artificial Player", knowledgeTree);
+		super("AI", knowledgeTree);
 		_realState = realState;
 	}
 }

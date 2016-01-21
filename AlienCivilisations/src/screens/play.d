@@ -5,6 +5,7 @@ import src.handlers.containers;
 import std.stdio;
 import src.handlers.gameManager;
 import src.entities.planet;
+import src.entities.player;
 
 class Play : AppFrame {
 	private {
@@ -17,14 +18,25 @@ class Play : AppFrame {
 		AnimatedDrawable _animation;
 		DrawableRef _drawableRef;
 		Widget _planetInfoContainer;
+		Widget _playerStatsContainer;
 	}
 
 
 	this(){
 		mouseEvent = &handleMouseEvent;
 		initialise();
+		addChild(makeLayout());
+		_planetInfoContainer = childById("verticalContainer").childById("horizontalContainer").
+			childById("rightVerticalPanel").childById("hr2").childById("vr2");
+		_planetInfoContainer.visibility = Visibility.Invisible;
+		_playerStatsContainer = childById("verticalContainer").childById("horizontalContainer").
+			childById("vr1").childById("hr1");
+		updatePlayerStats();
+	}
+
+	Widget makeLayout(){
 		auto layout =
-		q{
+			q{
 			VerticalLayout {
 				id: verticalContainer
 				layoutHeight: fill
@@ -34,9 +46,9 @@ class Play : AppFrame {
 					layoutHeight: fill
 					layoutWidth: fill
 					VerticalLayout {
-						id: verticalRestrictor
+						id: vr1
 						HorizontalLayout {
-							id: horizontalRestrictor
+							id: hr1
 							backgroundColor: 0x80000000
 							padding: 5
 							Button {
@@ -47,20 +59,24 @@ class Play : AppFrame {
 							}
 							TextWidget {
 								fontWeight: 800
+								fontSize: 120%
 								text: "Total population:"
 							}
 							TextWidget {
 								id: totalPopulation
 								text: ""
+								fontSize: 120%
 								padding: Rect {5 10 30 10}
 							}
 							TextWidget {
 								fontWeight: 800
+								fontSize: 120%
 								text: "Total military units:"
 							}
 							TextWidget {
 								id: totalMilitaryUnits
 								text: ""
+								fontSize: 120%
 								padding: Rect {5 10 30 10}
 							}
 						}
@@ -71,9 +87,9 @@ class Play : AppFrame {
 						layoutHeight: fill
 						VSpacer {}
 						HorizontalLayout {
-							id: horizontalRestrictor
+							id: hr2
 							VerticalLayout {
-								id: verticalRestrictor
+								id: vr2
 								backgroundColor: 0x80000000
 								TextWidget {
 									padding: 10
@@ -88,30 +104,30 @@ class Play : AppFrame {
 									colCount: 2
 									TextWidget {
 										fontWeight: 800
-										text: "Population: "
+										text: "Population:"
 									}
 									TextWidget {
 										id: planetPopulation
-										text : ""
+										text : "0"
 									}
 									TextWidget {
 										fontWeight: 800
-										text: "Military units: "
+										text: "Military units:"
 										
 									}
 									TextWidget {
 										id: militaryUnits
-										text : ""
+										text : "0"
 									}
 								}
 								Button {
-									id: newGameButton
+									id: inhabitButton
 									text: "Inhabit"
 									padding: 10
 									margins: 10
 								}
 								Button {
-									id: newGameButton
+									id: convertUnitsButton
 									text: "Convert units"
 									padding: 10
 									margins: 10
@@ -135,10 +151,7 @@ class Play : AppFrame {
 				}
 			}
 		};
-		addChild(parseML(layout));
-		_planetInfoContainer = childById("verticalContainer").childById("horizontalContainer").
-			childById("rightVerticalPanel").childById("horizontalRestrictor").childById("verticalRestrictor");
-		_planetInfoContainer.visibility = Visibility.Invisible;
+		return parseML(layout);
 	}
 
 	void initialise() {
@@ -149,8 +162,43 @@ class Play : AppFrame {
 		_endPosition = Vector2d(_gm.state.map.size/2, _gm.state.map.size/2);
 		_animation = new AnimatedDrawable(&_cameraPosition, _gm.state);
 		_drawableRef = _animation;
+
 	}
 
+	void updatePlanetInfo(Planet planet) {
+		if(planet) {
+			_planetInfoContainer.visibility = Visibility.Visible;
+			_planetInfoContainer.childById("planetPopulation").text = to!dstring(planet.populationSum);
+			_planetInfoContainer.childById("militaryUnits").text = to!dstring(planet.militaryUnits);
+			_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
+			_planetInfoContainer.childById("planetName").textFlags = TextFlag.Underline;
+			if(planet.owner == _gm.state.players[0]){
+				_planetInfoContainer.childById("convertUnitsButton").visibility = Visibility.Visible;
+				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Gone;
+				_planetInfoContainer.childById("inhabitButton").textColor = 0xFFFFFFFF;
+			} else {
+				_planetInfoContainer.childById("convertUnitsButton").textColor = 0xFFFFFFFF;
+				_planetInfoContainer.childById("convertUnitsButton").visibility = Visibility.Gone;
+				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Visible;
+			}
+		}
+		else {
+			_planetInfoContainer.visibility = Visibility.Invisible;
+		}
+
+	}
+	
+	void updatePlayerStats() {
+		Player human = _gm.state.players[0];
+		uint populationTotal = 0;
+		uint militaryUnitTotal = 0;
+		foreach(Planet p; human.planets(_gm.state.map.planets)) {
+			populationTotal += p.populationSum;
+			militaryUnitTotal += p.militaryUnits;
+		}
+		_playerStatsContainer.childById("totalPopulation").text = to!dstring(populationTotal);
+		_playerStatsContainer.childById("totalMilitaryUnits").text = to!dstring(militaryUnitTotal);
+	}
 
 	bool handleMouseEvent(Widget source, MouseEvent event) {
 		if(event.action == MouseAction.ButtonDown) {
@@ -158,15 +206,10 @@ class Play : AppFrame {
 				auto relativeMousePosition = Vector2d(
 					_cameraPosition.x + event.x,
 					_cameraPosition.y + event.y);
-				writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
+				debug writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
 				Planet selected = _gm.state.map.collides(relativeMousePosition, 1, 0);
 				_animation.setSelectedPlanet(selected);
-				if(selected){
-					updatePlanetInfo(selected);
-				}
-				else {
-					_planetInfoContainer.visibility = Visibility.Invisible;
-				}
+				updatePlanetInfo(selected);
 			}
 		}
 		if(event.button == MouseButton.Middle){
@@ -203,14 +246,6 @@ class Play : AppFrame {
 		else if(event.action == MouseAction.Wheel){
 		}
 		return true;
-	}
-	
-	void updatePlanetInfo(Planet planet){
-		_planetInfoContainer.visibility = Visibility.Visible;
-		_planetInfoContainer.childById("planetPopulation").text = to!dstring(planet.populationSum);
-		_planetInfoContainer.childById("militaryUnits").text = to!dstring(planet.militaryUnits);
-		_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
-		_planetInfoContainer.childById("planetName").textFlags = TextFlag.Underline;
 	}
 
 	override void animate(long interval) {
@@ -251,7 +286,7 @@ class AnimatedDrawable : Drawable {
 				int x = to!int(planet.position.x - _cameraPosition.x);
 				int y = to!int(planet.position.y - _cameraPosition.y);
 				uint colour = 0x408000;
-				if(planet.owner && planet.owner == _state.currentPlayer) {
+				if(planet.owner && planet.owner == _state.players[0]) {
 					colour = 0xe60000;
 				}
 				buf.drawLine(Point(x-1,y), Point(relX-1, relY), colour);
