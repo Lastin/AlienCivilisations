@@ -1,11 +1,12 @@
 ﻿module src.screens.play;
 
 import dlangui;
-import src.handlers.containers;
-import std.stdio;
-import src.handlers.gameManager;
 import src.entities.planet;
 import src.entities.player;
+import src.handlers.containers;
+import src.handlers.gameManager;
+import src.screens.menu;
+import std.stdio;
 
 class Play : AppFrame {
 	private {
@@ -24,6 +25,13 @@ class Play : AppFrame {
 
 	this(){
 		mouseEvent = &handleMouseEvent;
+		keyEvent = delegate(Widget source, KeyEvent event) {
+			if(event.action == KeyAction.KeyDown &&
+				event.keyCode == KeyCode.ESCAPE){
+				window.mainWidget = new Menu(this);
+			}
+			return true;
+		};
 		initialise();
 		addChild(makeLayout());
 		_planetInfoContainer = childById("verticalContainer").childById("horizontalContainer").
@@ -32,6 +40,12 @@ class Play : AppFrame {
 		_playerStatsContainer = childById("verticalContainer").childById("horizontalContainer").
 			childById("vr1").childById("hr1");
 		updatePlayerStats();
+		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
+		endTurnButton.click = &endTurn;
+	}
+
+	bool endTurn(Widget source){
+		return true;
 	}
 
 	Widget makeLayout(){
@@ -52,7 +66,7 @@ class Play : AppFrame {
 							backgroundColor: 0x80000000
 							padding: 5
 							Button {
-								id: newGameButton
+								id: endTurnButton
 								text: "END TURN"
 								padding: 15
 								margins: Rect { 10 10 30 10}

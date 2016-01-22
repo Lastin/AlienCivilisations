@@ -31,7 +31,8 @@ class Menu : HorizontalLayout {
 					layoutWidth: fill
 					HSpacer {}
 					VerticalLayout {
-					margins: 10
+						id: vr1
+						margins: 10
 						Button {
 							id: newGameButton
 							text: "NEW GAME"
@@ -73,6 +74,16 @@ class Menu : HorizontalLayout {
 			window.close();
 			return true;
 		};
+	}
+
+	this(Play play){
+		Button continueButton = new Button(null, "Continue");
+		continueButton.padding(10).margins(10);
+		Button saveButton = new Button(null, "Save");
+		saveButton.padding(10).margins(10);
+		Widget container = childById("vl1").childById("hl1").childById("vr1");
+		container.addChild(continueButton);
+		container.addChild(saveButton);
 	}
 
 	void loadPlay(){
