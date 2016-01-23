@@ -44,9 +44,8 @@ class Play : AppFrame {
 	bool handleKeyEvent(Widget source, KeyEvent event){
 		if(event.action == KeyAction.KeyDown &&
 			event.keyCode == KeyCode.ESCAPE) {
-			//window.mainWidget = new Menu(this);
-			//TODO: figure out, why variables are null in constructor causing game to crash when loading menu
-			return true;
+				window.mainWidget = new Menu(this);
+				return true;
 		}
 		return false;
 	}

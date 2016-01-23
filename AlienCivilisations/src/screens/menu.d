@@ -6,10 +6,57 @@ import src.screens.play;
 import core.thread;
 
 class Menu : HorizontalLayout {
-	this() {
+	this(Play play = null) {
+		backgroundImageId = "background";
+		setLayout();
+		Rect padding = Rect(100, 15, 100, 15);
+		if(play) {
+			Button contButton = new Button(null, "CONTINUE"d);
+			Button saveButton = new Button(null, "SAVE"d);
+			Button menuButton = new Button(null, "BACK TO MENU"d);
+			contButton.padding(padding).margins(10).fontSize(27);
+			saveButton.padding(padding).margins(10).fontSize(27);
+			menuButton.padding(padding).margins(10).fontSize(27);
+			childById("vl1").childById("hl1").childById("vr1").addChild(contButton);
+			childById("vl1").childById("hl1").childById("vr1").addChild(saveButton);
+			childById("vl1").childById("hl1").childById("vr1").addChild(menuButton);
+			contButton.click = delegate (Widget source) {
+				window.mainWidget = play;
+				super.destroy();
+				return true;
+			};
+			menuButton.click = delegate (Widget source) {
+				window.mainWidget = new Menu();
+				return true;
+			};
+		} else {
+			Button playButton = new Button(null, "START GAME"d);
+			Button loadButton = new Button(null, "LOAD"d);
+			playButton.padding(padding).margins(10).fontSize(27);
+			loadButton.padding(padding).margins(10).fontSize(27);
+			playButton.click = delegate (Widget source) {
+				//Thread play = new Thread(&loadPlay).start();
+				loadPlay();
+				return true;
+			};
+			childById("vl1").childById("hl1").childById("vr1").addChild(playButton);
+			childById("vl1").childById("hl1").childById("vr1").addChild(loadButton);
+		}
+		Button exitButton = new Button(null, "EXIT"d);
+		exitButton.padding(padding).margins(10).fontSize(27);
+		exitButton.click = delegate (Widget source) {
+			window.close();
+			return true;
+		};
+		childById("vl1").childById("hl1").childById("vr1").addChild(exitButton);
+		childById("vl1").childById("hl1").childById("vr1").addChild(new VSpacer());
+	}
+
+	private void setLayout() {
 		layoutWidth = FILL_PARENT;
 		layoutHeight = FILL_PARENT;
 		alignment = Align.Center;
+		addChild(new HSpacer());
 		auto layout =
 		q{
 			VerticalLayout {
@@ -20,7 +67,7 @@ class Menu : HorizontalLayout {
 				TextWidget {
 					text: "Alien Civilisations"
 					textColor: "white"
-					fontSize: 400%
+					fontSize: 500%
 					fontWeight: 800
 					padding: 40
 				}
@@ -32,65 +79,19 @@ class Menu : HorizontalLayout {
 					VerticalLayout {
 						id: vr1
 						margins: 10
-						Button {
-							id: newGameButton
-							text: "NEW GAME"
-							padding: Rect { 100 10 100 10 }
-							margins: 10
-						}
-						Button { 
-							id: loadButton
-							text: "LOAD SAVE"
-							padding: 10
-							margins: 10
-						}
-						Button { 
-							id: exitButton
-							text: "EXIT"
-							padding: 10
-							margins: 10
-						}
-						VSpacer {}
 					}
 					HSpacer {}
 				}
 				VSpacer {}
 			}
 		};
-		addChild(new HSpacer());
 		addChild(parseML(layout));
 		addChild(new HSpacer());
-		backgroundImageId = "background";
-		auto play = childById("vl1").childById("hl1").childById("newGameButton");
-		auto load = childById("vl1").childById("hl1").childById("loadButton");
-		auto exit = childById("vl1").childById("hl1").childById("exitButton");
-		play.click = delegate (Widget source) {
-			Thread play = new Thread(&loadPlay).start();
-			//loadPlay();
-			return true;
-		};
-		exit.click = delegate (Widget source) {
-			window.close();
-			return true;
-		};
-	}
-
-	this(Play play){
-		Button continueButton = new Button(null, "Continue");
-		continueButton.padding(10).margins(10);
-		Button saveButton = new Button(null, "Save");
-		saveButton.padding(10).margins(10);
-		Widget container = childById("vl1").childById("hl1").childById("vr1");
-		container.addChild(continueButton);
-		container.addChild(saveButton);
 	}
 
 	void loadPlay(){
-		synchronized {
-			embeddedResourceList.addResources(embedResourcesFromList!("play_resources.list")());
-		}
+		embeddedResourceList.addResources(embedResourcesFromList!("play_resources.list")());
 		window.mainWidget = new Play();
-		super.destroy();
 	}
 
 	void writeSomething(){
