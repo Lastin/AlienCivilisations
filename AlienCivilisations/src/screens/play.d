@@ -1,11 +1,12 @@
 ﻿module src.screens.play;
 
 import dlangui;
-import src.handlers.containers;
-import std.stdio;
-import src.handlers.gameManager;
 import src.entities.planet;
 import src.entities.player;
+import src.handlers.containers;
+import src.handlers.gameManager;
+import src.screens.menu;
+import std.stdio;
 
 class Play : AppFrame {
 	private {
@@ -24,6 +25,13 @@ class Play : AppFrame {
 
 	this(){
 		mouseEvent = &handleMouseEvent;
+		keyEvent = delegate(Widget source, KeyEvent event) {
+			if(event.action == KeyAction.KeyDown &&
+				event.keyCode == KeyCode.ESCAPE){
+				window.mainWidget = new Menu(this);
+			}
+			return true;
+		};
 		initialise();
 		addChild(makeLayout());
 		_planetInfoContainer = childById("verticalContainer").childById("horizontalContainer").
@@ -32,6 +40,12 @@ class Play : AppFrame {
 		_playerStatsContainer = childById("verticalContainer").childById("horizontalContainer").
 			childById("vr1").childById("hr1");
 		updatePlayerStats();
+		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
+		endTurnButton.click = &endTurn;
+	}
+
+	bool endTurn(Widget source){
+		return true;
 	}
 
 	Widget makeLayout(){
@@ -49,10 +63,10 @@ class Play : AppFrame {
 						id: vr1
 						HorizontalLayout {
 							id: hr1
-							backgroundColor: 0x80000000
+							backgroundColor: 0x80969696
 							padding: 5
 							Button {
-								id: newGameButton
+								id: endTurnButton
 								text: "END TURN"
 								padding: 15
 								margins: Rect { 10 10 30 10}
@@ -60,23 +74,27 @@ class Play : AppFrame {
 							TextWidget {
 								fontWeight: 800
 								fontSize: 120%
+								textColor: white
 								text: "Total population:"
 							}
 							TextWidget {
 								id: totalPopulation
 								text: ""
 								fontSize: 120%
+								textColor: white
 								padding: Rect {5 10 30 10}
 							}
 							TextWidget {
 								fontWeight: 800
 								fontSize: 120%
+								textColor: white
 								text: "Total military units:"
 							}
 							TextWidget {
 								id: totalMilitaryUnits
 								text: ""
 								fontSize: 120%
+								textColor: white
 								padding: Rect {5 10 30 10}
 							}
 						}
@@ -90,13 +108,14 @@ class Play : AppFrame {
 							id: hr2
 							VerticalLayout {
 								id: vr2
-								backgroundColor: 0x80000000
+								backgroundColor: 0x80969696
 								TextWidget {
 									padding: 10
 									id: planetName
 									text : ""
 									fontWeight: 800
 									fontSize: 20
+									textColor: white
 								}
 								TableLayout {
 									id: planetInfoTable
@@ -104,19 +123,23 @@ class Play : AppFrame {
 									colCount: 2
 									TextWidget {
 										fontWeight: 800
+										textColor: white
 										text: "Population:"
 									}
 									TextWidget {
 										id: planetPopulation
+										textColor: white
 										text : "0"
 									}
 									TextWidget {
 										fontWeight: 800
+										textColor: white
 										text: "Military units:"
 										
 									}
 									TextWidget {
 										id: militaryUnits
+										textColor: white
 										text : "0"
 									}
 								}
@@ -140,7 +163,7 @@ class Play : AppFrame {
 				VSpacer{}
 				HorizontalLayout {
 					VerticalLayout {
-						backgroundColor: 0x80000000
+						backgroundColor: 0x80969696
 						Button {
 							id: knowledgeTreeButton
 							text: "KNOWLEDGE TREE"
@@ -162,7 +185,6 @@ class Play : AppFrame {
 		_endPosition = Vector2d(_gm.state.map.size/2, _gm.state.map.size/2);
 		_animation = new AnimatedDrawable(&_cameraPosition, _gm.state);
 		_drawableRef = _animation;
-
 	}
 
 	void updatePlanetInfo(Planet planet) {
@@ -259,7 +281,7 @@ class Play : AppFrame {
 }
 
 class AnimatedDrawable : Drawable {
-	DrawableRef background;
+	private DrawableRef _background;
 	private Vector2d* _cameraPosition;
 	private Planet[] _planets;
 	private Planet _selected;
@@ -268,7 +290,7 @@ class AnimatedDrawable : Drawable {
 		_cameraPosition = cameraPosition;
 		_state = state;
 		_planets = _state.map.planets;
-		//background = drawableCache.get("tx_fabric.tiled");
+		_background = drawableCache.get("background3.tiled");
 	}
 
 	void setSelectedPlanet(Planet selected){
@@ -276,7 +298,6 @@ class AnimatedDrawable : Drawable {
 	}
 
 	override void drawTo(DrawBuf buf, Rect rc, uint state = 0, int tilex0 = 0, int tiley0 = 0) {
-		//background.drawTo(buf, rc, state, cast(int)(animationProgress / 695430), cast(int)(animationProgress / 1500000));
 		//drawAnimatedIcon(buf, cast(uint)(animationProgress / 212400) + 200, rc, -2, 1, "earth");
 		DrawBufRef image = drawableCache.getImage("earth");
 		foreach(Planet planet; _planets) {

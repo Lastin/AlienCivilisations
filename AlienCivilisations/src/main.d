@@ -17,6 +17,7 @@ extern (C) int UIAppMain(string[] args) {
 													height);
 
 	window.mainWidget = new Menu();
+	window.backgroundColor = 0;
 	window.show();
 	return Platform.instance.enterMessageLoop();
 }
