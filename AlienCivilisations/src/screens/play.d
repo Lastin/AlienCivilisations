@@ -290,7 +290,7 @@ class AnimatedDrawable : Drawable {
 		_cameraPosition = cameraPosition;
 		_state = state;
 		_planets = _state.map.planets;
-		_background = drawableCache.get("background3.tiled");
+		_background = drawableCache.get("noise.tiled");
 	}
 
 	void setSelectedPlanet(Planet selected){
@@ -298,7 +298,12 @@ class AnimatedDrawable : Drawable {
 	}
 
 	override void drawTo(DrawBuf buf, Rect rc, uint state = 0, int tilex0 = 0, int tiley0 = 0) {
-		//drawAnimatedIcon(buf, cast(uint)(animationProgress / 212400) + 200, rc, -2, 1, "earth");
+		Rect noisePos = Rect(to!int(0-_cameraPosition.x/5), to!int(0-_cameraPosition.y/5), rc.right, rc.bottom);
+		_background.drawTo(buf, noisePos, state, tilex0, tiley0);
+		noisePos = Rect(to!int(0-_cameraPosition.x/2), to!int(0-_cameraPosition.y/2), rc.right, rc.bottom);
+		_background.drawTo(buf, noisePos, state, tilex0, tiley0);
+		noisePos = Rect(to!int(0-_cameraPosition.x/7), to!int(0-_cameraPosition.y/7), rc.right, rc.bottom);
+		_background.drawTo(buf, noisePos, state, tilex0, tiley0);
 		DrawBufRef image = drawableCache.getImage("earth");
 		foreach(Planet planet; _planets) {
 			if(_selected && _selected != planet) {
