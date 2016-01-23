@@ -22,16 +22,9 @@ class Play : AppFrame {
 		Widget _playerStatsContainer;
 	}
 
-
 	this(){
 		mouseEvent = &handleMouseEvent;
-		keyEvent = delegate(Widget source, KeyEvent event) {
-			if(event.action == KeyAction.KeyDown &&
-				event.keyCode == KeyCode.ESCAPE){
-				window.mainWidget = new Menu(this);
-			}
-			return true;
-		};
+		keyEvent = &handleKeyEvent;
 		initialise();
 		addChild(makeLayout());
 		_planetInfoContainer = childById("verticalContainer").childById("horizontalContainer").
@@ -44,8 +37,18 @@ class Play : AppFrame {
 		endTurnButton.click = &endTurn;
 	}
 
-	bool endTurn(Widget source){
+	bool endTurn(Widget source) {
 		return true;
+	}
+
+	bool handleKeyEvent(Widget source, KeyEvent event){
+		if(event.action == KeyAction.KeyDown &&
+			event.keyCode == KeyCode.ESCAPE) {
+			//window.mainWidget = new Menu(this);
+			//TODO: figure out, why variables are null in constructor causing game to crash when loading menu
+			return true;
+		}
+		return false;
 	}
 
 	Widget makeLayout(){
@@ -181,8 +184,11 @@ class Play : AppFrame {
 		layoutWidth = FILL_PARENT;
 		layoutHeight = FILL_PARENT;
 		_gm = new GameManager();
-		_cameraPosition = Vector2d(_gm.state.map.size/2, _gm.state.map.size/2);
-		_endPosition = Vector2d(_gm.state.map.size/2, _gm.state.map.size/2);
+		float tempX = _gm.state.players[0].planets(_gm.state.map.planets)[0].position.x;
+		float tempY = _gm.state.players[0].planets(_gm.state.map.planets)[0].position.y;
+		_cameraPosition = Vector2d(tempX - width / 2, tempY - height / 2);
+		debug writefln("camera initial position: %s %s", tempX, tempY);
+		_endPosition = Vector2d(tempX - width / 2, tempY - height / 2);
 		_animation = new AnimatedDrawable(&_cameraPosition, _gm.state);
 		_drawableRef = _animation;
 	}
@@ -194,12 +200,10 @@ class Play : AppFrame {
 			_planetInfoContainer.childById("militaryUnits").text = to!dstring(planet.militaryUnits);
 			_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
 			_planetInfoContainer.childById("planetName").textFlags = TextFlag.Underline;
-			if(planet.owner == _gm.state.players[0]){
+			if(planet.owner == _gm.state.players[0]) {
 				_planetInfoContainer.childById("convertUnitsButton").visibility = Visibility.Visible;
 				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Gone;
-				_planetInfoContainer.childById("inhabitButton").textColor = 0xFFFFFFFF;
 			} else {
-				_planetInfoContainer.childById("convertUnitsButton").textColor = 0xFFFFFFFF;
 				_planetInfoContainer.childById("convertUnitsButton").visibility = Visibility.Gone;
 				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Visible;
 			}
@@ -298,13 +302,16 @@ class AnimatedDrawable : Drawable {
 	}
 
 	override void drawTo(DrawBuf buf, Rect rc, uint state = 0, int tilex0 = 0, int tiley0 = 0) {
-		Rect noisePos = Rect(to!int(0-_cameraPosition.x/5), to!int(0-_cameraPosition.y/5), rc.right, rc.bottom);
-		_background.drawTo(buf, noisePos, state, tilex0, tiley0);
-		noisePos = Rect(to!int(0-_cameraPosition.x/2), to!int(0-_cameraPosition.y/2), rc.right, rc.bottom);
-		_background.drawTo(buf, noisePos, state, tilex0, tiley0);
-		noisePos = Rect(to!int(0-_cameraPosition.x/7), to!int(0-_cameraPosition.y/7), rc.right, rc.bottom);
-		_background.drawTo(buf, noisePos, state, tilex0, tiley0);
+		Rect noisePos;
+		int startX, startY;
+		for(int i=7; i>2; i -= 2) {
+			startX = to!int(0-_cameraPosition.x/i);
+			startY = to!int(0-_cameraPosition.y/i);
+			noisePos = Rect(startX, startY, rc.right, rc.bottom);
+			_background.drawTo(buf, noisePos, state, tilex0, tiley0);
+		}
 		DrawBufRef image = drawableCache.getImage("earth");
+		//Image circle = new Image(Geometry(10, 10), new Color("white"));
 		foreach(Planet planet; _planets) {
 			if(_selected && _selected != planet) {
 				int relX = to!int(_selected.position.x - _cameraPosition.x);

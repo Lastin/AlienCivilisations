@@ -22,7 +22,6 @@ class Menu : HorizontalLayout {
 					textColor: "white"
 					fontSize: 400%
 					fontWeight: 800
-					fontFace: "Arial"
 					padding: 40
 				}
 				HorizontalLayout {
@@ -66,8 +65,8 @@ class Menu : HorizontalLayout {
 		auto load = childById("vl1").childById("hl1").childById("loadButton");
 		auto exit = childById("vl1").childById("hl1").childById("exitButton");
 		play.click = delegate (Widget source) {
-			//Thread play = new Thread(&loadPlay).start();
-			loadPlay();
+			Thread play = new Thread(&loadPlay).start();
+			//loadPlay();
 			return true;
 		};
 		exit.click = delegate (Widget source) {
@@ -87,8 +86,14 @@ class Menu : HorizontalLayout {
 	}
 
 	void loadPlay(){
-		embeddedResourceList.addResources(embedResourcesFromList!("play_resources.list")());
+		synchronized {
+			embeddedResourceList.addResources(embedResourcesFromList!("play_resources.list")());
+		}
 		window.mainWidget = new Play();
 		super.destroy();
+	}
+
+	void writeSomething(){
+		writeln("works");
 	}
 }

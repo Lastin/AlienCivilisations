@@ -3,6 +3,7 @@
 import dlangui;
 import std.stdio;
 import src.screens.menu;
+import src.screens.play;
 
 mixin APP_ENTRY_POINT;
 
@@ -15,7 +16,6 @@ extern (C) int UIAppMain(string[] args) {
 													WindowFlag.Resizable,
 													width,
 													height);
-
 	window.mainWidget = new Menu();
 	window.backgroundColor = 0;
 	window.show();

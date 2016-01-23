@@ -1,6 +1,7 @@
 #!/bin/bash
 # Handy script for cloning repositories
 cd AlienCivilisations/lib
+git clone https://github.com/MikeWey/DMagick.git
 git clone https://github.com/buggins/dlangui.git
 cd dlangui
 mkdir deps

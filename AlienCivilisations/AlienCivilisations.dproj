@@ -23,6 +23,7 @@
         <Path>lib/dlangui/deps/DerelictUtil/source</Path>
         <Path>lib/dlangui/3rdparty</Path>
         <Path>lib/dlangui/3rdparty-extra</Path>
+        <Path>lib/DMagick</Path>
       </Includes>
     </Includes>
   </PropertyGroup>
@@ -35,8 +36,7 @@
     <OutputName>AlienCivilisations</OutputName>
     <Target>Executable</Target>
     <DebugLevel>0</DebugLevel>
-    <ExtraLinkerArguments>-L-ldl
-</ExtraLinkerArguments>
+    <ExtraLinkerArguments>-L-ldl</ExtraLinkerArguments>
     <Externalconsole>true</Externalconsole>
     <ExtraCompilerArguments>-Jviews
 -Jviews/res
