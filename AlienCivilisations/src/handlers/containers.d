@@ -32,14 +32,12 @@ class GameState {
 	private {
 		Map _map;
 		Player[] _players;
-		Ship[] _ships;
 		size_t _queuePosition;
 	}
 
-	this(Map map, Player[] players, Ship[] ships, size_t queuePosition) {
+	this(Map map, Player[] players, size_t queuePosition) {
 		_map = map;
 		_players = players;
-		_ships = ships;
 		_queuePosition = queuePosition;
 	}
 	@property Map map() {
@@ -51,19 +49,6 @@ class GameState {
 	@property Player currentPlayer() {
 		return _players[_queuePosition];
 	}
-	@property Ship[] ships() {
-		return _ships;
-	}
-	/** Returns all complete and not used ships which belong to p**/
-	@property Ship[] availableShips(Player p) {
-		Ship[] available;
-		foreach(Ship s; _ships){
-			if(s.owner == p && s.complete && !s.used){
-				available ~= s;
-			}
-		}
-		return available;
-	}
 	/** Moves queue position to next available position **/
 	void moveQPosition() {
 		if(++_queuePosition == _players.length){
@@ -73,50 +58,59 @@ class GameState {
 	
 	GameState dup() {
 		GameState duplicateState;
-		Map mapDup;
-		Player[] playersDup;
-		Planet[] planetsDup;
-		Ship[] shipsDup;
-		//duplicate players
-		foreach(Player origin; _players) {
-			string name = origin.name;
-			KnowledgeTree ktDup = origin.knowledgeTree.dup;
-			if(cast(AI)origin){
-				playersDup ~= new AI(&duplicateState, ktDup);
-			} else {
-				playersDup ~= new Player(name, ktDup);
-			}
-		}
-		//duplicate planets
-		foreach(Planet origin; _map.planets) {
-			string name = origin.name;
-			Vector2d position = origin.position;
-			float radius = origin.radius;
-			bool ba = origin.breathableAtmosphere;
-			uint[8] population = origin.population.dup;
-			uint food = origin.food;
-			uint militaryUnits = origin.militaryUnits;
-			uint workForce = origin.workForce;
-			Planet cpy = new Planet(name, position, radius, ba, population, food, workForce, militaryUnits);
-			cpy.setOwner(findOwnerIndex(origin, _players, playersDup));
-			planetsDup ~= cpy;
-		}
+		Player[] playersDup = duplicatePlayers();
+		Planet[] planetsDup = duplicatePlanets(playersDup);
 		//duplicate map
 		mapDup = new Map(_map.size, planetsDup);
-		//duplicate ships
-		foreach(Ship origin; _ships) {
-			Player owner = findOwnerIndex(origin, _players, playersDup);
-			shipsDup ~= new Ship(owner, origin.complete, origin.used);
-		}
-		duplicateState = new GameState(mapDup, playersDup, shipsDup, _queuePosition);
+		duplicateState = new GameState(mapDup, playersDup, _queuePosition);
 		return duplicateState;
 	}
-	
-	private Player findOwnerIndex(Owned obj, Player[] origins, Player[] dups) const {
-		foreach(size_t index, const Player player; _players){
-			if(obj.owner && obj.owner == player)
-				return dups[index];
+
+	/** Function used by duplicatePlayers function **/
+	private Ship[] duplicateShips(Ship[] originShips) {
+		Ship[] duplicates;
+		foreach(Ship origin; originShips){
+			duplicates ~= origin.dup();
 		}
-		return null;
+		return duplicates;
+	}
+
+	private Player[] duplicatePlayers() {
+		Player[] duplicates;
+		foreach(Player origin; _players) {
+			duplicates ~= new Player(
+				origin.name,
+				origin.knowledgeTree.dup,
+				duplicateShips(origin.ships)
+				);
+		}
+		return duplicates;
+	}
+
+	private Planet[] duplicatePlanets(Player[] playersDup){
+		Planet[] duplicates;
+		foreach(Planet origin; map.planets){
+			string name = origin.name;
+			Vector2d pos = origin.position;
+			float r = origin.radius;
+			bool ba = origin.breathableAtmosphere;
+			uint[8] pop = origin.population.dup;
+			uint food = origin.food;
+			uint mu = origin.militaryUnits;
+			duplicates ~= new Planet(name, pos, r, ba, pop, food, mu);
+			duplicates[$].owner = newOwner(origin, playersDup);
+		}
+		return duplicates;
+	}
+
+	private Player newOwner(Planet planet, Player[] playersDup) {
+		if(!planet.owner){
+		} else {
+			foreach(i, Player p; playersDup){
+				if(p == planet.owner)
+					return playersDup[i];
+			}
+			throw new Exception("Cannot find planet owner");
+		}
 	}
 }

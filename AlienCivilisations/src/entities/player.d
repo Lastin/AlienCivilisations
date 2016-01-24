@@ -9,11 +9,12 @@ import src.entities.branch;
 class Player {
 	private immutable string _name;
 	private KnowledgeTree _knowledgeTree;
-	private bool _locked = true;
+	private Ship[] _ships;
 
-	this(string name, KnowledgeTree knowledgeTree) {
+	this(string name, KnowledgeTree knowledgeTree, Ship[] ships) {
 		_name = name;
 		_knowledgeTree = knowledgeTree;
+		_ships = ships;
 	}
 	/** Returns player's knowledge tree **/
 	@property KnowledgeTree knowledgeTree() {
@@ -27,7 +28,7 @@ class Player {
 	@property bool locked() const {
 		return _locked;
 	}
-
+	/** Returns planets which belong to the player **/
 	@property Planet[] planets(Planet[] list){
 		Planet[] owned;
 		foreach(Planet p; list) {
@@ -36,25 +37,43 @@ class Player {
 		}
 		return owned;
 	}
-
-	Player completeTurn() {
-
+	/** Returns all complete and not used ships which belong to p**/
+	@property Ship[] availableShips() {
+		Ship[] available;
+		foreach(Ship s; _ships){
+			if(s.complete && !s.used){
+				available ~= s;
+			}
+		}
+		return available;
+	}
+	/** Returns all ships **/
+	@property Ship[] ships(){
+		_ships;
+	}
+	/** Function executing actions on the end of the turn **/
+	void completeTurn() {
+		//1: Produce ships
+		//2: 
 		return this;
 	}
 
-	Player orderInhabit(Planet planet) {
+	void orderInhabit(Planet planet) {
 		return this;
 	}
 
-	Player orderShip(ShipType type) {
+	void orderShip(ShipType type) {
 		return this;
 	}
 
-	Player orderDevelop(Branch branch, int leaf) {
+	void orderDevelop(Branch branch, int leaf) {
 		return this;
 	}
-}
 
-interface Owned {
-	@property Player owner();
+	void inhabitPlanet(Planet planet){
+		if(planet.owner)
+			return;
+		planet.setOwner(this);
+		planet.resetPopulation();
+	}
 }

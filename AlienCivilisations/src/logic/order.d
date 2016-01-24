@@ -18,7 +18,6 @@ class KnowledgeOrder : Order {
 		_branch = branch;
 		_leaf = leaf;
 	}
-
 	bool execute() {
 		return false;
 	}

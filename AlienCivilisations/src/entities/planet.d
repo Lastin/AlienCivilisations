@@ -32,11 +32,10 @@ class Planet : Owned {
 	}
 	/** (Cloning) Constructor for creating planet from existing values **/
 	this(string name, Vector2d position, float radius, bool breathableAtmosphere,
-		uint[8] population, uint food, uint workForce, uint militaryUnits) {
+		uint[8] population, uint food, uint militaryUnits) {
 		this(name, position, radius, breathableAtmosphere);
 		_population = population;
 		_food = food;
-		_workForce = workForce;
 		_militaryUnits = militaryUnits;
 	}
 
@@ -93,7 +92,7 @@ class Planet : Owned {
 		_owner = player;
 		return this;
 	}
-
+	/** Sets population to default value of 1/8th maximum capacity **/
 	void resetPopulation() {
 		int ppa = to!int(capacity / 8 / 8);
 		_population = [ppa,ppa,ppa,ppa,ppa,ppa,ppa,ppa];
@@ -104,28 +103,29 @@ class Planet : Owned {
 		affectFood();
 		growPopulation();
 	}
-
+	/** 
+	 * Food supply at best increases at arythmetic rate
+	 * 1 > 2 > 3 > 4 > 5
+	**/
 	private void affectFood() {
-		//TODO
-		//food supply at best increases at arythmetic rate
-		//1 > 2 > 3 > 4 > 5
 		_food -= populationSum;
 		//fpe - food production effectiveness
 		double fpe = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
 		_food += to!int(_workForce * fpe);
 		_workForce = 0;
 	}
+	/**
+	 * Population grows at exponential rate
+	 * 1 > 2 > 4 > 8 > 16
+	**/
 	private void growPopulation() {
 		double overPopulationFactor = 1;
 		if(populationSum > capacity){
 			int overflow =  populationSum - capacity;
 			overPopulationFactor = overflow / capacity;
 		}
-		//population grows at exponential rate
-		//1 > 2 > 4 > 8 > 16
-		//but is also affected by the food
+		//Age the population
 		for(size_t i = _population.length - 1; i>0; i--){
-			//elder the population
 			_population[i] = _population[i-1];
 		}
 		double reproductivePairs = (_population[2] + _population[3]) / 2;
@@ -134,6 +134,7 @@ class Planet : Owned {
 		_population[0] = to!int(reproductivePairs * childPerPair * foodFactor / overPopulationFactor);
 	}
 
+	/** Converts civil units into military units **/
 	uint convertUnits(int percent) {
 		uint p = max(0, min(percent, 100));
 		uint g1 = to!int(_population[2] * p/100);
@@ -156,27 +157,27 @@ class Planet : Owned {
 		return g1 + g2;
 	}
 
+	/** Subtract value, evenly distributing across all ages where possible **/
 	void subtractPopulation(uint value) {
 		//TODO: check if function distributes the values as intended
-		if(value > populationSum){
+		if(value > populationSum) {
 			_population = [0,0,0,0,0,0,0,0];
 		}
 		else {
-			while(value >= 0){
+			while(value >= 0 && value <= populationSum) {
 				uint perGroup = to!uint(value / _population.length);
-				if(perGroup == 0){
+				if(perGroup == 0) {
 					perGroup = 1;
 				}
-				for(int i=0; i < _population.length; i++){
+				for(int i=0; i < _population.length && value > 0; i++) {
 					if(_population[i] == 0)
 						continue;
-					if(_population[i] < perGroup){
-						_population[i] = 0;
+					if(_population[i] < perGroup) {
 						value -= _population[i];
-					}
-					else {
-						_population[i] -= perGroup;
+						_population[i] = 0;
+					} else {
 						value -= perGroup;
+						_population[i] -= perGroup;
 					}
 				}
 			}

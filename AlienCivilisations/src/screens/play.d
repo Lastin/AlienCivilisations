@@ -14,7 +14,6 @@ class Play : AppFrame {
 		Vector2d _startPosition;
 		Vector2d _endPosition;
 		Vector2d _cameraPosition;
-		short zoom = 1;
 		GameManager _gm;
 		AnimatedDrawable _animation;
 		DrawableRef _drawableRef;
@@ -51,6 +50,7 @@ class Play : AppFrame {
 		return false;
 	}
 
+	/** Assigns functions to buttons **/
 	private void assignButtonsActions(){
 		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
 		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");

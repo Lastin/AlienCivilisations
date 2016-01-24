@@ -2,7 +2,6 @@
 
 import src.entities.knowledgeTree;
 import src.entities.planet;
-import src.entities.player;
 import std.conv;
 
 enum ShipType : ubyte {
@@ -12,87 +11,61 @@ enum ShipType : ubyte {
 
 enum int MULTIPLIER = 1000;
 
-class Ship : Owned {
+abstract class Ship {
 	private {
-		Player _owner;
 		immutable uint _capacity;
 		bool _completed;
-		bool _used;
 	}
 
-	this(Player owner, bool completed = false, bool used = false){
-		_owner = owner;
-		double energy = _owner.knowledgeTree.branch(BranchName.Energy).effectiveness;
-		double science = _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
-		_capacity = cast(int)(MULTIPLIER * energy * science);
+	this(bool completed = false, double eneEff = 1, double sciEff = 1){
+		_capacity = to!int(MULTIPLIER * eneEff * sciEff);
 		_completed = completed;
-		_used = used;
 	}
 
-	Ship completeShip(){
+	/** Sets _completed property to true **/
+	void complete() {
 		_completed = true;
 		return this;
 	}
-
-	@property bool complete() const {
+	/** Returns _completed variable **/
+	@property bool completed() const {
 		return _completed;
 	}
-	@property bool used() const {
-		return _used;
-	}
-	override @property Player owner(){
-		return _owner;
-	}
+	Ship dup();
 }
 
 class MilitaryShip : Ship {
-	private uint _onboard = 0;
-
-	this(Player player){
-		super(player);
+	private int _onboard;
+	/** Takes number onboard  **/
+	this(int onboard, bool _completed = false) {
+		super(completed);
+		_onboard = onboard;
 	}
-
-	void attack(Planet p){
-		if(p.owner && p.owner != _owner){
-			double effectiveness = _owner.knowledgeTree.branch(BranchName.Military).effectiveness;
-			uint attackPower = to!int(effectiveness * _onboard);
-			double left = p.attack(attackPower) / effectiveness;
-			if(left < 1){
-				_onboard = 0;
-				_used = true;
-			}
-			else {
-				_onboard = to!int(left);
-			}
-		}
-	}
-
-	int addUnits(uint units) {
-		uint freeSpaces = _capacity - _onboard;
-		if(freeSpaces >= units){
-			_onboard += units;
-			return 0;
-		}
-		_onboard = _capacity;
-		return units - freeSpaces;
-	}
-
 	@property bool empty() const {
 		return _onboard <= 0;
 	}
-	@property uint onboard() const {
+	@property int onboard() const {
 		return _onboard;
+	}
+	int kill(int amount){
+		if(amount > _onboard){
+			amount -= _onboard;
+			_onboard = 0;
+			return amount;
+		}
+		_onboard -= amount;
+		return 0;
+	}
+	MilitaryShip dup() const {
+		return new Ship(_onboard, _completed);
 	}
 }
 
 class InhabitationShip : Ship {
-	this(Player player, uint[8] population){
-		super(player);
+	this(bool completed = false) {
+		super(completed);
 	}
+	InhabitationShip dup() const {
 
-	void inhabit(Planet p){
-		if(p.owner == _owner){
-			p.setOwner(_owner);
-		}
 	}
 }
