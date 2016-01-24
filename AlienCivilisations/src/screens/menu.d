@@ -22,7 +22,6 @@ class Menu : HorizontalLayout {
 			childById("vl1").childById("hl1").childById("vr1").addChild(menuButton);
 			contButton.click = delegate (Widget source) {
 				window.mainWidget = play;
-				super.destroy();
 				return true;
 			};
 			menuButton.click = delegate (Widget source) {
@@ -90,7 +89,6 @@ class Menu : HorizontalLayout {
 	}
 
 	void loadPlay(){
-		embeddedResourceList.addResources(embedResourcesFromList!("play_resources.list")());
 		window.mainWidget = new Play();
 	}
 

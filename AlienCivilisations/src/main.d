@@ -9,6 +9,7 @@ mixin APP_ENTRY_POINT;
 
 extern (C) int UIAppMain(string[] args) {
 	embeddedResourceList.addResources(embedResourcesFromList!("menu_resources.list")());
+	embeddedResourceList.addResources(embedResourcesFromList!("play_resources.list")());
 	int width = 1920;
 	int height = 1080;
 	Window window = Platform.instance.createWindow("Alien Civilisations", 

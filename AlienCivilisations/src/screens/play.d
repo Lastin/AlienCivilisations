@@ -33,8 +33,7 @@ class Play : AppFrame {
 		_playerStatsContainer = childById("verticalContainer").childById("horizontalContainer").
 			childById("vr1").childById("hr1");
 		updatePlayerStats();
-		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
-		endTurnButton.click = &endTurn;
+		assignButtonsActions();
 	}
 
 	bool endTurn(Widget source) {
@@ -42,12 +41,51 @@ class Play : AppFrame {
 	}
 
 	bool handleKeyEvent(Widget source, KeyEvent event){
-		if(event.action == KeyAction.KeyDown &&
+		if(enabled && event.action == KeyAction.KeyDown &&
 			event.keyCode == KeyCode.ESCAPE) {
 				window.mainWidget = new Menu(this);
 				return true;
 		}
 		return false;
+	}
+
+	private void assignButtonsActions(){
+		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
+		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
+		//Assign
+		endTurnButton.click = &endTurn;
+		convertUnitsButton.click = delegate(Widget action){
+			window.showPopup(convertUnitsPopup, this);
+			//convertUnitsButton.clickable(false);
+			enabled = false;
+			//buttonsEnabled(false);
+			return true;
+		};
+	}
+
+	void buttonsEnabled(bool status = true){
+		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
+		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
+		Widget inhabitButton = _planetInfoContainer.childById("inhabitButton");
+		Widget knowledgeTreeButton = childById("verticalContainer").childById("verticalContainer").childById("knowledgeTreeButton");
+		endTurnButton.clickable = false;
+		convertUnitsButton.clickable = false;
+		inhabitButton.clickable = false;
+		knowledgeTreeButton.clickable = false;
+	}
+
+	Widget convertUnitsPopup(){
+		VerticalLayout layout = new VerticalLayout;
+		Button x = new Button(null, "TEST"d);
+		ScrollBar sb = new ScrollBar("hscroll", Orientation.Horizontal);
+		sb.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
+			writeln("scrolly scrolly");
+			return true;
+		};
+		layout.addChild(x);
+		layout.addChild(sb);
+		layout.margins(10);
+		return layout;
 	}
 
 	Widget makeLayout(){
@@ -126,6 +164,16 @@ class Play : AppFrame {
 									TextWidget {
 										fontWeight: 800
 										textColor: white
+										text: "Capacity:"
+									}
+									TextWidget {
+										id: planetCapacity
+										textColor: white
+										text : "0"
+									}
+									TextWidget {
+										fontWeight: 800
+										textColor: white
 										text: "Population:"
 									}
 									TextWidget {
@@ -195,6 +243,7 @@ class Play : AppFrame {
 	void updatePlanetInfo(Planet planet) {
 		if(planet) {
 			_planetInfoContainer.visibility = Visibility.Visible;
+			_planetInfoContainer.childById("planetCapacity").text = to!dstring(planet.capacity);
 			_planetInfoContainer.childById("planetPopulation").text = to!dstring(planet.populationSum);
 			_planetInfoContainer.childById("militaryUnits").text = to!dstring(planet.militaryUnits);
 			_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
@@ -284,7 +333,7 @@ class Play : AppFrame {
 }
 
 class AnimatedDrawable : Drawable {
-	private DrawableRef _background;
+	private DrawableRef[] _background;
 	private Vector2d* _cameraPosition;
 	private Planet[] _planets;
 	private Planet _selected;
@@ -293,7 +342,9 @@ class AnimatedDrawable : Drawable {
 		_cameraPosition = cameraPosition;
 		_state = state;
 		_planets = _state.map.planets;
-		_background = drawableCache.get("noise.tiled");
+		_background ~= drawableCache.get("noise1.tiled");
+		_background ~= drawableCache.get("noise2.tiled");
+		_background ~= drawableCache.get("noise3.tiled");
 	}
 
 	void setSelectedPlanet(Planet selected){
@@ -303,11 +354,11 @@ class AnimatedDrawable : Drawable {
 	override void drawTo(DrawBuf buf, Rect rc, uint state = 0, int tilex0 = 0, int tiley0 = 0) {
 		Rect noisePos;
 		int startX, startY;
-		for(int i=7; i>2; i -= 2) {
-			startX = to!int(0-_cameraPosition.x/i);
-			startY = to!int(0-_cameraPosition.y/i);
+		for(int i=0, offset=7; i<3; i++, offset -= 2) {
+			startX = to!int(0-_cameraPosition.x/offset);
+			startY = to!int(0-_cameraPosition.y/offset);
 			noisePos = Rect(startX, startY, rc.right, rc.bottom);
-			_background.drawTo(buf, noisePos, state, tilex0, tiley0);
+			_background[i].drawTo(buf, noisePos, state, tilex0, tiley0);
 		}
 		DrawBufRef image = drawableCache.getImage("earth");
 		//Image circle = new Image(Geometry(10, 10), new Color("white"));
