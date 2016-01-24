@@ -20,6 +20,8 @@ class Play : AppFrame {
 		DrawableRef _drawableRef;
 		Widget _planetInfoContainer;
 		Widget _playerStatsContainer;
+		Planet _selectedPlanet;
+		PopupWidget _convertUnitsPopup;
 	}
 
 	this(){
@@ -55,7 +57,7 @@ class Play : AppFrame {
 		//Assign
 		endTurnButton.click = &endTurn;
 		convertUnitsButton.click = delegate(Widget action){
-			window.showPopup(convertUnitsPopup, this);
+			_convertUnitsPopup = window.showPopup(convertUnitsPopup, this);
 			//convertUnitsButton.clickable(false);
 			enabled = false;
 			//buttonsEnabled(false);
@@ -74,17 +76,63 @@ class Play : AppFrame {
 		knowledgeTreeButton.clickable = false;
 	}
 
+
+	/** Returns widget for converting units popup **/
 	Widget convertUnitsPopup(){
 		VerticalLayout layout = new VerticalLayout;
-		Button x = new Button(null, "TEST"d);
-		ScrollBar sb = new ScrollBar("hscroll", Orientation.Horizontal);
-		sb.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
-			writeln("scrolly scrolly");
+		layout.minWidth = 400;
+		HorizontalLayout titleBar = new HorizontalLayout();
+		titleBar.layoutWidth = FILL_PARENT;
+		titleBar.backgroundColor = 0x404040;
+		TextWidget titleText = new TextWidget(null, "Convert civil units into military"d);
+		titleText.fontSize = 17;
+		titleText.textColor = 0xFFFFFF;
+		titleBar.addChild(titleText);
+		HorizontalLayout infoContainer = new HorizontalLayout();
+		infoContainer.padding(10);
+		infoContainer.layoutWidth = FILL_PARENT;
+		TextWidget tw1 = new TextWidget(null, "Convert units:"d);
+		tw1.textFlags(TextFlag.Underline);
+		tw1.fontWeight(FontWeight.Bold);
+		tw1.fontSize = 15;
+		tw1.textColor = 0xFFFFFF;
+		TextWidget units = new TextWidget(null, "0"d);
+		units.fontSize = 15;
+		units.textColor = 0xFFFFFF;
+		infoContainer.addChild(new HSpacer());
+		infoContainer.addChild(tw1);
+		infoContainer.addChild(units);
+		infoContainer.addChild(new HSpacer());
+		HorizontalLayout buttonContainer = new HorizontalLayout();
+		buttonContainer.layoutWidth = FILL_PARENT;
+		Button apply = new Button(null, "Apply"d);
+		Button cancel = new Button(null, "Cancel"d);
+		buttonContainer.addChild(new HSpacer());
+		buttonContainer.addChild(apply);
+		buttonContainer.addChild(cancel);
+		ScrollBar slider = new ScrollBar(null, Orientation.Horizontal);
+		//slider.layoutWidth = FILL_PARENT;
+		slider.position = slider.minValue;
+		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
+			units.text = to!dstring(source.position);
 			return true;
 		};
-		layout.addChild(x);
-		layout.addChild(sb);
-		layout.margins(10);
+		apply.click = delegate(Widget action){
+			enabled = true;
+			window.removePopup(_convertUnitsPopup);
+			return true;
+		};
+		cancel.click = delegate(Widget action){
+			enabled = true;
+			window.removePopup(_convertUnitsPopup);
+			return true;
+		};
+		layout.addChild(titleBar);
+		layout.addChild(infoContainer);
+		layout.addChild(slider);
+		layout.addChild(buttonContainer);
+		layout.padding(0);
+		layout.backgroundColor(0x4B4B4B);
 		return layout;
 	}
 
@@ -258,6 +306,7 @@ class Play : AppFrame {
 		}
 		else {
 			_planetInfoContainer.visibility = Visibility.Invisible;
+			window.removePopup(_convertUnitsPopup);
 		}
 
 	}
@@ -281,9 +330,9 @@ class Play : AppFrame {
 					_cameraPosition.x + event.x,
 					_cameraPosition.y + event.y);
 				debug writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
-				Planet selected = _gm.state.map.collides(relativeMousePosition, 1, 0);
-				_animation.setSelectedPlanet(selected);
-				updatePlanetInfo(selected);
+				_selectedPlanet = _gm.state.map.collides(relativeMousePosition, 1, 0);
+				_animation.setSelectedPlanet(_selectedPlanet);
+				updatePlanetInfo(_selectedPlanet);
 			}
 		}
 		if(event.button == MouseButton.Middle){
