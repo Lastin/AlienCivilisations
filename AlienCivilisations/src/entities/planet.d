@@ -7,6 +7,7 @@ import src.entities.player;
 import src.entities.ship;
 import std.format;
 import src.entities.knowledgeTree;
+import std.stdio;
 
 public enum int POPULATION_CONSTANT = 10000;
 
@@ -133,13 +134,25 @@ class Planet : Owned {
 		_population[0] = to!int(reproductivePairs * childPerPair * foodFactor / overPopulationFactor);
 	}
 
-	uint militarise(int percent) {
-		uint p = min(percent, 100);
-		uint g1 = to!int(p/100 * _population[2]);
-		uint g2 = to!int(p/100 * _population[3]);
+	uint convertUnits(int percent) {
+		uint p = max(0, min(percent, 100));
+		uint g1 = to!int(_population[2] * p/100);
+		uint g2 = to!int(_population[3] * p/100);
 		_population[2] -= g1;
 		_population[3] -= g2;
 		_militaryUnits += g1 + g2;
+		debug {
+			writefln("Substructed age group 2: %s", g1);
+			writefln("Substructed age group 3: %s", g2);
+			writefln("New military units: %s", _militaryUnits);
+		}
+		return g1 + g2;
+	}
+
+	uint percentToNumber(int percent) const {
+		uint p = max(0, min(percent, 100));
+		uint g1 = to!int(_population[2] * p/100);
+		uint g2 = to!int(_population[3] * p/100);
 		return g1 + g2;
 	}
 

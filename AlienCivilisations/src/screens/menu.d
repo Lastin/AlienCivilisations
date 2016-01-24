@@ -35,7 +35,7 @@ class Menu : HorizontalLayout {
 			loadButton.padding(padding).margins(10).fontSize(27);
 			playButton.click = delegate (Widget source) {
 				//Thread play = new Thread(&loadPlay).start();
-				loadPlay();
+				window.mainWidget = new Play();
 				return true;
 			};
 			childById("vl1").childById("hl1").childById("vr1").addChild(playButton);
@@ -86,13 +86,5 @@ class Menu : HorizontalLayout {
 		};
 		addChild(parseML(layout));
 		addChild(new HSpacer());
-	}
-
-	void loadPlay(){
-		window.mainWidget = new Play();
-	}
-
-	void writeSomething(){
-		writeln("works");
 	}
 }

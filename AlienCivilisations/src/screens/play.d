@@ -43,7 +43,7 @@ class Play : AppFrame {
 	}
 
 	bool handleKeyEvent(Widget source, KeyEvent event){
-		if(enabled && event.action == KeyAction.KeyDown &&
+		if(event.action == KeyAction.KeyDown &&
 			event.keyCode == KeyCode.ESCAPE) {
 				window.mainWidget = new Menu(this);
 				return true;
@@ -57,30 +57,16 @@ class Play : AppFrame {
 		//Assign
 		endTurnButton.click = &endTurn;
 		convertUnitsButton.click = delegate(Widget action){
+			window.removePopup(_convertUnitsPopup);
 			_convertUnitsPopup = window.showPopup(convertUnitsPopup, this);
-			//convertUnitsButton.clickable(false);
-			enabled = false;
-			//buttonsEnabled(false);
 			return true;
 		};
 	}
 
-	void buttonsEnabled(bool status = true){
-		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
-		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
-		Widget inhabitButton = _planetInfoContainer.childById("inhabitButton");
-		Widget knowledgeTreeButton = childById("verticalContainer").childById("verticalContainer").childById("knowledgeTreeButton");
-		endTurnButton.clickable = false;
-		convertUnitsButton.clickable = false;
-		inhabitButton.clickable = false;
-		knowledgeTreeButton.clickable = false;
-	}
-
-
 	/** Returns widget for converting units popup **/
 	Widget convertUnitsPopup(){
 		VerticalLayout layout = new VerticalLayout;
-		layout.minWidth = 400;
+		//Title bar
 		HorizontalLayout titleBar = new HorizontalLayout();
 		titleBar.layoutWidth = FILL_PARENT;
 		titleBar.backgroundColor = 0x404040;
@@ -88,21 +74,62 @@ class Play : AppFrame {
 		titleText.fontSize = 17;
 		titleText.textColor = 0xFFFFFF;
 		titleBar.addChild(titleText);
-		HorizontalLayout infoContainer = new HorizontalLayout();
+		//Conversion info
+		TableLayout infoContainer = new TableLayout();
 		infoContainer.padding(10);
+		infoContainer.colCount(2);
 		infoContainer.layoutWidth = FILL_PARENT;
-		TextWidget tw1 = new TextWidget(null, "Convert units:"d);
+		//Row 1
+		TextWidget tw1 = new TextWidget(null, "Convert percent:"d);
 		tw1.textFlags(TextFlag.Underline);
 		tw1.fontWeight(FontWeight.Bold);
 		tw1.fontSize = 15;
 		tw1.textColor = 0xFFFFFF;
-		TextWidget units = new TextWidget(null, "0"d);
-		units.fontSize = 15;
-		units.textColor = 0xFFFFFF;
-		infoContainer.addChild(new HSpacer());
+		TextWidget perc = new TextWidget(null, "1%"d);
+		perc.fontSize = 15;
+		perc.textColor = 0xFFFFFF;
+		//Row 2
+		TextWidget tw2 = new TextWidget(null, "Military units:"d);
+		tw2.textFlags(TextFlag.Underline);
+		tw2.fontWeight(FontWeight.Bold);
+		tw2.fontSize = 15;
+		tw2.textColor = 0xFFFFFF;
+		TextWidget milUnits = new TextWidget(null, to!dstring(_selectedPlanet.percentToNumber(1)));
+		milUnits.fontSize = 15;
+		milUnits.textColor = 0xFFFFFF;
+		//Row 3
+		TextWidget tw3 = new TextWidget(null, "Civil units left on planet:"d);
+		tw3.textFlags(TextFlag.Underline);
+		tw3.fontWeight(FontWeight.Bold);
+		tw3.fontSize = 15;
+		tw3.textColor = 0xFFFFFF;
+		TextWidget civLeft = new TextWidget(null, to!dstring(_selectedPlanet.populationSum - _selectedPlanet.percentToNumber(1)));
+		civLeft.fontSize = 15;
+		civLeft.textColor = 0xFFFFFF;
+		//add to table
 		infoContainer.addChild(tw1);
-		infoContainer.addChild(units);
-		infoContainer.addChild(new HSpacer());
+		infoContainer.addChild(perc);
+		infoContainer.addChild(tw2);
+		infoContainer.addChild(milUnits);
+		infoContainer.addChild(tw3);
+		infoContainer.addChild(civLeft);
+		//Slider and its actions
+		ScrollBar slider = new ScrollBar(null, Orientation.Horizontal);
+		slider.position = 1;
+		slider.pageSize(1);
+		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
+			perc.text = to!dstring(source.position+1) ~ "%"d;
+			auto ptn = _selectedPlanet.percentToNumber(source.position+1);
+			milUnits.text = to!dstring(ptn);
+			civLeft.text = to!dstring(_selectedPlanet.populationSum - ptn);
+			
+			return true;
+		};
+		//info
+		TextWidget extraInfo = new TextWidget(null, "*Only units from 2nd and 3rd age group are converted"d);
+		extraInfo.textColor = 0xFFFFFF;
+		extraInfo.padding = 7;
+		//Buttons and their actions
 		HorizontalLayout buttonContainer = new HorizontalLayout();
 		buttonContainer.layoutWidth = FILL_PARENT;
 		Button apply = new Button(null, "Apply"d);
@@ -110,28 +137,25 @@ class Play : AppFrame {
 		buttonContainer.addChild(new HSpacer());
 		buttonContainer.addChild(apply);
 		buttonContainer.addChild(cancel);
-		ScrollBar slider = new ScrollBar(null, Orientation.Horizontal);
-		//slider.layoutWidth = FILL_PARENT;
-		slider.position = slider.minValue;
-		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
-			units.text = to!dstring(source.position);
-			return true;
-		};
 		apply.click = delegate(Widget action){
-			enabled = true;
+			_selectedPlanet.convertUnits(slider.position+1);
 			window.removePopup(_convertUnitsPopup);
+			updatePlayerStats();
+			updatePlanetInfo(_selectedPlanet);
 			return true;
 		};
 		cancel.click = delegate(Widget action){
-			enabled = true;
 			window.removePopup(_convertUnitsPopup);
 			return true;
 		};
+		//Layout properties
 		layout.addChild(titleBar);
 		layout.addChild(infoContainer);
 		layout.addChild(slider);
+		layout.addChild(extraInfo);
 		layout.addChild(buttonContainer);
 		layout.padding(0);
+		layout.minWidth = 400;
 		layout.backgroundColor(0x4B4B4B);
 		return layout;
 	}
@@ -289,6 +313,7 @@ class Play : AppFrame {
 	}
 
 	void updatePlanetInfo(Planet planet) {
+		window.removePopup(_convertUnitsPopup);
 		if(planet) {
 			_planetInfoContainer.visibility = Visibility.Visible;
 			_planetInfoContainer.childById("planetCapacity").text = to!dstring(planet.capacity);
@@ -306,7 +331,6 @@ class Play : AppFrame {
 		}
 		else {
 			_planetInfoContainer.visibility = Visibility.Invisible;
-			window.removePopup(_convertUnitsPopup);
 		}
 
 	}
