@@ -47,7 +47,7 @@ class Planet : Owned {
 	}
 
 	@property int capacity() {
-		return to!int(_radius * POPULATION_CONSTANT);
+		return to!int(_radius / 10 * POPULATION_CONSTANT);
 	}
 	@property uint populationSum() {
 		return _population[].sum;
@@ -94,7 +94,7 @@ class Planet : Owned {
 	}
 
 	void resetPopulation() {
-		int ppa = to!int(capacity / 8);
+		int ppa = to!int(capacity / 8 / 8);
 		_population = [ppa,ppa,ppa,ppa,ppa,ppa,ppa,ppa];
 	}
 	/** Function affects planet's attributes. Should be called after player finishes move **/
