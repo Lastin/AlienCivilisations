@@ -1,6 +1,7 @@
 ﻿module src.logic.order;
 
 import src.entities.branch;
+import src.entities.knowledgeTree;
 
 class Order {
 	private bool _completed = false;
@@ -12,14 +13,18 @@ class Order {
 }
 
 class KnowledgeOrder : Order {
-	private Branch _branch;
+	private BranchName _branch;
 	private int _leaf;
-	this(Branch branch, int leaf) {
+	this(BranchName branch, int leaf) {
 		_branch = branch;
 		_leaf = leaf;
 	}
 	bool execute() {
 		return false;
 	}
+}
+
+class ShipOrder : Order {
+
 }
 

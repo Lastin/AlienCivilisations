@@ -24,10 +24,6 @@ class Player {
 	@property string name() const {
 		return _name;
 	}
-	/** Returns true if player moves are locked **/
-	@property bool locked() const {
-		return _locked;
-	}
 	/** Returns planets which belong to the player **/
 	@property Planet[] planets(Planet[] list){
 		Planet[] owned;
