@@ -20,7 +20,7 @@ class Play : AppFrame {
 		Widget _planetInfoContainer;
 		Widget _playerStatsContainer;
 		Planet _selectedPlanet;
-		PopupWidget _convertUnitsPopup;
+		PopupWidget _currentPopup;
 	}
 
 	this(){
@@ -54,26 +54,30 @@ class Play : AppFrame {
 	private void assignButtonsActions(){
 		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
 		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
+		Widget orderShipButton = _planetInfoContainer.childById("convertUnitsButton");
 		//Assign
 		endTurnButton.click = &endTurn;
-		convertUnitsButton.click = delegate(Widget action){
-			window.removePopup(_convertUnitsPopup);
-			_convertUnitsPopup = window.showPopup(convertUnitsPopup, this);
+		convertUnitsButton.click = delegate(Widget source){
+			window.removePopup(_currentPopup);
+			_currentPopup = window.showPopup(convertUnitsPopup, this);
+			return true;
+		};
+		orderShipButton.click = delegate(Widget source){
+			window.removePopup(_currentPopup);
+			_currentPopup = window,showPopupMenu(orderShipPopup, this);
 			return true;
 		};
 	}
 
+	/** Returns widget for putting an order of ship on the planet **/
+	Widget orderShipPopup(){
+		Widget popupWindow = defaultPopup("Order ship production");
+		return popupWindow;
+	}
+
 	/** Returns widget for converting units popup **/
 	Widget convertUnitsPopup(){
-		VerticalLayout layout = new VerticalLayout;
-		//Title bar
-		HorizontalLayout titleBar = new HorizontalLayout();
-		titleBar.layoutWidth = FILL_PARENT;
-		titleBar.backgroundColor = 0x404040;
-		TextWidget titleText = new TextWidget(null, "Convert civil units into military"d);
-		titleText.fontSize = 17;
-		titleText.textColor = 0xFFFFFF;
-		titleBar.addChild(titleText);
+		Widget popupWindow = defaultPopup("Convert civil units into military");
 		//Conversion info
 		TableLayout infoContainer = new TableLayout();
 		infoContainer.padding(10);
@@ -139,21 +143,35 @@ class Play : AppFrame {
 		buttonContainer.addChild(cancel);
 		apply.click = delegate(Widget action){
 			_selectedPlanet.convertUnits(slider.position+1);
-			window.removePopup(_convertUnitsPopup);
+			window.removePopup(_currentPopup);
 			updatePlayerStats();
 			updatePlanetInfo(_selectedPlanet);
 			return true;
 		};
 		cancel.click = delegate(Widget action){
-			window.removePopup(_convertUnitsPopup);
+			window.removePopup(_currentPopup);
 			return true;
 		};
 		//Layout properties
+		popupWindow.addChild(infoContainer);
+		popupWindow.addChild(slider);
+		popupWindow.addChild(extraInfo);
+		popupWindow.addChild(buttonContainer);
+		return popupWindow;
+	}
+
+	Widget defaultPopup(string title){
+		VerticalLayout layout = new VerticalLayout;
+		//Title bar
+		HorizontalLayout titleBar = new HorizontalLayout();
+		titleBar.layoutWidth = FILL_PARENT;
+		titleBar.backgroundColor = 0x404040;
+		TextWidget titleText = new TextWidget(null, to!dstring(title));
+		titleText.fontSize = 17;
+		titleText.textColor = 0xFFFFFF;
+		titleBar.addChild(titleText);
+		//Layout properties
 		layout.addChild(titleBar);
-		layout.addChild(infoContainer);
-		layout.addChild(slider);
-		layout.addChild(extraInfo);
-		layout.addChild(buttonContainer);
 		layout.padding(0);
 		layout.minWidth = 400;
 		layout.backgroundColor(0x4B4B4B);
@@ -277,6 +295,12 @@ class Play : AppFrame {
 									padding: 10
 									margins: 10
 								}
+								Button {
+									id: orderShip
+									text: "Order ship production"
+									padding: 10
+									margins: 10
+								}
 							}
 						}
 						VSpacer {}
@@ -313,7 +337,7 @@ class Play : AppFrame {
 	}
 
 	void updatePlanetInfo(Planet planet) {
-		window.removePopup(_convertUnitsPopup);
+		window.removePopup(_currentPopup);
 		if(planet) {
 			_planetInfoContainer.visibility = Visibility.Visible;
 			_planetInfoContainer.childById("planetCapacity").text = to!dstring(planet.capacity);
