@@ -54,9 +54,7 @@ class Player {
 	}
 
 	void orderInhabit(Planet planet) {
-	}
 
-	void orderShip(ShipType type) {
 	}
 
 	void orderDevelop(Branch branch, int leaf) {

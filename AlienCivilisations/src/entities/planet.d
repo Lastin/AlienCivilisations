@@ -10,6 +10,8 @@ import src.entities.knowledgeTree;
 import std.stdio;
 
 public enum int POPULATION_CONSTANT = 10000;
+enum double FOOD_CONSUMPTION_RATE = 1;
+enum double CHILD_PER_PAID = 2.5;
 
 class Planet {
 	private {
@@ -19,9 +21,9 @@ class Planet {
 		immutable bool _breathableAtmosphere;
 		Player _owner;
 		uint[8] _population = [0,0,0,0,0,0,0,0];
-		uint _food = 0;
-		uint _workForce = 0;
+		double _food = 0;
 		uint _militaryUnits = 0;
+		Ship[] _shipOrders;
 	}
 
 	this(string name, Vector2d position, float radius, bool breathableAtmosphere) {
@@ -32,7 +34,7 @@ class Planet {
 	}
 	/** (Cloning) Constructor for creating planet from existing values **/
 	this(string name, Vector2d position, float radius, bool breathableAtmosphere,
-		uint[8] population, uint food, uint militaryUnits) {
+		uint[8] population, double food, uint militaryUnits) {
 		this(name, position, radius, breathableAtmosphere);
 		_population = population;
 		_food = food;
@@ -61,7 +63,7 @@ class Planet {
 	@property Player owner() {
 		return _owner;
 	}
-	@property uint food() const {
+	@property double food() const {
 		return _food;
 	}
 	@property uint militaryUnits() const {
@@ -69,9 +71,6 @@ class Planet {
 	}
 	@property uint[8] population() {
 		return _population;
-	} 
-	@property uint workForce() {
-		return _workForce;
 	}
 
 	override public string toString() {
@@ -90,6 +89,7 @@ class Planet {
 
 	Planet setOwner(Player player) {
 		_owner = player;
+		_shipOrders = null;
 		return this;
 	}
 	/** Sets population to default value of 1/8th maximum capacity **/
@@ -97,22 +97,31 @@ class Planet {
 		int ppa = to!int(capacity / 8 / 8);
 		_population = [ppa,ppa,ppa,ppa,ppa,ppa,ppa,ppa];
 	}
+
+	/** Returns workforce points based on number of units within certain age groups and knowledge boost **/
+	double calculateWorkforce() {
+		KnowledgeTree kt = _owner.knowledgeTree;
+		double boost = kt.branch(BranchName.Energy).effectiveness * _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
+		double result = to!double(_population[2 .. 6].sum) * boost;
+		debug writefln("Calulated workforce: %s", result);
+		return result;
+	}
 	/** Function affects planet's attributes. Should be called after player finishes move **/
 	void step() {
-		_workForce = to!uint(_population[2 .. 6].sum * _owner.knowledgeTree.branch(BranchName.Energy).effectiveness);
-		affectFood();
+		double workforce = calculateWorkforce();
+		workforce = produceShips(workforce);
+		affectFood(workforce);
 		growPopulation();
 	}
 	/** 
 	 * Food supply at best increases at arythmetic rate
 	 * 1 > 2 > 3 > 4 > 5
 	**/
-	private void affectFood() {
-		_food -= populationSum;
-		//fpe - food production effectiveness
+	private void affectFood(double workforce) {
+		//Consume food
+		_food -= populationSum * FOOD_CONSUMPTION_RATE;
 		double fpe = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
-		_food += to!int(_workForce * fpe);
-		_workForce = 0;
+		_food += workforce * fpe;
 	}
 	/**
 	 * Population grows at exponential rate
@@ -128,10 +137,15 @@ class Planet {
 		for(size_t i = _population.length - 1; i>0; i--){
 			_population[i] = _population[i-1];
 		}
-		double reproductivePairs = (_population[2] + _population[3]) / 2;
-		double childPerPair = 2.5;
-		double foodFactor = populationSum / _food;
-		_population[0] = to!int(reproductivePairs * childPerPair * foodFactor / overPopulationFactor);
+		int reproductivePairs = _population[2 .. 3].sum / 2;
+		double foodFactor = populationSum * FOOD_CONSUMPTION_RATE / _food;
+		//Threshold to stop foodFactoring from going negative
+		if(foodFactor < 0){
+			foodFactor = 0.001;
+		}
+		_population[0] = to!int(reproductivePairs * CHILD_PER_PAID * foodFactor / overPopulationFactor);
+		debug writefln("Newborn number: %s", _population[0]);
+		assert(_population[0] >= 0);
 	}
 
 	/** Converts civil units into military units **/
@@ -184,11 +198,20 @@ class Planet {
 		}
 	}
 
-	private void produceShips(Ship ship) {
-		double productionCost = POPULATION_CONSTANT / 4;
-		if(_workForce >= productionCost){
-			_workForce -= to!int(productionCost);
-			ship.complete;
+	private double produceShips(double workforce) {
+		double productionCost = POPULATION_CONSTANT / 2;
+		foreach(Ship s; _shipOrders){
+			if(workforce < productionCost){
+				return workforce;
+			}
+			workforce -= productionCost;
+			s.complete();
+			_shipOrders = _shipOrders[1 .. $];
 		}
+		return workforce;
+	}
+
+	void addShipOrder(Ship ship){
+		_shipOrders ~= ship;
 	}
 }

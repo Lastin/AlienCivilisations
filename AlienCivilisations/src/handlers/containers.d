@@ -95,7 +95,7 @@ class GameState {
 			float r = origin.radius;
 			bool ba = origin.breathableAtmosphere;
 			uint[8] pop = origin.population.dup;
-			uint food = origin.food;
+			double food = origin.food;
 			uint mu = origin.militaryUnits;
 			duplicates ~= new Planet(name, pos, r, ba, pop, food, mu);
 			duplicates[$].setOwner(newOwner(origin, playersDup));

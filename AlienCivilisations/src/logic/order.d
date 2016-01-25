@@ -24,7 +24,3 @@ class KnowledgeOrder : Order {
 	}
 }
 
-class ShipOrder : Order {
-
-}
-

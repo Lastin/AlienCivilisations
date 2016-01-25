@@ -4,11 +4,6 @@ import src.entities.knowledgeTree;
 import src.entities.planet;
 import std.conv;
 
-enum ShipType : ubyte {
-	Military,
-	Inhabitation
-}
-
 enum int MULTIPLIER = 1000;
 
 abstract class Ship {

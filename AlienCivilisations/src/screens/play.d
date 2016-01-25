@@ -7,6 +7,7 @@ import src.handlers.containers;
 import src.handlers.gameManager;
 import src.screens.menu;
 import std.stdio;
+import src.entities.ship;
 
 class Play : AppFrame {
 	private {
@@ -55,7 +56,7 @@ class Play : AppFrame {
 	private void assignButtonsActions(){
 		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
 		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
-		Widget orderShipButton = _planetInfoContainer.childById("orderShip");
+		Widget orderShipButton = _planetInfoContainer.childById("orderMilitaryShip");
 		//Assign
 		endTurnButton.click = &endTurn;
 		convertUnitsButton.click = delegate(Widget source){
@@ -65,59 +66,47 @@ class Play : AppFrame {
 		};
 		orderShipButton.click = delegate(Widget source){
 			window.removePopup(_currentPopup);
-			_currentPopup = window.showPopup(orderShipPopup, this);
+			_currentPopup = window.showPopup(orderMilitaryShipPopup(), this);
 			return true;
 		};
 	}
 
 	/** Returns widget for putting an order of ship on the planet **/
-	Widget orderShipPopup(){
+	Widget orderMilitaryShipPopup(){
 		Widget popupWindow = defaultPopup("Order ship production");
-		TextWidget tw1 = new TextWidget(null, "Ship type:"d);
-		tw1.textFlags(TextFlag.Underline);
+		//Information table
+		TableLayout infoTable = new TableLayout();
+		infoTable.colCount(2);
+		TextWidget tw1 = new TextWidget(null, "Military units onboard:"d);
 		tw1.fontWeight(FontWeight.Bold);
-		tw1.fontSize = 15;
-		tw1.textColor = 0xFFFFFF;
-		//Radiobuttons
-		RadioButton rb1 = new RadioButton(null, "Military"d);
-		rb1.checked(true);
-		RadioButton rb2 = new RadioButton(null, "Inhabitation"d);
-		//assign actions
-		VerticalLayout moContainer = new VerticalLayout();
-		rb1.addOnClickListener = delegate (Widget source) {
-			moContainer.visibility(Visibility.Visible);
-			return true;
-		};
-		rb2.addOnClickListener = delegate (Widget source) {
-			moContainer.visibility(Visibility.Gone);
-			return true;
-		};
-		//Military ship info
-		HorizontalLayout hl = new HorizontalLayout();
-		TextWidget info = new TextWidget(null, "Military units onboard"d);
-		info.fontWeight(FontWeight.Bold);
-		info.fontSize = 15;
-		info.textColor = 0xFFFFFF;
-		TextWidget total = new TextWidget(null, to!dstring(to!int(_selectedPlanet.militaryUnits * 1/100)));
-		total.fontSize = 15;
-		total.textColor = 0xFFFFFF;
+		tw1.fontSize(15);
+		tw1.textColor(0xFFFFFF);
+		int temp = _selectedPlanet.militaryUnits * 1/100;
+		TextWidget total = new TextWidget(null, to!dstring(temp));
+		total.fontSize(15);
+		total.textColor(0xFFFFFF);
 		//
-		hl.addChild(info);
-		hl.addChild(total);
+		infoTable.addChild(tw1);
+		infoTable.addChild(total);
 		//
 		ScrollBar slider = new ScrollBar(null, Orientation.Horizontal);
 		slider.position = 1;
 		slider.pageSize(1);
 		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
-			double percent = (to!double(source.position) + 1) / 100;
+			double percent = (source.position + 1.0) / 100;
 			int result = to!int(_selectedPlanet.militaryUnits * percent);
 			debug writeln(percent);
 			debug writeln(result);
 			total.text = to!dstring(result);
 			return true;
 		};
-		moContainer.addChild(hl);
-		moContainer.addChild(slider);
+		//Extra info
+		MultilineTextWidget mtw2 = new MultilineTextWidget(null, "Select number of military units from selected planet \nto be added to a new ship"d);
+		mtw2.fontSize(15);
+		mtw2.textColor(0xFFFFFF);
+		MultilineTextWidget mtw3 = new MultilineTextWidget(null, "Constructing the ship uses resources of the planet, \notherwise spent for production of food"d);
+		mtw3.fontSize(15);
+		mtw3.textColor(0xFFFFFF);
 		//Buttons container
 		HorizontalLayout buttonContainer = new HorizontalLayout();
 		buttonContainer.layoutWidth = FILL_PARENT;
@@ -127,18 +116,19 @@ class Play : AppFrame {
 		buttonContainer.addChild(apply);
 		buttonContainer.addChild(cancel);
 		apply.click = delegate(Widget action){
-			//
+
+			//TODO: add action to order ship
 			return true;
 		};
 		cancel.click = delegate(Widget action){
 			window.removePopup(_currentPopup);
 			return true;
 		};
-		//
-		popupWindow.addChild(tw1);
-		popupWindow.addChild(rb1);
-		popupWindow.addChild(rb2);
-		popupWindow.addChild(moContainer);
+		//Add children to layout
+		popupWindow.addChild(infoTable);
+		popupWindow.addChild(slider);
+		popupWindow.addChild(mtw2);
+		popupWindow.addChild(mtw3);
 		popupWindow.addChild(buttonContainer);
 		return popupWindow;
 	}
@@ -364,8 +354,14 @@ class Play : AppFrame {
 									margins: 10
 								}
 								Button {
-									id: orderShip
-									text: "Order ship production"
+									id: orderMilitaryShip
+									text: "Order military ship"
+									padding: 10
+									margins: 10
+								}
+								Button {
+									id: orderInhabitShip
+									text: "Order inhabitation ship"
 									padding: 10
 									margins: 10
 								}
@@ -376,19 +372,39 @@ class Play : AppFrame {
 				}
 				VSpacer{}
 				HorizontalLayout {
+					id: bottomPanel
+					layoutWidth: fill
 					VerticalLayout {
-						backgroundColor: 0x80969696
-						Button {
-							id: knowledgeTreeButton
-							text: "KNOWLEDGE TREE"
-							padding: 20
-							margins: 10
+						HorizontalLayout {
+							Button {
+								id: knowledgeTreeButton
+								text: "KNOWLEDGE TREE"
+								padding: 20
+								margins: 10
+							}
 						}
+					}
+					ListWidget {
 					}
 				}
 			}
 		};
-		return parseML(layout);
+		auto parsed = parseML(layout);
+		ListWidget list = new ListWidget(null, Orientation.Vertical);
+		//TODO: figure out how to add list adapter in ML
+		/*WidgetListAdapter listAdapter = new WidgetListAdapter();
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		list.ownAdapter = listAdapter;
+		list.backgroundColor(0x80969696);
+		parsed.childById("bottomPanel").addChild(new HSpacer());
+		parsed.childById("bottomPanel").addChild(list);
+		parsed.childById("bottomPanel").addChild(new HSpacer());
+		parsed.childById("bottomPanel").addChild(new HSpacer());*/
+		return parsed;
 	}
 
 	void initialise() {
