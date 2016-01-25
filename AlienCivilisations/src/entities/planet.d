@@ -49,22 +49,22 @@ class Planet {
 	@property int capacity() {
 		return to!int(_radius / 10 * POPULATION_CONSTANT);
 	}
-	@property uint populationSum() {
+	@property uint populationSum() const {
 		return _population[].sum;
 	}
-	@property float radius() {
+	@property float radius() const {
 		return _radius;
 	}
-	@property string name() {
+	@property string name() const {
 		return _name;
 	}
 	@property Player owner() {
 		return _owner;
 	}
-	@property uint food() {
+	@property uint food() const {
 		return _food;
 	}
-	@property uint militaryUnits() {
+	@property uint militaryUnits() const {
 		return _militaryUnits;
 	}
 	@property uint[8] population() {

@@ -38,6 +38,7 @@ class Play : AppFrame {
 	}
 
 	bool endTurn(Widget source) {
+		_gm.endTurn();
 		return true;
 	}
 
@@ -54,7 +55,7 @@ class Play : AppFrame {
 	private void assignButtonsActions(){
 		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
 		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
-		Widget orderShipButton = _planetInfoContainer.childById("convertUnitsButton");
+		Widget orderShipButton = _planetInfoContainer.childById("orderShip");
 		//Assign
 		endTurnButton.click = &endTurn;
 		convertUnitsButton.click = delegate(Widget source){
@@ -72,6 +73,73 @@ class Play : AppFrame {
 	/** Returns widget for putting an order of ship on the planet **/
 	Widget orderShipPopup(){
 		Widget popupWindow = defaultPopup("Order ship production");
+		TextWidget tw1 = new TextWidget(null, "Ship type:"d);
+		tw1.textFlags(TextFlag.Underline);
+		tw1.fontWeight(FontWeight.Bold);
+		tw1.fontSize = 15;
+		tw1.textColor = 0xFFFFFF;
+		//Radiobuttons
+		RadioButton rb1 = new RadioButton(null, "Military"d);
+		rb1.checked(true);
+		RadioButton rb2 = new RadioButton(null, "Inhabitation"d);
+		//assign actions
+		VerticalLayout moContainer = new VerticalLayout();
+		rb1.addOnClickListener = delegate (Widget source) {
+			moContainer.visibility(Visibility.Visible);
+			return true;
+		};
+		rb2.addOnClickListener = delegate (Widget source) {
+			moContainer.visibility(Visibility.Gone);
+			return true;
+		};
+		//Military ship info
+		HorizontalLayout hl = new HorizontalLayout();
+		TextWidget info = new TextWidget(null, "Military units onboard"d);
+		info.fontWeight(FontWeight.Bold);
+		info.fontSize = 15;
+		info.textColor = 0xFFFFFF;
+		TextWidget total = new TextWidget(null, to!dstring(to!int(_selectedPlanet.militaryUnits * 1/100)));
+		total.fontSize = 15;
+		total.textColor = 0xFFFFFF;
+		//
+		hl.addChild(info);
+		hl.addChild(total);
+		//
+		ScrollBar slider = new ScrollBar(null, Orientation.Horizontal);
+		slider.position = 1;
+		slider.pageSize(1);
+		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
+			double percent = (to!double(source.position) + 1) / 100;
+			int result = to!int(_selectedPlanet.militaryUnits * percent);
+			debug writeln(percent);
+			debug writeln(result);
+			total.text = to!dstring(result);
+			return true;
+		};
+		moContainer.addChild(hl);
+		moContainer.addChild(slider);
+		//Buttons container
+		HorizontalLayout buttonContainer = new HorizontalLayout();
+		buttonContainer.layoutWidth = FILL_PARENT;
+		Button apply = new Button(null, "Apply"d);
+		Button cancel = new Button(null, "Cancel"d);
+		buttonContainer.addChild(new HSpacer());
+		buttonContainer.addChild(apply);
+		buttonContainer.addChild(cancel);
+		apply.click = delegate(Widget action){
+			//
+			return true;
+		};
+		cancel.click = delegate(Widget action){
+			window.removePopup(_currentPopup);
+			return true;
+		};
+		//
+		popupWindow.addChild(tw1);
+		popupWindow.addChild(rb1);
+		popupWindow.addChild(rb2);
+		popupWindow.addChild(moContainer);
+		popupWindow.addChild(buttonContainer);
 		return popupWindow;
 	}
 

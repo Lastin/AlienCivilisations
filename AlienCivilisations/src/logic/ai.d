@@ -12,4 +12,7 @@ class AI : Player{
 		super("AI", knowledgeTree);
 		_realState = realState;
 	}
+	void makeMove(){
+
+	}
 }

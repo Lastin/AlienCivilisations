@@ -34,4 +34,13 @@ class GameManager {
 	@property GameState state(){
 		return _realState;
 	}
+
+	void endTurn(){
+		_realState.currentPlayer.completeTurn();
+		_realState.moveQPosition;
+		if(AI ai = cast(AI)_realState.currentPlayer){
+			ai.makeMove();
+		}
+		_realState.moveQPosition();
+	}
 }

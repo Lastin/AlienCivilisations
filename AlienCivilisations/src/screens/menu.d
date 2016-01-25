@@ -14,9 +14,9 @@ class Menu : HorizontalLayout {
 			Button contButton = new Button(null, "CONTINUE"d);
 			Button saveButton = new Button(null, "SAVE"d);
 			Button menuButton = new Button(null, "BACK TO MENU"d);
-			contButton.padding(padding).margins(10).fontSize(27);
-			saveButton.padding(padding).margins(10).fontSize(27);
-			menuButton.padding(padding).margins(10).fontSize(27);
+			contButton.padding(padding).margins(10).fontSize(20);
+			saveButton.padding(padding).margins(10).fontSize(20);
+			menuButton.padding(padding).margins(10).fontSize(20);
 			childById("vl1").childById("hl1").childById("vr1").addChild(contButton);
 			childById("vl1").childById("hl1").childById("vr1").addChild(saveButton);
 			childById("vl1").childById("hl1").childById("vr1").addChild(menuButton);
@@ -31,8 +31,8 @@ class Menu : HorizontalLayout {
 		} else {
 			Button playButton = new Button(null, "START GAME"d);
 			Button loadButton = new Button(null, "LOAD"d);
-			playButton.padding(padding).margins(10).fontSize(27);
-			loadButton.padding(padding).margins(10).fontSize(27);
+			playButton.padding(padding).margins(10).fontSize(20);
+			loadButton.padding(padding).margins(10).fontSize(20);
 			playButton.click = delegate (Widget source) {
 				//Thread play = new Thread(&loadPlay).start();
 				window.mainWidget = new Play();
@@ -42,7 +42,7 @@ class Menu : HorizontalLayout {
 			childById("vl1").childById("hl1").childById("vr1").addChild(loadButton);
 		}
 		Button exitButton = new Button(null, "EXIT"d);
-		exitButton.padding(padding).margins(10).fontSize(27);
+		exitButton.padding(padding).margins(10).fontSize(20);
 		exitButton.click = delegate (Widget source) {
 			window.close();
 			return true;
