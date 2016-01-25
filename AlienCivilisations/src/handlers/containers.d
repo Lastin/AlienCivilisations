@@ -61,7 +61,7 @@ class GameState {
 		Player[] playersDup = duplicatePlayers();
 		Planet[] planetsDup = duplicatePlanets(playersDup);
 		//duplicate map
-		mapDup = new Map(_map.size, planetsDup);
+		Map mapDup = new Map(_map.size, planetsDup);
 		duplicateState = new GameState(mapDup, playersDup, _queuePosition);
 		return duplicateState;
 	}
@@ -98,13 +98,14 @@ class GameState {
 			uint food = origin.food;
 			uint mu = origin.militaryUnits;
 			duplicates ~= new Planet(name, pos, r, ba, pop, food, mu);
-			duplicates[$].owner = newOwner(origin, playersDup);
+			duplicates[$].setOwner(newOwner(origin, playersDup));
 		}
 		return duplicates;
 	}
 
 	private Player newOwner(Planet planet, Player[] playersDup) {
 		if(!planet.owner){
+			return null;
 		} else {
 			foreach(i, Player p; playersDup){
 				if(p == planet.owner)

@@ -11,7 +11,7 @@ import std.stdio;
 
 public enum int POPULATION_CONSTANT = 10000;
 
-class Planet : Owned {
+class Planet {
 	private {
 		immutable string _name;
 		immutable Vector2d _position;
@@ -58,7 +58,7 @@ class Planet : Owned {
 	@property string name() {
 		return _name;
 	}
-	override @property Player owner() {
+	@property Player owner() {
 		return _owner;
 	}
 	@property uint food() {

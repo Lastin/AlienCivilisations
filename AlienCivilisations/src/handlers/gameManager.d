@@ -28,7 +28,7 @@ class GameManager {
 		players ~= new AI(&_realState, new KnowledgeTree(_startPoints.to!(int[][])));
 		Map map = new Map(_mapSize, _planetsCount, players);
 		size_t queuePosition = uniform(0, players.length);
-		_realState = new GameState(map, players, null, queuePosition);
+		_realState = new GameState(map, players, queuePosition);
 	}
 
 	@property GameState state(){

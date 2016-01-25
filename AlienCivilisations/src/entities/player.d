@@ -11,7 +11,7 @@ class Player {
 	private KnowledgeTree _knowledgeTree;
 	private Ship[] _ships;
 
-	this(string name, KnowledgeTree knowledgeTree, Ship[] ships) {
+	this(string name, KnowledgeTree knowledgeTree, Ship[] ships = null) {
 		_name = name;
 		_knowledgeTree = knowledgeTree;
 		_ships = ships;
@@ -37,7 +37,7 @@ class Player {
 	@property Ship[] availableShips() {
 		Ship[] available;
 		foreach(Ship s; _ships){
-			if(s.complete && !s.used){
+			if(s.completed){
 				available ~= s;
 			}
 		}
@@ -45,25 +45,21 @@ class Player {
 	}
 	/** Returns all ships **/
 	@property Ship[] ships(){
-		_ships;
+		return _ships;
 	}
 	/** Function executing actions on the end of the turn **/
 	void completeTurn() {
 		//1: Produce ships
 		//2: 
-		return this;
 	}
 
 	void orderInhabit(Planet planet) {
-		return this;
 	}
 
 	void orderShip(ShipType type) {
-		return this;
 	}
 
 	void orderDevelop(Branch branch, int leaf) {
-		return this;
 	}
 
 	void inhabitPlanet(Planet planet){

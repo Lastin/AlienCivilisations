@@ -13,23 +13,27 @@ enum int MULTIPLIER = 1000;
 
 abstract class Ship {
 	private {
-		immutable uint _capacity;
 		bool _completed;
+		double _eneEff;
+		double _sciEff;
 	}
 
 	this(bool completed = false, double eneEff = 1, double sciEff = 1){
-		_capacity = to!int(MULTIPLIER * eneEff * sciEff);
 		_completed = completed;
+		_eneEff = eneEff;
+		_sciEff = sciEff;
 	}
 
 	/** Sets _completed property to true **/
 	void complete() {
 		_completed = true;
-		return this;
 	}
 	/** Returns _completed variable **/
 	@property bool completed() const {
 		return _completed;
+	}
+	@property uint capacity() const {
+		return to!int(MULTIPLIER * _eneEff * _sciEff);
 	}
 	Ship dup();
 }
@@ -37,8 +41,8 @@ abstract class Ship {
 class MilitaryShip : Ship {
 	private int _onboard;
 	/** Takes number onboard  **/
-	this(int onboard, bool _completed = false) {
-		super(completed);
+	this(bool _completed = false, double eneEff = 1, double sciEff = 1, int onboard = 1) {
+		super(completed, eneEff, sciEff);
 		_onboard = onboard;
 	}
 	@property bool empty() const {
@@ -57,15 +61,15 @@ class MilitaryShip : Ship {
 		return 0;
 	}
 	MilitaryShip dup() const {
-		return new Ship(_onboard, _completed);
+		return new MilitaryShip(_completed, _eneEff, _sciEff, onboard);
 	}
 }
 
 class InhabitationShip : Ship {
-	this(bool completed = false) {
-		super(completed);
+	this(bool _completed = false,  double eneEff = 1, double sciEff = 1) {
+		super(completed, eneEff, sciEff);
 	}
 	InhabitationShip dup() const {
-
+		return new InhabitationShip(_completed, _eneEff, _sciEff);
 	}
 }

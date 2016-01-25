@@ -64,7 +64,7 @@ class Play : AppFrame {
 		};
 		orderShipButton.click = delegate(Widget source){
 			window.removePopup(_currentPopup);
-			_currentPopup = window,showPopupMenu(orderShipPopup, this);
+			_currentPopup = window.showPopup(orderShipPopup, this);
 			return true;
 		};
 	}
