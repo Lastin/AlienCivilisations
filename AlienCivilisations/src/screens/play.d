@@ -18,6 +18,7 @@ class Play : AppFrame {
 		Vector2d _cameraPosition;
 		//other
 		GameManager _gm;
+		GameState _gameState;
 		Planet _selectedPlanet;
 		//Widgets often reused
 		AnimatedBackground _animatedBackground;
@@ -39,6 +40,7 @@ class Play : AppFrame {
 
 	void initialiseObjects() {
 		_gm = new GameManager();
+		_gameState = _gm.state;
 		_mainContainer = childById("verticalContainer").childById("horizontalContainer");
 		_playerStatsContainer = _mainContainer.childById("vr1").childById("hr1");
 		_planetInfoContainer = _mainContainer.childById("rvp").childById("hr2").childById("vr2");
@@ -47,15 +49,15 @@ class Play : AppFrame {
 		_solAdapter = new WidgetListAdapter();
 		(cast(ListWidget)_playersPlanetOptions.childById("shipOrdersList")).ownAdapter = _solAdapter;
 		//set camera positions
-		float tempX = _gm.state.players[0].planets(_gm.state.map.planets)[0].position.x;
-		float tempY = _gm.state.players[0].planets(_gm.state.map.planets)[0].position.y;
+		float tempX = _gameState.human.planets(_gameState.map.planets)[0].position.x;
+		float tempY = _gameState.human.planets(_gameState.map.planets)[0].position.y;
 		_cameraPosition = Vector2d(tempX - _mainContainer.width / 2, tempY - _mainContainer.height / 2);
 		_endPosition = _cameraPosition.dup;
 		debug {
 			writefln("camera initial position: %s %s", tempX, tempY);
 		}
 		//set background
-		_animatedBackground = new AnimatedBackground(&_cameraPosition, _gm.state);
+		_animatedBackground = new AnimatedBackground(&_cameraPosition, _gameState);
 		_drawableRef = _animatedBackground;
 	}
 	~this(){
@@ -65,8 +67,11 @@ class Play : AppFrame {
 	/** Assigns functions to buttons **/
 	private void assignButtonsActions(){
 		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
+		Widget inhabitButton = _planetInfoContainer.childById("inhabitButton");
+		Widget attackButton = _planetInfoContainer.childById("attackButton");
 		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
 		Widget orderMilShipBtn = _planetInfoContainer.childById("orderMilitaryShip");
+		Widget orderInhShipBtn = _planetInfoContainer.childById("orderInhabitShip");
 		//Assign
 		mouseEvent = &handleMouseEvent;
 		keyEvent = delegate (Widget source, KeyEvent event) {
@@ -81,6 +86,26 @@ class Play : AppFrame {
 			_gm.endTurn();
 			return true;
 		};
+		inhabitButton.click = delegate (Widget source) {
+			if(_gameState.human.inhabitationShips.length < 1){
+				window.removePopup(_currentPopup);
+				string title = "Inhabitation ship needed";
+				string message = "You need inhabitation ship to inhabit a planet\n" ~ 
+					"Order production of inhabitation ship on one of your planets\n" ~
+					"Production uses resources otherwise spent on food production!";
+				_currentPopup = window.showPopup(infoPopup(title, message), this);
+			} else {
+				//TODO: check correctness of this function
+				_selectedPlanet.setOwner(_gameState.human);
+				_selectedPlanet.resetPopulation();
+				updatePlanetInfo(_selectedPlanet);
+			}
+			return true;
+		};
+		attackButton.click = delegate (Widget source) {
+			//TODO: add options for attacking planet
+			return true;
+		};
 		convertUnitsButton.click = delegate (Widget source) {
 			window.removePopup(_currentPopup);
 			_currentPopup = window.showPopup(convertUnitsPopup, this);
@@ -93,10 +118,19 @@ class Play : AppFrame {
 				string message =
 					"Convert civil units of the selected planet into military units first.\n" ~
 					"Military units can then be loaded onto a ship.";
-				_currentPopup = window.showPopup(infoPopup(title, message));
+				_currentPopup = window.showPopup(infoPopup(title, message), this);
 			} else {
 				_currentPopup = window.showPopup(orderMilitaryShipPopup(), this);
 			}
+			return true;
+		};
+		orderInhShipBtn.click = delegate (Widget source) {
+			_selectedPlanet.addShipOrder(ShipType.Inhabitation);
+			updatePlanetInfo(_selectedPlanet);
+			window.removePopup(_currentPopup);
+			string title = "Done!";
+			string message = "One inhabitation ship has been order to be produced on planet " ~ _selectedPlanet.name;
+			_currentPopup = window.showPopup(infoPopup(title, message), this);
 			return true;
 		};
 	}
@@ -108,7 +142,7 @@ class Play : AppFrame {
 					_cameraPosition.x + event.x,
 					_cameraPosition.y + event.y);
 				debug writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
-				_selectedPlanet = _gm.state.map.collides(relativeMousePosition, 1, 0);
+				_selectedPlanet = _gameState.map.collides(relativeMousePosition, 1, 0);
 				_animatedBackground.setSelectedPlanet(_selectedPlanet);
 				updatePlanetInfo(_selectedPlanet);
 			}
@@ -132,15 +166,15 @@ class Play : AppFrame {
 			if(_cameraPosition.x < 0 - (width / 2)) {
 				_cameraPosition.x = 0 - (width / 2);
 			}
-			else if(_cameraPosition.x > _gm.state.map.size + (width / 2)) {
-				_cameraPosition.x = to!int(_gm.state.map.size) + (width / 2);
+			else if(_cameraPosition.x > _gameState.map.size + (width / 2)) {
+				_cameraPosition.x = to!int(_gameState.map.size) + (width / 2);
 			}
 			//check y boundaries
 			if(_cameraPosition.y < 0 - (height / 2)) {
 				_cameraPosition.y = 0 - (height / 2);
 			}
-			else if(_cameraPosition.y > _gm.state.map.size + (height / 2)) {
-				_cameraPosition.y = to!int(_gm.state.map.size) + (height / 2);
+			else if(_cameraPosition.y > _gameState.map.size + (height / 2)) {
+				_cameraPosition.y = to!int(_gameState.map.size) + (height / 2);
 			}
 			//writefln("X: %s Y: %s", _cameraPosition.x, _cameraPosition.y);
 		}
@@ -152,10 +186,9 @@ class Play : AppFrame {
 	/** 
 	 * Widgets and layouts sections
 	 **/
-
 	/** Returns widget for putting an order of ship on the planet **/
 	private Widget orderMilitaryShipPopup(){
-		Widget popupWindow = defaultPopup("Order ship production");
+		Widget popupWindow = defaultPopup("Order military ship production");
 		//Information table
 		TableLayout infoTable = new TableLayout();
 		infoTable.colCount(2);
@@ -216,7 +249,7 @@ class Play : AppFrame {
 		popupWindow.addChild(buttonContainer);
 		return popupWindow;
 	}
-	/** Returns widget for converting units popup **/
+	/** Returns popup widget for converting units **/
 	private Widget convertUnitsPopup(){
 		Widget popupWindow = defaultPopup("Convert civil units into military");
 		//Conversion info
@@ -304,16 +337,16 @@ class Play : AppFrame {
 		VerticalLayout layout = new VerticalLayout;
 		//Title bar
 		HorizontalLayout titleBar = new HorizontalLayout();
-		titleBar.layoutWidth = FILL_PARENT;
-		titleBar.backgroundColor = 0x404040;
+		titleBar.layoutWidth(FILL_PARENT);
+		titleBar.backgroundColor(0x404040);
 		TextWidget titleText = new TextWidget(null, to!dstring(title));
-		titleText.fontSize = 17;
-		titleText.textColor = 0xFFFFFF;
+		titleText.fontSize(17);
+		titleText.textColor(0xFFFFFF);
 		titleBar.addChild(titleText);
 		//Layout properties
 		layout.addChild(titleBar);
 		layout.padding(0);
-		layout.minWidth = 400;
+		layout.minWidth(400);
 		layout.backgroundColor(0x4B4B4B);
 		return layout;
 	}
@@ -321,6 +354,8 @@ class Play : AppFrame {
 		Widget popup = defaultPopup(title);
 		MultilineTextWidget msg = new MultilineTextWidget(null, to!dstring(message));
 		msg.padding(10);
+		msg.fontSize(15);
+		msg.textColor(0xFFFFFF);
 		HorizontalLayout btnCont = new HorizontalLayout();
 		btnCont.layoutWidth(FILL_PARENT);
 		Button btn = new Button(null, "OK"d);
@@ -447,6 +482,13 @@ class Play : AppFrame {
 									padding: 10
 									margins: 10
 								}
+
+								Button {
+									id: attackButton
+									text: "Attack"
+									padding: 10
+									margins: 10
+								}
 								VerticalLayout {
 									id: ppo
 									Button {
@@ -499,7 +541,7 @@ class Play : AppFrame {
 		return parseML(layout);
 	}
 
-
+	/** Updates information in right hand panel about selected planet **/
 	void updatePlanetInfo(Planet planet) {
 		window.removePopup(_currentPopup);
 		if(planet) {
@@ -509,9 +551,10 @@ class Play : AppFrame {
 			_planetInfoContainer.childById("militaryUnits").text = to!dstring(planet.militaryUnits);
 			_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
 			_planetInfoContainer.childById("planetName").textFlags = TextFlag.Underline;
-			if(planet.owner == _gm.state.players[0]) {
+			if(planet.owner == _gameState.human) {
 				_playersPlanetOptions.visibility(Visibility.Visible);
-				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Gone;
+				_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Gone);
+				_planetInfoContainer.childById("attackButton").visibility(Visibility.Gone);
 				_solAdapter.clear();
 				if(planet.shipOrders.length > 0) {
 					_playersPlanetOptions.childById("olt").visibility(Visibility.Visible);
@@ -542,9 +585,16 @@ class Play : AppFrame {
 					_playersPlanetOptions.childById("olt").visibility(Visibility.Gone);
 				}
 
+			}
+			else if(planet.owner == _gameState.ai){
+				_playersPlanetOptions.visibility(Visibility.Gone);
+				_planetInfoContainer.childById("attackButton").visibility(Visibility.Visible);
+				_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Gone);
+
 			} else {
 				_playersPlanetOptions.visibility(Visibility.Gone);
-				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Visible;
+				_planetInfoContainer.childById("attackButton").visibility(Visibility.Gone);
+				_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Visible);
 			}
 		}
 		else {
@@ -552,11 +602,11 @@ class Play : AppFrame {
 		}
 
 	}
+	/** Updates information, about player, in the overhead panel **/
 	void updatePlayerStats() {
-		Player human = _gm.state.players[0];
 		uint populationTotal = 0;
 		uint militaryUnitTotal = 0;
-		foreach(Planet p; human.planets(_gm.state.map.planets)) {
+		foreach(Planet p; _gameState.human.planets(_gameState.map.planets)) {
 			populationTotal += p.populationSum;
 			militaryUnitTotal += p.militaryUnits;
 		}
@@ -609,9 +659,12 @@ class AnimatedBackground : Drawable {
 				int relY = to!int(_selected.position.y - _cameraPosition.y);
 				int x = to!int(planet.position.x - _cameraPosition.x);
 				int y = to!int(planet.position.y - _cameraPosition.y);
-				uint colour = 0x408000;
-				if(planet.owner && planet.owner == _state.players[0]) {
-					colour = 0xe60000;
+				uint colour = 0x0033cc;
+				if(planet.owner){
+					if(planet.owner == _state.human)
+						colour = 0x006600;
+					else
+						colour = 0xe60000;
 				}
 				buf.drawLine(Point(x-1,y), Point(relX-1, relY), colour);
 				buf.drawLine(Point(x,y-1), Point(relX, relY-1), colour);

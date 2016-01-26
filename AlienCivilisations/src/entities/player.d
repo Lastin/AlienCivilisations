@@ -38,6 +38,25 @@ class Player {
 		return _ships;
 	}
 
+	@property MilitaryShip[] militaryShips(){
+		MilitaryShip[] milShips;
+		foreach(Ship ship; _ships){
+			if(auto casted = cast(MilitaryShip)ship){
+				milShips ~= casted;
+			}
+		}
+		return milShips;
+	}
+	@property InhabitationShip[] inhabitationShips(){
+		InhabitationShip[] inhShips;
+		foreach(Ship ship; _ships){
+			if(auto casted = cast(InhabitationShip)ship){
+				inhShips ~= casted;
+			}
+		}
+		return inhShips;
+	}
+
 	void addShip(Ship ship){
 		_ships ~= ship;
 	}

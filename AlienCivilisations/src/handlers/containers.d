@@ -49,6 +49,12 @@ class GameState {
 	@property Player currentPlayer() {
 		return _players[_queuePosition];
 	}
+	@property Player human(){
+		return _players[0];
+	}
+	@property AI ai(){
+		return cast(AI)_players[1];
+	}
 	/** Moves queue position to next available position **/
 	void moveQPosition() {
 		if(++_queuePosition == _players.length){
@@ -77,12 +83,11 @@ class GameState {
 
 	private Player[] duplicatePlayers() {
 		Player[] duplicates;
+		//TODO: add duplication for AI
 		foreach(Player origin; _players) {
-			duplicates ~= new Player(
-				origin.name,
-				origin.knowledgeTree.dup,
-				duplicateShips(origin.ships)
-				);
+			duplicates ~= new Player(origin.name,
+									 origin.knowledgeTree.dup,
+									 duplicateShips(origin.ships));
 		}
 		return duplicates;
 	}
