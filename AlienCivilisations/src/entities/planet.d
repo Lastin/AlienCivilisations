@@ -34,11 +34,12 @@ class Planet {
 	}
 	/** (Cloning) Constructor for creating planet from existing values **/
 	this(string name, Vector2d position, float radius, bool breathableAtmosphere,
-		uint[8] population, double food, uint militaryUnits) {
+		uint[8] population, double food, uint militaryUnits, Ship[] shipOrders) {
 		this(name, position, radius, breathableAtmosphere);
 		_population = population;
 		_food = food;
 		_militaryUnits = militaryUnits;
+		_shipOrders = shipOrders;
 	}
 
 	@property Vector2d position() {
@@ -71,6 +72,10 @@ class Planet {
 	}
 	@property uint[8] population() {
 		return _population;
+	}
+
+	@property Ship[] shipOrders() {
+		return _shipOrders;
 	}
 
 	override public string toString() {
@@ -200,18 +205,32 @@ class Planet {
 
 	private double produceShips(double workforce) {
 		double productionCost = POPULATION_CONSTANT / 2;
-		foreach(Ship s; _shipOrders){
-			if(workforce < productionCost){
+		foreach(Ship s; _shipOrders) {
+			if(workforce < productionCost) {
 				return workforce;
 			}
 			workforce -= productionCost;
-			s.complete();
+			_owner.addShip(s);
 			_shipOrders = _shipOrders[1 .. $];
 		}
 		return workforce;
 	}
 
-	void addShipOrder(Ship ship){
-		_shipOrders ~= ship;
+	void addShipOrder(ShipType type, int units = 0) {
+		double eneEff = _owner.knowledgeTree.branch(BranchName.Energy).effectiveness;
+		double sciEff = _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
+		if(type == ShipType.Military) {
+			debug {
+				writefln("Added order for new military ship with %s units", units);
+				if(units > _militaryUnits){
+					throw new Exception("Number of requested units is larget than available on a planet");
+				}
+			}
+			_militaryUnits -= units;
+			_shipOrders ~= new MilitaryShip(eneEff, sciEff, units);
+		} else {
+			debug writeln("Added new inhabitation ship to the queue");
+			_shipOrders ~= new InhabitationShip(eneEff, sciEff);
+		}
 	}
 }

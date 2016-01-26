@@ -16,7 +16,7 @@ class Play : AppFrame {
 		Vector2d _startPosition;
 		Vector2d _endPosition;
 		Vector2d _cameraPosition;
-		//
+		//other
 		GameManager _gm;
 		Planet _selectedPlanet;
 		//Widgets often reused
@@ -66,7 +66,7 @@ class Play : AppFrame {
 	private void assignButtonsActions(){
 		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
 		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
-		Widget orderShipButton = _planetInfoContainer.childById("orderMilitaryShip");
+		Widget orderMilShipBtn = _planetInfoContainer.childById("orderMilitaryShip");
 		//Assign
 		mouseEvent = &handleMouseEvent;
 		keyEvent = delegate (Widget source, KeyEvent event) {
@@ -86,9 +86,17 @@ class Play : AppFrame {
 			_currentPopup = window.showPopup(convertUnitsPopup, this);
 			return true;
 		};
-		orderShipButton.click = delegate (Widget source) {
+		orderMilShipBtn.click = delegate (Widget source) {
 			window.removePopup(_currentPopup);
-			_currentPopup = window.showPopup(orderMilitaryShipPopup(), this);
+			if(_selectedPlanet.militaryUnits < 1){
+				string title = "Insufficient military units";
+				string message =
+					"Convert civil units of the selected planet into military units first.\n" ~
+					"Military units can then be loaded onto a ship.";
+				_currentPopup = window.showPopup(infoPopup(title, message));
+			} else {
+				_currentPopup = window.showPopup(orderMilitaryShipPopup(), this);
+			}
 			return true;
 		};
 	}
@@ -167,10 +175,8 @@ class Play : AppFrame {
 		slider.position = 1;
 		slider.pageSize(1);
 		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
-			double percent = (source.position + 1.0) / 100;
+			double percent = (slider.position + 1.0) / 100;
 			int result = to!int(_selectedPlanet.militaryUnits * percent);
-			debug writeln(percent);
-			debug writeln(result);
 			total.text = to!dstring(result);
 			return true;
 		};
@@ -190,8 +196,12 @@ class Play : AppFrame {
 		buttonContainer.addChild(apply);
 		buttonContainer.addChild(cancel);
 		apply.click = delegate(Widget action){
-
 			//TODO: add action to order ship
+			double percent = (slider.position + 1.0) / 100;
+			int result = to!int(_selectedPlanet.militaryUnits * percent);
+			_selectedPlanet.addShipOrder(ShipType.Military, result);
+			updatePlanetInfo(_selectedPlanet);
+			updatePlayerStats();
 			return true;
 		};
 		cancel.click = delegate(Widget action){
@@ -306,6 +316,25 @@ class Play : AppFrame {
 		layout.minWidth = 400;
 		layout.backgroundColor(0x4B4B4B);
 		return layout;
+	}
+	private Widget infoPopup(string title, string message){
+		Widget popup = defaultPopup(title);
+		MultilineTextWidget msg = new MultilineTextWidget(null, to!dstring(message));
+		msg.padding(10);
+		HorizontalLayout btnCont = new HorizontalLayout();
+		btnCont.layoutWidth(FILL_PARENT);
+		Button btn = new Button(null, "OK"d);
+		btn.padding(10);
+		btn.click = delegate (Widget source) {
+			window.removePopup(_currentPopup);
+			return true;
+		};
+		btnCont.addChild(new HSpacer());
+		btnCont.addChild(btn);
+		popup.addChild(msg);
+		popup.addChild(new VSpacer());
+		popup.addChild(btnCont);
+		return popup;
 	}
 	private Widget getLayout(){
 		auto layout =
@@ -460,6 +489,7 @@ class Play : AppFrame {
 					Button {
 						id: knowledgeTreeButton
 						text: "KNOWLEDGE TREE"
+						backgroundColor: 0x80969696
 						padding: 20
 						margins: 10
 					}
@@ -482,6 +512,10 @@ class Play : AppFrame {
 			if(planet.owner == _gm.state.players[0]) {
 				_playersPlanetOptions.visibility(Visibility.Visible);
 				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Gone;
+				_solAdapter.clear();
+				foreach(Ship ship; planet.shipOrders){
+					_solAdapter.add(new Button(null, "Ship order"));
+				}
 			} else {
 				_playersPlanetOptions.visibility(Visibility.Gone);
 				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Visible;

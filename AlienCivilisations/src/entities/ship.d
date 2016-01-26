@@ -6,26 +6,20 @@ import std.conv;
 
 enum int MULTIPLIER = 1000;
 
+enum ShipType : ubyte {
+	Military,
+	Inhabitation
+}
+
 abstract class Ship {
 	private {
-		bool _completed;
 		double _eneEff;
 		double _sciEff;
 	}
 
-	this(bool completed = false, double eneEff = 1, double sciEff = 1){
-		_completed = completed;
+	this(double eneEff = 1, double sciEff = 1){
 		_eneEff = eneEff;
 		_sciEff = sciEff;
-	}
-
-	/** Sets _completed property to true **/
-	void complete() {
-		_completed = true;
-	}
-	/** Returns _completed variable **/
-	@property bool completed() const {
-		return _completed;
 	}
 	@property uint capacity() const {
 		return to!int(MULTIPLIER * _eneEff * _sciEff);
@@ -36,8 +30,8 @@ abstract class Ship {
 class MilitaryShip : Ship {
 	private int _onboard;
 	/** Takes number onboard  **/
-	this(bool _completed = false, double eneEff = 1, double sciEff = 1, int onboard = 1) {
-		super(completed, eneEff, sciEff);
+	this(double eneEff = 1, double sciEff = 1, int onboard = 1) {
+		super(eneEff, sciEff);
 		_onboard = onboard;
 	}
 	@property bool empty() const {
@@ -56,15 +50,15 @@ class MilitaryShip : Ship {
 		return 0;
 	}
 	MilitaryShip dup() const {
-		return new MilitaryShip(_completed, _eneEff, _sciEff, onboard);
+		return new MilitaryShip(_eneEff, _sciEff, onboard);
 	}
 }
 
 class InhabitationShip : Ship {
-	this(bool _completed = false,  double eneEff = 1, double sciEff = 1) {
-		super(completed, eneEff, sciEff);
+	this(double eneEff = 1, double sciEff = 1) {
+		super(eneEff, sciEff);
 	}
 	InhabitationShip dup() const {
-		return new InhabitationShip(_completed, _eneEff, _sciEff);
+		return new InhabitationShip(_eneEff, _sciEff);
 	}
 }

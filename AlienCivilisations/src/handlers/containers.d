@@ -97,7 +97,8 @@ class GameState {
 			uint[8] pop = origin.population.dup;
 			double food = origin.food;
 			uint mu = origin.militaryUnits;
-			duplicates ~= new Planet(name, pos, r, ba, pop, food, mu);
+			Ship[] so = origin.shipOrders.dup;
+			duplicates ~= new Planet(name, pos, r, ba, pop, food, mu, so);
 			duplicates[$].setOwner(newOwner(origin, playersDup));
 		}
 		return duplicates;

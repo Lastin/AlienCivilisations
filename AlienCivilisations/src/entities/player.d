@@ -33,19 +33,13 @@ class Player {
 		}
 		return owned;
 	}
-	/** Returns all complete and not used ships which belong to p**/
-	@property Ship[] availableShips() {
-		Ship[] available;
-		foreach(Ship s; _ships){
-			if(s.completed){
-				available ~= s;
-			}
-		}
-		return available;
-	}
 	/** Returns all ships **/
 	@property Ship[] ships(){
 		return _ships;
+	}
+
+	void addShip(Ship ship){
+		_ships ~= ship;
 	}
 	/** Function executing actions on the end of the turn **/
 	void completeTurn() {
