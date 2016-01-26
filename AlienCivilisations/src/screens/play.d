@@ -140,34 +140,34 @@ class Play : AppFrame {
 		TableLayout infoContainer = new TableLayout();
 		infoContainer.padding(10);
 		infoContainer.colCount(2);
-		infoContainer.layoutWidth = FILL_PARENT;
+		infoContainer.layoutWidth(FILL_PARENT);
 		//Row 1
 		TextWidget tw1 = new TextWidget(null, "Convert percent:"d);
 		tw1.textFlags(TextFlag.Underline);
 		tw1.fontWeight(FontWeight.Bold);
-		tw1.fontSize = 15;
-		tw1.textColor = 0xFFFFFF;
+		tw1.fontSize(15);
+		tw1.textColor(0xFFFFFF);
 		TextWidget perc = new TextWidget(null, "1%"d);
-		perc.fontSize = 15;
-		perc.textColor = 0xFFFFFF;
+		perc.fontSize(15);
+		perc.textColor(0xFFFFFF);
 		//Row 2
 		TextWidget tw2 = new TextWidget(null, "Military units:"d);
 		tw2.textFlags(TextFlag.Underline);
 		tw2.fontWeight(FontWeight.Bold);
-		tw2.fontSize = 15;
-		tw2.textColor = 0xFFFFFF;
+		tw2.fontSize(15);
+		tw2.textColor(0xFFFFFF);
 		TextWidget milUnits = new TextWidget(null, to!dstring(_selectedPlanet.percentToNumber(1)));
-		milUnits.fontSize = 15;
-		milUnits.textColor = 0xFFFFFF;
+		milUnits.fontSize(15);
+		milUnits.textColor(0xFFFFFF);
 		//Row 3
 		TextWidget tw3 = new TextWidget(null, "Civil units left on planet:"d);
 		tw3.textFlags(TextFlag.Underline);
 		tw3.fontWeight(FontWeight.Bold);
-		tw3.fontSize = 15;
-		tw3.textColor = 0xFFFFFF;
+		tw3.fontSize(15);
+		tw3.textColor(0xFFFFFF);
 		TextWidget civLeft = new TextWidget(null, to!dstring(_selectedPlanet.populationSum - _selectedPlanet.percentToNumber(1)));
-		civLeft.fontSize = 15;
-		civLeft.textColor = 0xFFFFFF;
+		civLeft.fontSize(15);
+		civLeft.textColor(0xFFFFFF);
 		//add to table
 		infoContainer.addChild(tw1);
 		infoContainer.addChild(perc);
@@ -177,7 +177,7 @@ class Play : AppFrame {
 		infoContainer.addChild(civLeft);
 		//Slider and its actions
 		ScrollBar slider = new ScrollBar(null, Orientation.Horizontal);
-		slider.position = 1;
+		slider.position(0);
 		slider.pageSize(1);
 		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
 			perc.text = to!dstring(source.position+1) ~ "%"d;
@@ -347,23 +347,37 @@ class Play : AppFrame {
 									padding: 10
 									margins: 10
 								}
-								Button {
-									id: convertUnitsButton
-									text: "Convert units"
-									padding: 10
-									margins: 10
-								}
-								Button {
-									id: orderMilitaryShip
-									text: "Order military ship"
-									padding: 10
-									margins: 10
-								}
-								Button {
-									id: orderInhabitShip
-									text: "Order inhabitation ship"
-									padding: 10
-									margins: 10
+								VerticalLayout {
+									id: ppo
+									Button {
+										id: convertUnitsButton
+										text: "Convert units"
+										padding: 10
+										margins: 10
+									}
+									Button {
+										id: orderMilitaryShip
+										text: "Order military ship"
+										padding: 10
+										margins: 10
+									}
+									Button {
+										id: orderInhabitShip
+										text: "Order inhabitation ship"
+										padding: 10
+										margins: 10
+									}
+									TextWidget {
+										fontWeight: 800
+										
+										textColor: white
+										text: "Ship orders"
+									}
+									ListWidget {
+										id: shipOrdersList
+										layoutHeight: 200
+										padding: 5
+									}
 								}
 							}
 						}
@@ -372,38 +386,47 @@ class Play : AppFrame {
 				}
 				VSpacer{}
 				HorizontalLayout {
-					id: bottomPanel
-					layoutWidth: fill
-					VerticalLayout {
-						HorizontalLayout {
-							Button {
-								id: knowledgeTreeButton
-								text: "KNOWLEDGE TREE"
-								padding: 20
-								margins: 10
-							}
-						}
-					}
-					ListWidget {
+					Button {
+						id: knowledgeTreeButton
+						text: "KNOWLEDGE TREE"
+						padding: 20
+						margins: 10
 					}
 				}
 			}
 		};
 		auto parsed = parseML(layout);
-		ListWidget list = new ListWidget(null, Orientation.Vertical);
-		//TODO: figure out how to add list adapter in ML
-		/*WidgetListAdapter listAdapter = new WidgetListAdapter();
+		Widget rightPanel = parsed.childById("rightVerticalPanel");
+		ListWidget list = cast(ListWidget)rightPanel.childById("shipOrdersList");
+		WidgetListAdapter listAdapter = new WidgetListAdapter();
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
+		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
 		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
 		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
 		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
 		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
 		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
 		list.ownAdapter = listAdapter;
-		list.backgroundColor(0x80969696);
-		parsed.childById("bottomPanel").addChild(new HSpacer());
-		parsed.childById("bottomPanel").addChild(list);
-		parsed.childById("bottomPanel").addChild(new HSpacer());
-		parsed.childById("bottomPanel").addChild(new HSpacer());*/
 		return parsed;
 	}
 

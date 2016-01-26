@@ -52,9 +52,8 @@ class Menu : HorizontalLayout {
 	}
 
 	private void setLayout() {
-		layoutWidth = FILL_PARENT;
-		layoutHeight = FILL_PARENT;
-		alignment = Align.Center;
+		layoutWidth(FILL_PARENT);
+		layoutHeight(FILL_PARENT);
 		addChild(new HSpacer());
 		auto layout =
 		q{
