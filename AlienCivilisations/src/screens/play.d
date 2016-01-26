@@ -468,8 +468,8 @@ class Play : AppFrame {
 										margins: 10
 									}
 									TextWidget {
+										id: olt
 										fontWeight: 800
-										
 										textColor: white
 										text: "Ship orders"
 									}
@@ -513,9 +513,35 @@ class Play : AppFrame {
 				_playersPlanetOptions.visibility(Visibility.Visible);
 				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Gone;
 				_solAdapter.clear();
-				foreach(Ship ship; planet.shipOrders){
-					_solAdapter.add(new Button(null, "Ship order"));
+				if(planet.shipOrders.length > 0) {
+					_playersPlanetOptions.childById("olt").visibility(Visibility.Visible);
+					foreach(Ship ship; planet.shipOrders) {
+						HorizontalLayout sohl = new HorizontalLayout();
+						sohl.padding(2);
+						sohl.margins(2);
+						sohl.layoutWidth(FILL_PARENT);
+						if(auto ms = cast(MilitaryShip)ship){
+							VerticalLayout sovl = new VerticalLayout();
+							sovl.addChild(new TextWidget(null, "Military ship"d).textColor(0xFFFFFF));
+							sovl.addChild(new TextWidget(null, "Units: " ~ to!dstring(ms.onboard)).textColor(0xFFFFFF));
+							sohl.addChild(sovl);
+						} else {
+							sohl.addChild(new TextWidget(null, "Inhabitation ship"d));
+						}
+						sohl.addChild(new HSpacer());
+						Button cancelBtn = new Button(null, "Cancel"d);
+						cancelBtn.click = delegate (Widget source) {
+							writeln("clicked order cancelation");
+							return true;
+						};
+						sohl.addChild(cancelBtn);
+						sohl.backgroundColor(0x737373);
+						_solAdapter.add(sohl);
+					}
+				} else {
+					_playersPlanetOptions.childById("olt").visibility(Visibility.Gone);
 				}
+
 			} else {
 				_playersPlanetOptions.visibility(Visibility.Gone);
 				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Visible;
