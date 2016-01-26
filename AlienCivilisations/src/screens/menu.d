@@ -26,6 +26,7 @@ class Menu : HorizontalLayout {
 			};
 			menuButton.click = delegate (Widget source) {
 				window.mainWidget = new Menu();
+				play.destroy();
 				return true;
 			};
 		} else {

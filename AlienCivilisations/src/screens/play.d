@@ -11,24 +11,31 @@ import src.entities.ship;
 
 class Play : AppFrame {
 	private {
+		int _width = 100;
+		int _height = 100;
+		//Vectors used for camera
 		bool _middleDown = false;
 		Vector2d _startPosition;
 		Vector2d _endPosition;
 		Vector2d _cameraPosition;
+		//
 		GameManager _gm;
-		AnimatedDrawable _animation;
+		Planet _selectedPlanet;
+		//Widgets often reused
+		AnimatedBackground _animatedBackground;
 		DrawableRef _drawableRef;
 		Widget _planetInfoContainer;
 		Widget _playerStatsContainer;
-		Planet _selectedPlanet;
 		PopupWidget _currentPopup;
+		Widget _mainContainer;
 	}
 
 	this(){
+		addChild(makeLayout());
+		initialiseObjects();
 		mouseEvent = &handleMouseEvent;
 		keyEvent = &handleKeyEvent;
-		initialise();
-		addChild(makeLayout());
+
 		_planetInfoContainer = childById("verticalContainer").childById("horizontalContainer").
 			childById("rightVerticalPanel").childById("hr2").childById("vr2");
 		_planetInfoContainer.visibility = Visibility.Invisible;
@@ -38,11 +45,23 @@ class Play : AppFrame {
 		assignButtonsActions();
 	}
 
+	~this(){
+		_animatedBackground.destroy();
+		super.destroy();
+	}
+
+	override protected void initialize() {
+		super.initialize;
+		if(!window){
+			writeln("window is null");
+		}
+
+	}
+
 	bool endTurn(Widget source) {
 		_gm.endTurn();
 		return true;
 	}
-
 	bool handleKeyEvent(Widget source, KeyEvent event){
 		if(event.action == KeyAction.KeyDown &&
 			event.keyCode == KeyCode.ESCAPE) {
@@ -51,7 +70,6 @@ class Play : AppFrame {
 		}
 		return false;
 	}
-
 	/** Assigns functions to buttons **/
 	private void assignButtonsActions(){
 		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
@@ -70,7 +88,6 @@ class Play : AppFrame {
 			return true;
 		};
 	}
-
 	/** Returns widget for putting an order of ship on the planet **/
 	Widget orderMilitaryShipPopup(){
 		Widget popupWindow = defaultPopup("Order ship production");
@@ -132,7 +149,6 @@ class Play : AppFrame {
 		popupWindow.addChild(buttonContainer);
 		return popupWindow;
 	}
-
 	/** Returns widget for converting units popup **/
 	Widget convertUnitsPopup(){
 		Widget popupWindow = defaultPopup("Convert civil units into military");
@@ -217,7 +233,6 @@ class Play : AppFrame {
 		popupWindow.addChild(buttonContainer);
 		return popupWindow;
 	}
-
 	Widget defaultPopup(string title){
 		VerticalLayout layout = new VerticalLayout;
 		//Title bar
@@ -235,7 +250,6 @@ class Play : AppFrame {
 		layout.backgroundColor(0x4B4B4B);
 		return layout;
 	}
-
 	Widget makeLayout(){
 		auto layout =
 			q{
@@ -429,20 +443,16 @@ class Play : AppFrame {
 		list.ownAdapter = listAdapter;
 		return parsed;
 	}
-
-	void initialise() {
-		layoutWidth = FILL_PARENT;
-		layoutHeight = FILL_PARENT;
+	void initialiseObjects() {
 		_gm = new GameManager();
 		float tempX = _gm.state.players[0].planets(_gm.state.map.planets)[0].position.x;
 		float tempY = _gm.state.players[0].planets(_gm.state.map.planets)[0].position.y;
-		_cameraPosition = Vector2d(tempX - width / 2, tempY - height / 2);
+		_cameraPosition = Vector2d(tempX - _width / 2, tempY - _height / 2);
 		debug writefln("camera initial position: %s %s", tempX, tempY);
-		_endPosition = Vector2d(tempX - width / 2, tempY - height / 2);
-		_animation = new AnimatedDrawable(&_cameraPosition, _gm.state);
-		_drawableRef = _animation;
+		_endPosition = _cameraPosition.dup;
+		_animatedBackground = new AnimatedBackground(&_cameraPosition, _gm.state);
+		_drawableRef = _animatedBackground;
 	}
-
 	void updatePlanetInfo(Planet planet) {
 		window.removePopup(_currentPopup);
 		if(planet) {
@@ -465,7 +475,6 @@ class Play : AppFrame {
 		}
 
 	}
-	
 	void updatePlayerStats() {
 		Player human = _gm.state.players[0];
 		uint populationTotal = 0;
@@ -477,7 +486,6 @@ class Play : AppFrame {
 		_playerStatsContainer.childById("totalPopulation").text = to!dstring(populationTotal);
 		_playerStatsContainer.childById("totalMilitaryUnits").text = to!dstring(militaryUnitTotal);
 	}
-
 	bool handleMouseEvent(Widget source, MouseEvent event) {
 		if(event.action == MouseAction.ButtonDown) {
 			if(event.button == MouseButton.Left) {
@@ -486,7 +494,7 @@ class Play : AppFrame {
 					_cameraPosition.y + event.y);
 				debug writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
 				_selectedPlanet = _gm.state.map.collides(relativeMousePosition, 1, 0);
-				_animation.setSelectedPlanet(_selectedPlanet);
+				_animatedBackground.setSelectedPlanet(_selectedPlanet);
 				updatePlanetInfo(_selectedPlanet);
 			}
 		}
@@ -525,7 +533,6 @@ class Play : AppFrame {
 		}
 		return true;
 	}
-
 	override void animate(long interval) {
 		//_animation.animate(interval);
 		invalidate();
@@ -536,7 +543,7 @@ class Play : AppFrame {
 	}
 }
 
-class AnimatedDrawable : Drawable {
+class AnimatedBackground : Drawable {
 	private DrawableRef[] _background;
 	private Vector2d* _cameraPosition;
 	private Planet[] _planets;
