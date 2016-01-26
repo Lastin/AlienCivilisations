@@ -26,7 +26,6 @@ class Menu : HorizontalLayout {
 			};
 			menuButton.click = delegate (Widget source) {
 				window.mainWidget = new Menu();
-				play.destroy();
 				return true;
 			};
 		} else {
@@ -36,6 +35,7 @@ class Menu : HorizontalLayout {
 			loadButton.padding(padding).margins(10).fontSize(20);
 			playButton.click = delegate (Widget source) {
 				//Thread play = new Thread(&loadPlay).start();
+				//nplay.initialiseObjects();
 				window.mainWidget = new Play();
 				return true;
 			};

@@ -11,8 +11,6 @@ import src.entities.ship;
 
 class Play : AppFrame {
 	private {
-		int _width = 100;
-		int _height = 100;
 		//Vectors used for camera
 		bool _middleDown = false;
 		Vector2d _startPosition;
@@ -24,51 +22,45 @@ class Play : AppFrame {
 		//Widgets often reused
 		AnimatedBackground _animatedBackground;
 		DrawableRef _drawableRef;
+		Widget _mainContainer;
 		Widget _planetInfoContainer;
 		Widget _playerStatsContainer;
+		Widget _playersPlanetOptions;
+		WidgetListAdapter _solAdapter;
 		PopupWidget _currentPopup;
-		Widget _mainContainer;
 	}
 
 	this(){
-		addChild(makeLayout());
+		addChild(getLayout());
 		initialiseObjects();
-		mouseEvent = &handleMouseEvent;
-		keyEvent = &handleKeyEvent;
-
-		_planetInfoContainer = childById("verticalContainer").childById("horizontalContainer").
-			childById("rightVerticalPanel").childById("hr2").childById("vr2");
-		_planetInfoContainer.visibility = Visibility.Invisible;
-		_playerStatsContainer = childById("verticalContainer").childById("horizontalContainer").
-			childById("vr1").childById("hr1");
-		updatePlayerStats();
 		assignButtonsActions();
+		updatePlayerStats();
 	}
 
+	void initialiseObjects() {
+		_gm = new GameManager();
+		_mainContainer = childById("verticalContainer").childById("horizontalContainer");
+		_playerStatsContainer = _mainContainer.childById("vr1").childById("hr1");
+		_planetInfoContainer = _mainContainer.childById("rvp").childById("hr2").childById("vr2");
+		_planetInfoContainer.visibility(Visibility.Invisible);
+		_playersPlanetOptions = _planetInfoContainer.childById("ppo");
+		_solAdapter = new WidgetListAdapter();
+		(cast(ListWidget)_playersPlanetOptions.childById("shipOrdersList")).ownAdapter = _solAdapter;
+		//set camera positions
+		float tempX = _gm.state.players[0].planets(_gm.state.map.planets)[0].position.x;
+		float tempY = _gm.state.players[0].planets(_gm.state.map.planets)[0].position.y;
+		_cameraPosition = Vector2d(tempX - _mainContainer.width / 2, tempY - _mainContainer.height / 2);
+		_endPosition = _cameraPosition.dup;
+		debug {
+			writefln("camera initial position: %s %s", tempX, tempY);
+		}
+		//set background
+		_animatedBackground = new AnimatedBackground(&_cameraPosition, _gm.state);
+		_drawableRef = _animatedBackground;
+	}
 	~this(){
 		_animatedBackground.destroy();
 		super.destroy();
-	}
-
-	override protected void initialize() {
-		super.initialize;
-		if(!window){
-			writeln("window is null");
-		}
-
-	}
-
-	bool endTurn(Widget source) {
-		_gm.endTurn();
-		return true;
-	}
-	bool handleKeyEvent(Widget source, KeyEvent event){
-		if(event.action == KeyAction.KeyDown &&
-			event.keyCode == KeyCode.ESCAPE) {
-				window.mainWidget = new Menu(this);
-				return true;
-		}
-		return false;
 	}
 	/** Assigns functions to buttons **/
 	private void assignButtonsActions(){
@@ -76,20 +68,85 @@ class Play : AppFrame {
 		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
 		Widget orderShipButton = _planetInfoContainer.childById("orderMilitaryShip");
 		//Assign
-		endTurnButton.click = &endTurn;
-		convertUnitsButton.click = delegate(Widget source){
+		mouseEvent = &handleMouseEvent;
+		keyEvent = delegate (Widget source, KeyEvent event) {
+			if(event.action == KeyAction.KeyDown &&
+				event.keyCode == KeyCode.ESCAPE) {
+				window.mainWidget = new Menu(this);
+				return true;
+			}
+			return false;
+		};
+		endTurnButton.click = delegate (Widget source) {
+			_gm.endTurn();
+			return true;
+		};
+		convertUnitsButton.click = delegate (Widget source) {
 			window.removePopup(_currentPopup);
 			_currentPopup = window.showPopup(convertUnitsPopup, this);
 			return true;
 		};
-		orderShipButton.click = delegate(Widget source){
+		orderShipButton.click = delegate (Widget source) {
 			window.removePopup(_currentPopup);
 			_currentPopup = window.showPopup(orderMilitaryShipPopup(), this);
 			return true;
 		};
 	}
+	/** Handles mouse movements and clicks **/
+	bool handleMouseEvent(Widget source, MouseEvent event) {
+		if(event.action == MouseAction.ButtonDown) {
+			if(event.button == MouseButton.Left) {
+				auto relativeMousePosition = Vector2d(
+					_cameraPosition.x + event.x,
+					_cameraPosition.y + event.y);
+				debug writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
+				_selectedPlanet = _gm.state.map.collides(relativeMousePosition, 1, 0);
+				_animatedBackground.setSelectedPlanet(_selectedPlanet);
+				updatePlanetInfo(_selectedPlanet);
+			}
+		}
+		if(event.button == MouseButton.Middle){
+			if(event.action == MouseAction.ButtonUp) {
+				_middleDown = false;
+				_endPosition.x = _cameraPosition.x;
+				_endPosition.y = _cameraPosition.y;
+			}
+			else if(event.action == MouseAction.ButtonDown) {
+				_middleDown = true;
+				_startPosition.x = event.x;
+				_startPosition.y = event.y;
+			}
+		}
+		else if(_middleDown && event.action == MouseAction.Move) {
+			_cameraPosition.x = to!int(_endPosition.x + (_startPosition.x - event.x));
+			_cameraPosition.y = to!int(_endPosition.y + (_startPosition.y - event.y));
+			//check x boundaries
+			if(_cameraPosition.x < 0 - (width / 2)) {
+				_cameraPosition.x = 0 - (width / 2);
+			}
+			else if(_cameraPosition.x > _gm.state.map.size + (width / 2)) {
+				_cameraPosition.x = to!int(_gm.state.map.size) + (width / 2);
+			}
+			//check y boundaries
+			if(_cameraPosition.y < 0 - (height / 2)) {
+				_cameraPosition.y = 0 - (height / 2);
+			}
+			else if(_cameraPosition.y > _gm.state.map.size + (height / 2)) {
+				_cameraPosition.y = to!int(_gm.state.map.size) + (height / 2);
+			}
+			//writefln("X: %s Y: %s", _cameraPosition.x, _cameraPosition.y);
+		}
+		else if(event.action == MouseAction.Wheel){
+		}
+		return true;
+	}
+
+	/** 
+	 * Widgets and layouts sections
+	 **/
+
 	/** Returns widget for putting an order of ship on the planet **/
-	Widget orderMilitaryShipPopup(){
+	private Widget orderMilitaryShipPopup(){
 		Widget popupWindow = defaultPopup("Order ship production");
 		//Information table
 		TableLayout infoTable = new TableLayout();
@@ -150,7 +207,7 @@ class Play : AppFrame {
 		return popupWindow;
 	}
 	/** Returns widget for converting units popup **/
-	Widget convertUnitsPopup(){
+	private Widget convertUnitsPopup(){
 		Widget popupWindow = defaultPopup("Convert civil units into military");
 		//Conversion info
 		TableLayout infoContainer = new TableLayout();
@@ -233,7 +290,7 @@ class Play : AppFrame {
 		popupWindow.addChild(buttonContainer);
 		return popupWindow;
 	}
-	Widget defaultPopup(string title){
+	private Widget defaultPopup(string title){
 		VerticalLayout layout = new VerticalLayout;
 		//Title bar
 		HorizontalLayout titleBar = new HorizontalLayout();
@@ -250,7 +307,7 @@ class Play : AppFrame {
 		layout.backgroundColor(0x4B4B4B);
 		return layout;
 	}
-	Widget makeLayout(){
+	private Widget getLayout(){
 		auto layout =
 			q{
 			VerticalLayout {
@@ -303,7 +360,7 @@ class Play : AppFrame {
 					}
 					HSpacer {}
 					VerticalLayout {
-						id: rightVerticalPanel
+						id: rvp
 						layoutHeight: fill
 						VSpacer {}
 						HorizontalLayout {
@@ -389,7 +446,7 @@ class Play : AppFrame {
 									}
 									ListWidget {
 										id: shipOrdersList
-										layoutHeight: 200
+										maxHeight: 200
 										padding: 5
 									}
 								}
@@ -409,50 +466,10 @@ class Play : AppFrame {
 				}
 			}
 		};
-		auto parsed = parseML(layout);
-		Widget rightPanel = parsed.childById("rightVerticalPanel");
-		ListWidget list = cast(ListWidget)rightPanel.childById("shipOrdersList");
-		WidgetListAdapter listAdapter = new WidgetListAdapter();
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		listAdapter.add(new TextWidget(null, "test"d).textColor(0xFFFFFF));
-		list.ownAdapter = listAdapter;
-		return parsed;
+		return parseML(layout);
 	}
-	void initialiseObjects() {
-		_gm = new GameManager();
-		float tempX = _gm.state.players[0].planets(_gm.state.map.planets)[0].position.x;
-		float tempY = _gm.state.players[0].planets(_gm.state.map.planets)[0].position.y;
-		_cameraPosition = Vector2d(tempX - _width / 2, tempY - _height / 2);
-		debug writefln("camera initial position: %s %s", tempX, tempY);
-		_endPosition = _cameraPosition.dup;
-		_animatedBackground = new AnimatedBackground(&_cameraPosition, _gm.state);
-		_drawableRef = _animatedBackground;
-	}
+
+
 	void updatePlanetInfo(Planet planet) {
 		window.removePopup(_currentPopup);
 		if(planet) {
@@ -463,10 +480,10 @@ class Play : AppFrame {
 			_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
 			_planetInfoContainer.childById("planetName").textFlags = TextFlag.Underline;
 			if(planet.owner == _gm.state.players[0]) {
-				_planetInfoContainer.childById("convertUnitsButton").visibility = Visibility.Visible;
+				_playersPlanetOptions.visibility(Visibility.Visible);
 				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Gone;
 			} else {
-				_planetInfoContainer.childById("convertUnitsButton").visibility = Visibility.Gone;
+				_playersPlanetOptions.visibility(Visibility.Gone);
 				_planetInfoContainer.childById("inhabitButton").visibility = Visibility.Visible;
 			}
 		}
@@ -486,60 +503,13 @@ class Play : AppFrame {
 		_playerStatsContainer.childById("totalPopulation").text = to!dstring(populationTotal);
 		_playerStatsContainer.childById("totalMilitaryUnits").text = to!dstring(militaryUnitTotal);
 	}
-	bool handleMouseEvent(Widget source, MouseEvent event) {
-		if(event.action == MouseAction.ButtonDown) {
-			if(event.button == MouseButton.Left) {
-				auto relativeMousePosition = Vector2d(
-					_cameraPosition.x + event.x,
-					_cameraPosition.y + event.y);
-				debug writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
-				_selectedPlanet = _gm.state.map.collides(relativeMousePosition, 1, 0);
-				_animatedBackground.setSelectedPlanet(_selectedPlanet);
-				updatePlanetInfo(_selectedPlanet);
-			}
-		}
-		if(event.button == MouseButton.Middle){
-			if(event.action == MouseAction.ButtonUp) {
-				_middleDown = false;
-				_endPosition.x = _cameraPosition.x;
-				_endPosition.y = _cameraPosition.y;
-			}
-			else if(event.action == MouseAction.ButtonDown) {
-				_middleDown = true;
-				_startPosition.x = event.x;
-				_startPosition.y = event.y;
-			}
-		}
-		else if(_middleDown && event.action == MouseAction.Move) {
-			_cameraPosition.x = to!int(_endPosition.x + (_startPosition.x - event.x));
-			_cameraPosition.y = to!int(_endPosition.y + (_startPosition.y - event.y));
-			//check x boundaries
-			if(_cameraPosition.x < 0 - (width / 2)) {
-				_cameraPosition.x = 0 - (width / 2);
-			}
-			else if(_cameraPosition.x > _gm.state.map.size + (width / 2)) {
-				_cameraPosition.x = to!int(_gm.state.map.size) + (width / 2);
-			}
-			//check y boundaries
-			if(_cameraPosition.y < 0 - (height / 2)) {
-				_cameraPosition.y = 0 - (height / 2);
-			}
-			else if(_cameraPosition.y > _gm.state.map.size + (height / 2)) {
-				_cameraPosition.y = to!int(_gm.state.map.size) + (height / 2);
-			}
-			//writefln("X: %s Y: %s", _cameraPosition.x, _cameraPosition.y);
-		}
-		else if(event.action == MouseAction.Wheel){
-		}
-		return true;
-	}
 	override void animate(long interval) {
 		//_animation.animate(interval);
 		invalidate();
 	}
 	@property override bool animating() { return true; }
 	@property override DrawableRef backgroundDrawable() const {
-		return (cast(Play)this)._drawableRef;
+		return cast(DrawableRef)_drawableRef;//(cast(Play)this)._drawableRef;
 	}
 }
 
