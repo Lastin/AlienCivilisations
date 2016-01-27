@@ -39,13 +39,6 @@ public class KnowledgeTree {
 		addDependencies(_science);
 	}
 
-	this(Branch[] branches) {
-		_energy =	branches[0];
-		_food =		branches[1];
-		_military = branches[2];
-		_science = 	branches[3];
-	}
-
 	pure @property Branch branch(BranchName branch) {
 		switch(branch){
 			case BranchName.Energy: 	return _energy;
@@ -126,9 +119,9 @@ public class KnowledgeTree {
 			Order head = _orders[0];
 			points = branch(head.branch).addPoints(points, head.leaf);
 			if(points > 0){
-				//TODO: check if it crashes because of null reference
 				_orders = _orders[1 .. $];
 			}
 		}
+		return points;
 	}
 }

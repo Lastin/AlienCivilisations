@@ -562,7 +562,7 @@ class Play : AppFrame {
 				_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Gone);
 				_planetInfoContainer.childById("attackButton").visibility(Visibility.Gone);
 				_solAdapter.clear();
-				if(i, planet.shipOrders.length > 0) {
+				if(planet.shipOrders.length > 0) {
 					_playersPlanetOptions.childById("olt").visibility(Visibility.Visible);
 					foreach(Ship ship; planet.shipOrders) {
 						HorizontalLayout sohl = new HorizontalLayout();
