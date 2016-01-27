@@ -18,9 +18,15 @@ enum LEAF_NAMES : string[] {
 	Science = ["Automation", "Biology", "Chemistry", "Mathematics", "Physics"]
 }
 
+struct Order {
+	BranchName branch;
+	int leaf;
+}
+
 
 public class KnowledgeTree {
 	private Branch _energy, _food, _military, _science;
+	private Order[] _orders;
 
 	this(int[][] points) {
 		_energy = 	new Branch(BranchName.Energy,	points[0]);
@@ -109,5 +115,20 @@ public class KnowledgeTree {
 	override const string toString() {
 		return format("energy: %s \nfood: %s \nmilitary: %s \nscience: %s",
 			_energy, _food, _military, _science);
+	}
+
+	void makeOrder(BranchName bn, int leaf){
+		_orders ~= Order(bn, leaf);
+	}
+
+	int develop(int points){
+		while(points > 0 && _orders.length > 0){
+			Order head = _orders[0];
+			points = branch(head.branch).addPoints(points, head.leaf);
+			if(points > 0){
+				//TODO: check if it crashes because of null reference
+				_orders = _orders[1 .. $];
+			}
+		}
 	}
 }

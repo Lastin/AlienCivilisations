@@ -27,6 +27,7 @@ class Play : AppFrame {
 		Widget _planetInfoContainer;
 		Widget _playerStatsContainer;
 		Widget _playersPlanetOptions;
+		ListWidget _shipOrdersList;
 		WidgetListAdapter _solAdapter;
 		PopupWidget _currentPopup;
 	}
@@ -46,8 +47,9 @@ class Play : AppFrame {
 		_planetInfoContainer = _mainContainer.childById("rvp").childById("hr2").childById("vr2");
 		_planetInfoContainer.visibility(Visibility.Invisible);
 		_playersPlanetOptions = _planetInfoContainer.childById("ppo");
+		_shipOrdersList = cast(ListWidget)_playersPlanetOptions.childById("shipOrdersList");
 		_solAdapter = new WidgetListAdapter();
-		(cast(ListWidget)_playersPlanetOptions.childById("shipOrdersList")).ownAdapter = _solAdapter;
+		_shipOrdersList.ownAdapter = _solAdapter;
 		//set camera positions
 		float tempX = _gameState.human.planets(_gameState.map.planets)[0].position.x;
 		float tempY = _gameState.human.planets(_gameState.map.planets)[0].position.y;
@@ -131,6 +133,10 @@ class Play : AppFrame {
 			string title = "Done!";
 			string message = "One inhabitation ship has been order to be produced on planet " ~ _selectedPlanet.name;
 			_currentPopup = window.showPopup(infoPopup(title, message), this);
+			return true;
+		};
+		_shipOrdersList.click = delegate (Widget source){
+			//source.mouseEvent(source, new MouseEvent());
 			return true;
 		};
 	}
@@ -556,7 +562,7 @@ class Play : AppFrame {
 				_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Gone);
 				_planetInfoContainer.childById("attackButton").visibility(Visibility.Gone);
 				_solAdapter.clear();
-				if(planet.shipOrders.length > 0) {
+				if(i, planet.shipOrders.length > 0) {
 					_playersPlanetOptions.childById("olt").visibility(Visibility.Visible);
 					foreach(Ship ship; planet.shipOrders) {
 						HorizontalLayout sohl = new HorizontalLayout();
