@@ -5,6 +5,7 @@ import src.entities.planet;
 import src.entities.ship;
 import src.handlers.gameManager;
 import src.entities.branch;
+import std.conv;
 
 class Player {
 	private immutable string _name;
@@ -64,6 +65,12 @@ class Player {
 	void completeTurn() {
 		//1: Produce ships
 		//2: 
+	}
+
+	void attackPlanet(MilitaryShip ship, Planet planet){
+		//TODO: add attacking option
+		uint force = to!uint(ship.onboard * _knowledgeTree.branch(BranchName.Military).effectiveness);
+		planet.attack(force);
 	}
 
 	void orderInhabit(Planet planet) {

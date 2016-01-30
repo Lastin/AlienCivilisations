@@ -90,7 +90,7 @@ class Play : AppFrame {
 		};
 		inhabitButton.click = delegate (Widget source) {
 			if(_gameState.human.inhabitationShips.length < 1){
-				window.removePopup(_currentPopup);
+				switchPopup(null);//window.removePopup(_currentPopup);
 				string title = "Inhabitation ship needed";
 				string message = "You need inhabitation ship to inhabit a planet\n" ~ 
 					"Order production of inhabitation ship on one of your planets\n" ~
@@ -105,7 +105,9 @@ class Play : AppFrame {
 			return true;
 		};
 		attackButton.click = delegate (Widget source) {
-			//TODO: add options for attacking planet
+			debug writeln("trigger attack popup");
+			window.removePopup(_currentPopup);
+			_currentPopup = window.showPopup(attackPlanetPopup());
 			return true;
 		};
 		convertUnitsButton.click = delegate (Widget source) {
@@ -129,10 +131,9 @@ class Play : AppFrame {
 		orderInhShipBtn.click = delegate (Widget source) {
 			_selectedPlanet.addShipOrder(ShipType.Inhabitation);
 			updatePlanetInfo(_selectedPlanet);
-			window.removePopup(_currentPopup);
 			string title = "Done!";
 			string message = "One inhabitation ship has been order to be produced on planet " ~ _selectedPlanet.name;
-			_currentPopup = window.showPopup(infoPopup(title, message), this);
+			switchPopup(infoPopup(title, message));
 			return true;
 		};
 		_shipOrdersList.itemClick = delegate (Widget source, int itemIndex) {
@@ -148,9 +149,20 @@ class Play : AppFrame {
 					_cameraPosition.x + event.x,
 					_cameraPosition.y + event.y);
 				debug writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
-				_selectedPlanet = _gameState.map.collides(relativeMousePosition, 1, 0);
-				_animatedBackground.setSelectedPlanet(_selectedPlanet);
-				updatePlanetInfo(_selectedPlanet);
+				Planet clickedOn = _gameState.map.collides(relativeMousePosition, 1, 0);
+				debug {
+					if(_currentPopup){
+						writeln(_currentPopup.pos);
+					}
+				}
+				if(_currentPopup && !_currentPopup.isPointInside(event.x, event.y)) {
+					window.removePopup(_currentPopup);
+				} else if(!clickedOn || clickedOn != _selectedPlanet) {
+					window.removePopup(_currentPopup);
+					_selectedPlanet = clickedOn;
+					_animatedBackground.setSelectedPlanet(_selectedPlanet);
+					updatePlanetInfo(_selectedPlanet);
+				}
 			}
 		}
 		if(event.button == MouseButton.Middle){
@@ -192,6 +204,35 @@ class Play : AppFrame {
 	/** 
 	 * Widgets and layouts sections
 	 **/
+	private Widget attackPlanetPopup(){
+		if(_gameState.human.militaryShips.length < 1){
+			string msg = 
+				"You do not have any military ships that could be used to \n" ~
+				"perform the attack. Produce the ships on one of your planets.\n";
+			return infoPopup("Insufficient military ships", msg);
+		}
+		Widget popupWindow = defaultPopup("Execute military attack");
+		ListWidget shipsList = new ListWidget;
+		WidgetListAdapter wla = new WidgetListAdapter();
+		foreach(MilitaryShip ship; _gameState.human.militaryShips) {
+			HorizontalLayout hl = new HorizontalLayout();
+			hl.addChild(new TextWidget(null, "Military units onboard: " ~ to!dstring(ship.onboard)).textColor(0xFFFFFF));
+			hl.backgroundColor(0x737373);
+			hl.padding(2);
+			hl.margins(2);
+			wla.add(hl);
+		}
+		shipsList.itemClick = delegate (Widget source, int index) {
+			MilitaryShip s = _gameState.human.militaryShips[index];
+			_gameState.human.attackPlanet(s, _selectedPlanet);
+			debug {
+				writefln("Attacked planet: %s", _selectedPlanet.name);
+				writefln("Using ship: %s", index);
+			}
+			return true;
+		};
+		return popupWindow;
+	}
 	/** Returns widget for putting an order of ship on the planet **/
 	private Widget orderMilitaryShipPopup(){
 		Widget popupWindow = defaultPopup("Order military ship production");
@@ -557,19 +598,30 @@ class Play : AppFrame {
 		};
 		return parseML(layout);
 	}
+	/** Switches popup shown in window, to see only one **/
+	private void switchPopup(Widget popup){
+		if(!popup){
+			window.removePopup(_currentPopup);
+			_currentPopup = null;
 
+		} else {
+			window.removePopup(_currentPopup);
+			_currentPopup = window.showPopup(popup, this);
+		}
+
+	}
 	/** Updates information in right hand panel about selected planet **/
 	void updatePlanetInfo(Planet planet) {
-		window.removePopup(_currentPopup);
+		//window.removePopup(_currentPopup);
 		if(planet) {
 			_planetInfoContainer.visibility = Visibility.Visible;
+			_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
+			_planetInfoContainer.childById("planetName").textFlags = TextFlag.Underline;
 			_planetInfoContainer.childById("planetCapacity").text = to!dstring(planet.capacity);
 			_planetInfoContainer.childById("planetPopulation").text = to!dstring(planet.populationSum);
 			_planetInfoContainer.childById("militaryUnits").text = to!dstring(planet.militaryUnits);
-			_planetInfoContainer.childById("productivity").text = to!dstring(planet.calculateWorkforce);
-			_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
-			_planetInfoContainer.childById("planetName").textFlags = TextFlag.Underline;
 			if(planet.owner == _gameState.human) {
+				_planetInfoContainer.childById("productivity").text = to!dstring(planet.calculateWorkforce);
 				_playersPlanetOptions.visibility(Visibility.Visible);
 				_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Gone);
 				_planetInfoContainer.childById("attackButton").visibility(Visibility.Gone);
@@ -609,16 +661,16 @@ class Play : AppFrame {
 					_playersPlanetOptions.childById("olt").visibility(Visibility.Gone);
 				}
 
-			}
-			else if(planet.owner == _gameState.ai){
-				_playersPlanetOptions.visibility(Visibility.Gone);
-				_planetInfoContainer.childById("attackButton").visibility(Visibility.Visible);
-				_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Gone);
-
 			} else {
+				_planetInfoContainer.childById("productivity").text = "unknown"d;
 				_playersPlanetOptions.visibility(Visibility.Gone);
-				_planetInfoContainer.childById("attackButton").visibility(Visibility.Gone);
-				_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Visible);
+				if(planet.owner == _gameState.ai){
+					_planetInfoContainer.childById("attackButton").visibility(Visibility.Visible);
+					_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Gone);
+				} else {
+					_planetInfoContainer.childById("attackButton").visibility(Visibility.Gone);
+					_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Visible);
+				}
 			}
 		}
 		else {
