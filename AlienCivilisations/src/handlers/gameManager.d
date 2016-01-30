@@ -20,27 +20,30 @@ class GameManager {
 		[0,0,0,0,0],
 		[0,0,0,0,0]
 	];
-	private GameState _realState;
+	private GameState _gs;
 
 	this() {
 		Player[] players;
 		players ~= new Player("Human", new KnowledgeTree(_startPoints.to!(int[][])));
-		players ~= new AI(&_realState, new KnowledgeTree(_startPoints.to!(int[][])));
+		players ~= new AI(&_gs, new KnowledgeTree(_startPoints.to!(int[][])));
 		Map map = new Map(_mapSize, _planetsCount, players);
 		size_t queuePosition = uniform(0, players.length);
-		_realState = new GameState(map, players, queuePosition);
+		_gs = new GameState(map, players, queuePosition);
 	}
 
 	@property GameState state(){
-		return _realState;
+		return _gs;
 	}
 
 	void endTurn(){
-		_realState.currentPlayer.completeTurn();
-		_realState.moveQPosition;
-		if(AI ai = cast(AI)_realState.currentPlayer){
+		debug writefln("Ending turn of player: %s", _gs.currentPlayer.name);
+		_gs.currentPlayer.completeTurn(_gs.map.planets);
+		_gs.moveQPosition();
+		if(AI ai = cast(AI)_gs.currentPlayer){
 			ai.makeMove();
+			_gs.currentPlayer.completeTurn(_gs.map.planets);
+			_gs.moveQPosition();
 		}
-		_realState.moveQPosition();
+		debug writefln("Current player: %s", _gs.currentPlayer.name);
 	}
 }

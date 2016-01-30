@@ -62,22 +62,18 @@ class Player {
 		_ships ~= ship;
 	}
 	/** Function executing actions on the end of the turn **/
-	void completeTurn() {
-		//1: Produce ships
-		//2: 
+	void completeTurn(Planet[] allPlanets) {
+		Planet[] myPlanets = planets(allPlanets);
+		foreach(Planet planet; myPlanets){
+			planet.step();
+			//TODO: add development of the knowledge tree
+		}
 	}
 
 	void attackPlanet(MilitaryShip ship, Planet planet){
 		//TODO: add attacking option
 		uint force = to!uint(ship.onboard * _knowledgeTree.branch(BranchName.Military).effectiveness);
 		planet.attack(force);
-	}
-
-	void orderInhabit(Planet planet) {
-
-	}
-
-	void orderDevelop(Branch branch, int leaf) {
 	}
 
 	void inhabitPlanet(Planet planet){
