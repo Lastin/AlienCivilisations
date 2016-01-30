@@ -83,11 +83,12 @@ class GameState {
 
 	private Player[] duplicatePlayers() {
 		Player[] duplicates;
-		//TODO: add duplication for AI
 		foreach(Player origin; _players) {
-			duplicates ~= new Player(origin.name,
-									 origin.knowledgeTree.dup,
-									 duplicateShips(origin.ships));
+			if(AI ai = cast(AI)origin){
+				duplicates ~= new AI(&this, origin.knowledgeTree.dup, duplicateShips(origin.ships));
+			} else {
+				duplicates ~= new Player(origin.name, origin.knowledgeTree.dup, duplicateShips(origin.ships));
+			}
 		}
 		return duplicates;
 	}
