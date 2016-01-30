@@ -204,12 +204,12 @@ class Planet {
 	}
 
 	private double produceShips(double workforce) {
-		double productionCost = POPULATION_CONSTANT / 2;
+		//double productionCost = POPULATION_CONSTANT / 2;
 		foreach(Ship s; _shipOrders) {
-			if(workforce < productionCost) {
+			if(workforce < shipProdCost) {
 				return workforce;
 			}
-			workforce -= productionCost;
+			workforce -= shipProdCost;
 			_owner.addShip(s);
 			_shipOrders = _shipOrders[1 .. $];
 		}
@@ -232,5 +232,31 @@ class Planet {
 			debug writeln("Added new inhabitation ship to the queue");
 			_shipOrders ~= new InhabitationShip(eneEff, sciEff);
 		}
+	}
+
+	@property double shipProdCost() const {
+		return _population[2 .. 6].sum * 0.7;
+	}
+
+	int stepsToCompleteOrder(Ship ship) {
+		int steps = 1;
+		double workforce = calculateWorkforce();
+		for(int i=0; i < _shipOrders.length; i++){
+			if(workforce >= shipProdCost){
+				workforce -= shipProdCost;
+			} else {
+				workforce = calculateWorkforce();
+				steps++;
+			}
+			if(ship == _shipOrders[i]){
+				return steps;
+			}
+		}
+		return steps;
+	}
+
+	void cancelOrder(int index){
+		debug writefln("Removing order %s", index);
+		_shipOrders = _shipOrders.remove(index);
 	}
 }

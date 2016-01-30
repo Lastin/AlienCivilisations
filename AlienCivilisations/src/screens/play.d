@@ -135,8 +135,8 @@ class Play : AppFrame {
 			_currentPopup = window.showPopup(infoPopup(title, message), this);
 			return true;
 		};
-		_shipOrdersList.click = delegate (Widget source){
-			//source.mouseEvent(source, new MouseEvent());
+		_shipOrdersList.itemClick = delegate (Widget source, int itemIndex) {
+			writeln(itemIndex);
 			return true;
 		};
 	}
@@ -481,6 +481,17 @@ class Play : AppFrame {
 										textColor: white
 										text : "0"
 									}
+									TextWidget {
+										fontWeight: 800
+										textColor: white
+										text: "Productivity:"
+												
+									}
+									TextWidget {
+										id: productivity
+										textColor: white
+										text : "0"
+									}
 								}
 								Button {
 									id: inhabitButton
@@ -555,6 +566,7 @@ class Play : AppFrame {
 			_planetInfoContainer.childById("planetCapacity").text = to!dstring(planet.capacity);
 			_planetInfoContainer.childById("planetPopulation").text = to!dstring(planet.populationSum);
 			_planetInfoContainer.childById("militaryUnits").text = to!dstring(planet.militaryUnits);
+			_planetInfoContainer.childById("productivity").text = to!dstring(planet.calculateWorkforce);
 			_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
 			_planetInfoContainer.childById("planetName").textFlags = TextFlag.Underline;
 			if(planet.owner == _gameState.human) {
@@ -569,21 +581,27 @@ class Play : AppFrame {
 						sohl.padding(2);
 						sohl.margins(2);
 						sohl.layoutWidth(FILL_PARENT);
+						VerticalLayout sovl = new VerticalLayout();
 						if(auto ms = cast(MilitaryShip)ship){
-							VerticalLayout sovl = new VerticalLayout();
 							sovl.addChild(new TextWidget(null, "Military ship"d).textColor(0xFFFFFF));
 							sovl.addChild(new TextWidget(null, "Units: " ~ to!dstring(ms.onboard)).textColor(0xFFFFFF));
-							sohl.addChild(sovl);
+
 						} else {
-							sohl.addChild(new TextWidget(null, "Inhabitation ship"d));
+							sovl.addChild(new TextWidget(null, "Inhabitation ship"d).textColor(0xFFFFFF));
 						}
+						sovl.addChild(new TextWidget(null, "Cost: "d ~ to!dstring(planet.shipProdCost)).textColor(0xFFFFFF));
+						int stepsRequired = planet.stepsToCompleteOrder(ship);
+						sovl.addChild(new TextWidget(null, "Steps required: "d ~ to!dstring(stepsRequired)).textColor(0xFFFFFF));
+						sohl.addChild(sovl);
 						sohl.addChild(new HSpacer());
+						VerticalLayout br = new VerticalLayout();
 						Button cancelBtn = new Button(null, "Cancel"d);
 						cancelBtn.click = delegate (Widget source) {
 							writeln("clicked order cancelation");
 							return true;
 						};
-						sohl.addChild(cancelBtn);
+						br.addChild(cancelBtn);
+						sohl.addChild(br);
 						sohl.backgroundColor(0x737373);
 						_solAdapter.add(sohl);
 					}
