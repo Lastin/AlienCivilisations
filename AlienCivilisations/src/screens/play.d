@@ -90,12 +90,11 @@ class Play : AppFrame {
 		};
 		inhabitButton.click = delegate (Widget source) {
 			if(_gameState.human.inhabitationShips.length < 1){
-				switchPopup(null);//window.removePopup(_currentPopup);
 				string title = "Inhabitation ship needed";
 				string message = "You need inhabitation ship to inhabit a planet\n" ~ 
 					"Order production of inhabitation ship on one of your planets\n" ~
 					"Production uses resources otherwise spent on food production!";
-				_currentPopup = window.showPopup(infoPopup(title, message), this);
+				switchPopup(infoPopup(title, message));
 			} else {
 				//TODO: check correctness of this function
 				_selectedPlanet.setOwner(_gameState.human);
@@ -106,25 +105,22 @@ class Play : AppFrame {
 		};
 		attackButton.click = delegate (Widget source) {
 			debug writeln("trigger attack popup");
-			window.removePopup(_currentPopup);
-			_currentPopup = window.showPopup(attackPlanetPopup());
+			switchPopup(attackPlanetPopup());
 			return true;
 		};
 		convertUnitsButton.click = delegate (Widget source) {
-			window.removePopup(_currentPopup);
-			_currentPopup = window.showPopup(convertUnitsPopup, this);
+			switchPopup(convertUnitsPopup());
 			return true;
 		};
 		orderMilShipBtn.click = delegate (Widget source) {
-			window.removePopup(_currentPopup);
 			if(_selectedPlanet.militaryUnits < 1){
 				string title = "Insufficient military units";
 				string message =
 					"Convert civil units of the selected planet into military units first.\n" ~
 					"Military units can then be loaded onto a ship.";
-				_currentPopup = window.showPopup(infoPopup(title, message), this);
+				switchPopup(infoPopup(title, message));
 			} else {
-				_currentPopup = window.showPopup(orderMilitaryShipPopup(), this);
+				switchPopup(orderMilitaryShipPopup());
 			}
 			return true;
 		};
@@ -149,16 +145,12 @@ class Play : AppFrame {
 					_cameraPosition.x + event.x,
 					_cameraPosition.y + event.y);
 				debug writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
-				Planet clickedOn = _gameState.map.collides(relativeMousePosition, 1, 0);
-				debug {
-					if(_currentPopup){
-						writeln(_currentPopup.pos);
-					}
+				Planet clickedOn;
+				if(!_currentPopup || !_currentPopup.isPointInside(event.x, event.y)){
+					clickedOn = _gameState.map.collides(relativeMousePosition, 1, 0);
 				}
-				if(_currentPopup && !_currentPopup.isPointInside(event.x, event.y)) {
-					window.removePopup(_currentPopup);
-				} else if(!clickedOn || clickedOn != _selectedPlanet) {
-					window.removePopup(_currentPopup);
+				if(clickedOn && clickedOn != _selectedPlanet){
+					switchPopup(null);
 					_selectedPlanet = clickedOn;
 					_animatedBackground.setSelectedPlanet(_selectedPlanet);
 					updatePlanetInfo(_selectedPlanet);
@@ -285,7 +277,7 @@ class Play : AppFrame {
 			return true;
 		};
 		cancel.click = delegate(Widget action){
-			window.removePopup(_currentPopup);
+			switchPopup(null);
 			return true;
 		};
 		//Add children to layout
@@ -364,13 +356,13 @@ class Play : AppFrame {
 		buttonContainer.addChild(cancel);
 		apply.click = delegate(Widget action){
 			_selectedPlanet.convertUnits(slider.position+1);
-			window.removePopup(_currentPopup);
+			switchPopup(null);
 			updatePlayerStats();
 			updatePlanetInfo(_selectedPlanet);
 			return true;
 		};
 		cancel.click = delegate(Widget action){
-			window.removePopup(_currentPopup);
+			switchPopup(null);
 			return true;
 		};
 		//Layout properties
@@ -408,7 +400,7 @@ class Play : AppFrame {
 		Button btn = new Button(null, "OK"d);
 		btn.padding(10);
 		btn.click = delegate (Widget source) {
-			window.removePopup(_currentPopup);
+			switchPopup(null);
 			return true;
 		};
 		btnCont.addChild(new HSpacer());
@@ -600,19 +592,16 @@ class Play : AppFrame {
 	}
 	/** Switches popup shown in window, to see only one **/
 	private void switchPopup(Widget popup){
+		window.removePopup(_currentPopup);
 		if(!popup){
-			window.removePopup(_currentPopup);
 			_currentPopup = null;
 
 		} else {
-			window.removePopup(_currentPopup);
 			_currentPopup = window.showPopup(popup, this);
 		}
-
 	}
 	/** Updates information in right hand panel about selected planet **/
 	void updatePlanetInfo(Planet planet) {
-		//window.removePopup(_currentPopup);
 		if(planet) {
 			_planetInfoContainer.visibility = Visibility.Visible;
 			_planetInfoContainer.childById("planetName").text = to!dstring(planet.name);
