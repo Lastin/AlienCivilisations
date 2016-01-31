@@ -636,7 +636,7 @@ class Play : AppFrame {
 							sovl.addChild(new TextWidget(null, "Inhabitation ship"d).textColor(0xFFFFFF));
 						}
 						sovl.addChild(new TextWidget(null, "Units: " ~ to!dstring(ship.unitsOnboard)).textColor(0xFFFFFF));
-						sovl.addChild(new TextWidget(null, "Cost: "d ~ to!dstring(planet.shipProdCost)).textColor(0xFFFFFF));
+						sovl.addChild(new TextWidget(null, "Cost: "d ~ to!dstring(ship.buildCost)).textColor(0xFFFFFF));
 						int stepsRequired = planet.stepsToCompleteOrder(ship);
 						sovl.addChild(new TextWidget(null, "Steps required: "d ~ to!dstring(stepsRequired)).textColor(0xFFFFFF));
 						sohl.addChild(sovl);

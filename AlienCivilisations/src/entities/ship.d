@@ -3,6 +3,8 @@
 import src.entities.knowledgeTree;
 import src.entities.planet;
 import std.conv;
+import std.stdio;
+import src.entities.player;
 
 enum int MULTIPLIER = 1000;
 
@@ -28,6 +30,7 @@ abstract class Ship {
 	@property int capacity() const {
 		return to!int(MULTIPLIER * _eneEff * _sciEff);
 	}
+
 	/**Returns boolean whether the construction is completed**/
 	@property bool completed(){
 		return _completion >= buildCost();
@@ -56,22 +59,26 @@ abstract class Ship {
 
 class MilitaryShip : Ship {
 	private int _onboard;
-	this(double eneEff, double sciEff, double completion, int onboard) {
+	this(double eneEff, double sciEff, double completion) {
 		super(eneEff, sciEff, completion);
-		if(onboard > capacity){
-			throw new Exception("Units beyond capacity");
-		}
-		_onboard = onboard;
 	}
 	/**Returns true when no units onboard**/
 	@property bool empty() const {
 		return _onboard <= 0;
 	}
+	void addUnits(int units){
+		if(_onboard+units > capacity){
+			throw new Exception("Units beyond capacity");
+		}
+		_onboard += units;
+	}
 
 	void attackPlanet(Planet planet, double milEff){
-		//uint force = to!uint(ship.unitsOnboard * milEff);
-		planet.populationSum / milEff
-		planet.subtractPopulation(force);
+		debug writefln("Onboard before: %s", _onboard);
+		double force = _onboard * milEff;
+		double rest = planet.destroyPopulation(force);
+		_onboard = to!int(rest / milEff);
+		debug writefln("Onboard after: %s", _onboard);
 	}
 
 	/*int kill(int amount){
@@ -84,7 +91,9 @@ class MilitaryShip : Ship {
 		return 0;
 	}*/
 	MilitaryShip dup() const {
-		return new MilitaryShip(_eneEff, _sciEff, _completion, _onboard);
+		MilitaryShip ms = new MilitaryShip(_eneEff, _sciEff, _completion);
+		ms.addUnits(_onboard);
+		return ms;
 	}
 }
 

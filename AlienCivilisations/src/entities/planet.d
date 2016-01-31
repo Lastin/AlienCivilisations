@@ -8,6 +8,7 @@ import src.entities.ship;
 import std.format;
 import src.entities.knowledgeTree;
 import std.stdio;
+import std.math;
 
 public enum int POPULATION_CONSTANT = 10000;
 enum double FOOD_CONSUMPTION_RATE = 1;
@@ -121,9 +122,16 @@ class Planet {
 	/** Function affects planet's attributes. Should be called after player finishes move **/
 	void step() {
 		double workforce = calculateWorkforce();
-		workforce = produceShips(workforce);
+		debug {
+			writefln("Before population: %s", _population);
+			writefln("Workforce before ships production: %s", workforce);
+		}
+		//Consume at most half of the workforce on production
+		workforce -= workforce - produceShips(workforce/2);
+		debug writefln("Workforce after ships production: %s", workforce);
 		affectFood(workforce);
 		growPopulation();
+		debug writefln("After population: %s", _population);
 	}
 	/** 
 	 * Food supply at best increases at arythmetic rate
@@ -169,58 +177,61 @@ class Planet {
 		_population[3] -= g2;
 		_militaryUnits += g1 + g2;
 		debug {
-			writefln("Substructed age group 2: %s", g1);
-			writefln("Substructed age group 3: %s", g2);
+			writefln("Subtructed age group 2: %s", g1);
+			writefln("Subtructed age group 3: %s", g2);
 			writefln("New military units: %s", _militaryUnits);
 		}
 		return g1 + g2;
 	}
-
+	/** Converts percentage to military callable units **/
 	uint percentToNumber(int percent) const {
 		uint p = max(0, min(percent, 100));
 		uint g1 = to!int(_population[2] * p/100);
 		uint g2 = to!int(_population[3] * p/100);
 		return g1 + g2;
 	}
-
 	/** Subtract value, evenly distributing across all ages where possible **/
-	void destroyPopulation(uint force) {
-		//TODO: check if function distributes the values as intended
-		if(force > populationSum) {
+	double destroyPopulation(double force) {
+		debug {
+			writefln("Destroying population using force: %s", force);
+			writeln(_population);
+		}
+		if(force >= populationSum) {
+			force -= populationSum;
 			_population = [0,0,0,0,0,0,0,0];
-			_owner = null;
+			debug writeln(_population);
+			return force;
 		} else {
 			while(force > 0 && force <= populationSum) {
-				debug writefln("Force: %s", force);
 				int perG = to!int(force / 8);
-				debug writefln("Per group: %s", perG);
-				if(perG == 0)
-					return;
+				if(perG == 0){
+					debug writeln(_population);
+					return force;
+				}
 				foreach(i, int ageGroup; _population) {
 					if(ageGroup == 0)
 						continue;
 					if(perG > ageGroup) {
-						_population[i] = 0;
 						force -= ageGroup;
+						_population[i] = 0;
 					} else {
 						_population[i] -= perG;
 						force -= perG;
 					}
 				}
 			}
-			debug writefln("Exit population: %s", _population);
 		}
+		debug writeln(_population);
+		return force;
 	}
-
+	/** Produces ships in the queue **/
 	private double produceShips(double workforce) {
-		//double productionCost = POPULATION_CONSTANT / 2;
 		foreach(Ship s; _shipOrders) {
-			if(workforce < shipProdCost) {
-				return workforce;
+			workforce = s.build(workforce);
+			if(s.completed){
+				_owner.addShip(s);
+				_shipOrders = _shipOrders[1 .. $];
 			}
-			workforce -= shipProdCost;
-			_owner.addShip(s);
-			_shipOrders = _shipOrders[1 .. $];
 		}
 		return workforce;
 	}
@@ -236,33 +247,21 @@ class Planet {
 				}
 			}
 			_militaryUnits -= units;
-			_shipOrders ~= new MilitaryShip(eneEff, sciEff, 0, units);
+			MilitaryShip ns = new MilitaryShip(eneEff, sciEff, 0);
+			ns.addUnits(units);
+			_shipOrders ~= ns;
 		} else {
 			debug writeln("Added new inhabitation ship to the queue");
 			_shipOrders ~= new InhabitationShip(eneEff, sciEff, 0);
 		}
 	}
 
-	@property double shipProdCost() const {
-		//5 age groups contributing
-		//5000 = minimum starting number in each group on smallest planet
-		//40-81 radius / 10 * population constant
-		return 5000 * 5/8 * 0.7;
-	}
-
 	int stepsToCompleteOrder(Ship ship) {
-		int steps = 1;
-		double workforce = calculateWorkforce();
-		for(int i=0; i < _shipOrders.length; i++){
-			if(workforce >= shipProdCost){
-				workforce -= shipProdCost;
-			} else {
-				workforce = calculateWorkforce();
-				steps++;
-			}
-			if(ship == _shipOrders[i]){
+		int steps = 0;
+		foreach(Ship s; _shipOrders) {
+			steps += to!int(ceil(s.buildCost / (calculateWorkforce / 2)));
+			if(ship == s)
 				return steps;
-			}
 		}
 		return steps;
 	}
