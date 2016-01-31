@@ -74,6 +74,7 @@ class Play : AppFrame {
 		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
 		Widget orderMilShipBtn = _planetInfoContainer.childById("orderMilitaryShip");
 		Widget orderInhShipBtn = _planetInfoContainer.childById("orderInhabitShip");
+		Widget knowledgeTreeButton = childById("verticalContainer").childById("hr3").childById("knowledgeTreeButton");
 		//Assign
 		mouseEvent = &handleMouseEvent;
 		keyEvent = delegate (Widget source, KeyEvent event) {
@@ -133,7 +134,10 @@ class Play : AppFrame {
 			return true;
 		};
 		_shipOrdersList.itemClick = delegate (Widget source, int itemIndex) {
-			writeln(itemIndex);
+			debug writeln(itemIndex);
+			return true;
+		};
+		knowledgeTreeButton.click = delegate (Widget source){
 			return true;
 		};
 	}
@@ -148,13 +152,14 @@ class Play : AppFrame {
 				Planet clickedOn;
 				if(!_currentPopup || !_currentPopup.isPointInside(event.x, event.y)){
 					clickedOn = _gameState.map.collides(relativeMousePosition, 1, 0);
-				}
-				if(clickedOn && clickedOn != _selectedPlanet){
 					switchPopup(null);
 					_selectedPlanet = clickedOn;
 					_animatedBackground.setSelectedPlanet(_selectedPlanet);
 					updatePlanetInfo(_selectedPlanet);
 				}
+				/*if(clickedOn && clickedOn != _selectedPlanet){
+
+				}*/
 			}
 		}
 		if(event.button == MouseButton.Middle){
@@ -274,6 +279,7 @@ class Play : AppFrame {
 			_selectedPlanet.addShipOrder(ShipType.Military, result);
 			updatePlanetInfo(_selectedPlanet);
 			updatePlayerStats();
+			switchPopup(null);
 			return true;
 		};
 		cancel.click = delegate(Widget action){
@@ -578,6 +584,7 @@ class Play : AppFrame {
 				}
 				VSpacer{}
 				HorizontalLayout {
+					id: hr3
 					Button {
 						id: knowledgeTreeButton
 						text: "KNOWLEDGE TREE"
