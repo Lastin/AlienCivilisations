@@ -1,19 +1,25 @@
 # AlienCivilisations
-Project written in language D:
-http://dlang.org/
+####Game project
+Main features:
+* Regionalisation
+* Simulation of growth of population based on food and age and overpopulation factors
+* Turn-based
+* AI player opposing human
 
+
+Project written in language D
 Compiler:
-DMD64 D Compiler v2.068.2
-Copyright (c) 1999-2015 by Digital Mars written by Walter Bright
+DMD64 D Compiler v2.068 or newer
 
-=================================================
+----------------------------------------------------------------------------------------------------
 Using monodevelop requires installation of add-in:
 *Tools > Add-in Manager > Gallery > Languge Bindings > D Language Binding*
 
-=================================================
-Project utilises the Dlang UI
-https://github.com/buggins/dlangui
-which uses Derelict libraries for dynamic binding of OpenGL, SDL and other C++ libraries to D.
+----------------------------------------------------------------------------------------------------
+Project utilises the Dlang UI  
+https://github.com/buggins/dlangui  
+which uses Derelict libraries for dynamic binding of OpenGL, SDL and other C++ libraries to D.  
+https://github.com/DerelictOrg
 
 To clone all needed repositories, run `clone_script` from projects main directory.
 
@@ -36,7 +42,7 @@ and in *Extra Compiler Options* add
 -Jviews/res/hdpi
 ```
 
-=================================================
+----------------------------------------------------------------------------------------------------
 In older version of the program library GLFW3 had to be installed on the system.
 It can be downloaded from official website: http://www.glfw.org/
 ```
