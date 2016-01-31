@@ -6,6 +6,7 @@ import src.entities.ship;
 import src.handlers.gameManager;
 import src.entities.branch;
 import std.conv;
+import std.algorithm.mutation;
 
 class Player {
 	private immutable string _name;
@@ -77,9 +78,16 @@ class Player {
 	}
 
 	void inhabitPlanet(Planet planet){
-		if(planet.owner)
+		InhabitationShip[] ihabits = inhabitationShips();
+		if(planet.owner || ihabits.length < 1)
 			return;
 		planet.setOwner(this);
 		planet.resetPopulation();
+		foreach(i, Ship ship; _ships){
+			if(ship == ihabits[0]){
+				_ships = _ships.remove(i);
+				return;
+			}
+		}
 	}
 }

@@ -235,7 +235,10 @@ class Planet {
 	}
 
 	@property double shipProdCost() const {
-		return _population[2 .. 6].sum * 0.7;
+		//5 age groups contributing
+		//5000 = minimum starting number in each group on smallest planet
+		//40-81 radius / 10 * population constant
+		return 5 * 5000 * 0.7;
 	}
 
 	int stepsToCompleteOrder(Ship ship) {

@@ -98,9 +98,9 @@ class Play : AppFrame {
 				switchPopup(infoPopup(title, message));
 			} else {
 				//TODO: check correctness of this function
-				_selectedPlanet.setOwner(_gameState.human);
-				_selectedPlanet.resetPopulation();
+				_gameState.human.inhabitPlanet(_selectedPlanet);
 				updatePlanetInfo(_selectedPlanet);
+				updatePlayerStats();
 			}
 			return true;
 		};
