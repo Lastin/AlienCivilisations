@@ -15,32 +15,66 @@ abstract class Ship {
 	private {
 		double _eneEff;
 		double _sciEff;
+		double _completion;
+		int _onboard;
 	}
 
-	this(double eneEff = 1, double sciEff = 1){
+	this(double eneEff, double sciEff, double completion){
 		_eneEff = eneEff;
 		_sciEff = sciEff;
+		_completion = completion;
 	}
-	@property uint capacity() const {
+	/**Return number of units that can fit onboard**/
+	@property int capacity() const {
 		return to!int(MULTIPLIER * _eneEff * _sciEff);
+	}
+	/**Returns boolean whether the construction is completed**/
+	@property bool completed(){
+		return _completion >= buildCost();
+	}
+	/**Returns build cost of the ship**/
+	@property double buildCost() const {
+		return capacity * 0.5;
+	}
+	/**Returns number of units onboard**/
+	@property int unitsOnboard() const {
+		return _onboard;
+	}
+	/**Adds workforce to completion, eventually completing the construction**/
+	double build(double workforce){
+		if(workforce >= buildCost - _completion){
+			workforce = buildCost - _completion;
+			_completion = buildCost;
+		} else {
+			_completion += workforce;
+			workforce = 0;
+		}
+		return workforce;
 	}
 	Ship dup();
 }
 
 class MilitaryShip : Ship {
 	private int _onboard;
-	/** Takes number onboard  **/
-	this(double eneEff = 1, double sciEff = 1, int onboard = 1) {
-		super(eneEff, sciEff);
+	this(double eneEff, double sciEff, double completion, int onboard) {
+		super(eneEff, sciEff, completion);
+		if(onboard > capacity){
+			throw new Exception("Units beyond capacity");
+		}
 		_onboard = onboard;
 	}
+	/**Returns true when no units onboard**/
 	@property bool empty() const {
 		return _onboard <= 0;
 	}
-	@property int onboard() const {
-		return _onboard;
+
+	void attackPlanet(Planet planet, double milEff){
+		//uint force = to!uint(ship.unitsOnboard * milEff);
+		planet.populationSum / milEff
+		planet.subtractPopulation(force);
 	}
-	int kill(int amount){
+
+	/*int kill(int amount){
 		if(amount > _onboard){
 			amount -= _onboard;
 			_onboard = 0;
@@ -48,17 +82,19 @@ class MilitaryShip : Ship {
 		}
 		_onboard -= amount;
 		return 0;
-	}
+	}*/
 	MilitaryShip dup() const {
-		return new MilitaryShip(_eneEff, _sciEff, onboard);
+		return new MilitaryShip(_eneEff, _sciEff, _completion, _onboard);
 	}
 }
 
 class InhabitationShip : Ship {
-	this(double eneEff = 1, double sciEff = 1) {
-		super(eneEff, sciEff);
+	private int _onboard;
+	this(double eneEff, double sciEff, double completion) {
+		super(eneEff, sciEff, completion);
+		_onboard = to!int(capacity);
 	}
 	InhabitationShip dup() const {
-		return new InhabitationShip(_eneEff, _sciEff);
+		return new InhabitationShip(_eneEff, _sciEff, _completion);
 	}
 }

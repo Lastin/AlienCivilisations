@@ -7,7 +7,7 @@ import std.stdio;
 import std.conv;
 
 class Branch {
-	private enum double DEPENDENCY_EFFECT = 0.2;
+	private enum double DEPENDENCY_EFFECT = 0.3;
 	enum int[5] MULTIPLIERS = [2,4,8,16,32];
 	enum int MAX_LEVEL = 5;
 	private int[] _leafsPoints;
@@ -38,11 +38,11 @@ class Branch {
 	}
 
 	@property double effectiveness() const {
-		double branchLevel = level + 1;
+		double effness = level + 1;
 		foreach(const Branch dependency; _dependencies){
-			branchLevel += dependency.level * DEPENDENCY_EFFECT;
+			effness += dependency.level * DEPENDENCY_EFFECT;
 		}
-		return branchLevel;
+		return effness;
 	}
 
 	@property int[] undevelopedLeafs() const {

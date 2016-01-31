@@ -213,7 +213,7 @@ class Play : AppFrame {
 		WidgetListAdapter wla = new WidgetListAdapter();
 		foreach(MilitaryShip ship; _gameState.human.militaryShips) {
 			HorizontalLayout hl = new HorizontalLayout();
-			hl.addChild(new TextWidget(null, "Military units onboard: " ~ to!dstring(ship.onboard)).textColor(0xFFFFFF));
+			hl.addChild(new TextWidget(null, "Military units onboard: " ~ to!dstring(ship.unitsOnboard)).textColor(0xFFFFFF));
 			hl.backgroundColor(0x737373);
 			hl.padding(2);
 			hl.margins(2);
@@ -632,11 +632,10 @@ class Play : AppFrame {
 						VerticalLayout sovl = new VerticalLayout();
 						if(auto ms = cast(MilitaryShip)ship){
 							sovl.addChild(new TextWidget(null, "Military ship"d).textColor(0xFFFFFF));
-							sovl.addChild(new TextWidget(null, "Units: " ~ to!dstring(ms.onboard)).textColor(0xFFFFFF));
-
 						} else {
 							sovl.addChild(new TextWidget(null, "Inhabitation ship"d).textColor(0xFFFFFF));
 						}
+						sovl.addChild(new TextWidget(null, "Units: " ~ to!dstring(ship.unitsOnboard)).textColor(0xFFFFFF));
 						sovl.addChild(new TextWidget(null, "Cost: "d ~ to!dstring(planet.shipProdCost)).textColor(0xFFFFFF));
 						int stepsRequired = planet.stepsToCompleteOrder(ship);
 						sovl.addChild(new TextWidget(null, "Steps required: "d ~ to!dstring(stepsRequired)).textColor(0xFFFFFF));

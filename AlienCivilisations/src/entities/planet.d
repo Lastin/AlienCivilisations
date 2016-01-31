@@ -82,20 +82,27 @@ class Planet {
 		return format(": %s \n Y:%s", );
 	}
 
-	uint attack(uint force) {
+	/*uint attack(uint force) {
 		if(force >= populationSum){
 			_owner = null;
-			resetPopulation();
 			return force - capacity;
 		}
 		subtractPopulation(force);
 		return 0;
-	}
+	}*/
 
 	Planet setOwner(Player player) {
 		_owner = player;
 		_shipOrders = null;
 		return this;
+	}
+	/**Sets new owner of the planet and sets units from inhabitation ship**/
+	void inhabit(Player owner, InhabitationShip ship){
+		if(owner)
+			return;
+		_owner = owner;
+		int ppa = to!int(ship.unitsOnboard / 8);
+		_population = [ppa,ppa,ppa,ppa,ppa,ppa,ppa,ppa];
 	}
 	/** Sets population to default value of 1/8th maximum capacity **/
 	void resetPopulation() {
@@ -177,29 +184,31 @@ class Planet {
 	}
 
 	/** Subtract value, evenly distributing across all ages where possible **/
-	void subtractPopulation(uint value) {
+	void destroyPopulation(uint force) {
 		//TODO: check if function distributes the values as intended
-		if(value > populationSum) {
+		if(force > populationSum) {
 			_population = [0,0,0,0,0,0,0,0];
-		}
-		else {
-			while(value >= 0 && value <= populationSum) {
-				uint perGroup = to!uint(value / _population.length);
-				if(perGroup == 0) {
-					perGroup = 1;
-				}
-				for(int i=0; i < _population.length && value > 0; i++) {
-					if(_population[i] == 0)
+			_owner = null;
+		} else {
+			while(force > 0 && force <= populationSum) {
+				debug writefln("Force: %s", force);
+				int perG = to!int(force / 8);
+				debug writefln("Per group: %s", perG);
+				if(perG == 0)
+					return;
+				foreach(i, int ageGroup; _population) {
+					if(ageGroup == 0)
 						continue;
-					if(_population[i] < perGroup) {
-						value -= _population[i];
+					if(perG > ageGroup) {
 						_population[i] = 0;
+						force -= ageGroup;
 					} else {
-						value -= perGroup;
-						_population[i] -= perGroup;
+						_population[i] -= perG;
+						force -= perG;
 					}
 				}
 			}
+			debug writefln("Exit population: %s", _population);
 		}
 	}
 
@@ -227,10 +236,10 @@ class Planet {
 				}
 			}
 			_militaryUnits -= units;
-			_shipOrders ~= new MilitaryShip(eneEff, sciEff, units);
+			_shipOrders ~= new MilitaryShip(eneEff, sciEff, 0, units);
 		} else {
 			debug writeln("Added new inhabitation ship to the queue");
-			_shipOrders ~= new InhabitationShip(eneEff, sciEff);
+			_shipOrders ~= new InhabitationShip(eneEff, sciEff, 0);
 		}
 	}
 
@@ -238,7 +247,7 @@ class Planet {
 		//5 age groups contributing
 		//5000 = minimum starting number in each group on smallest planet
 		//40-81 radius / 10 * population constant
-		return 5 * 5000 * 0.7;
+		return 5000 * 5/8 * 0.7;
 	}
 
 	int stepsToCompleteOrder(Ship ship) {

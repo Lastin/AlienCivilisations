@@ -78,7 +78,7 @@ public class KnowledgeTree {
 
 	void addDependencies(Branch branch){
 		if(branch.name == BranchName.Energy) {
-			
+			branch.addDependency(_science);
 		}
 		else if(branch.name == BranchName.Food) {
 			branch.addDependency(_energy);

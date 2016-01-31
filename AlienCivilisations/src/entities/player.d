@@ -67,14 +67,14 @@ class Player {
 		Planet[] myPlanets = planets(allPlanets);
 		foreach(Planet planet; myPlanets){
 			planet.step();
-			//TODO: add development of the knowledge tree
 		}
+		//TODO: add development of the knowledge tree
 	}
 
 	void attackPlanet(MilitaryShip ship, Planet planet){
 		//TODO: add attacking option
-		uint force = to!uint(ship.onboard * _knowledgeTree.branch(BranchName.Military).effectiveness);
-		planet.attack(force);
+		double milEff = _knowledgeTree.branch(BranchName.Military).effectiveness;
+		ship.attackPlanet(planet, milEff);
 	}
 
 	void inhabitPlanet(Planet planet){
