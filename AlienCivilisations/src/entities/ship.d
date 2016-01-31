@@ -30,7 +30,12 @@ abstract class Ship {
 	@property int capacity() const {
 		return to!int(MULTIPLIER * _eneEff * _sciEff);
 	}
-
+	/** Returns ship capacity for player with given knowledge tree levels**/
+	static @property int capacity(Player player){
+		double ene = player.knowledgeTree.branch(BranchName.Energy).effectiveness;
+		double sci = player.knowledgeTree.branch(BranchName.Science).effectiveness;
+		return to!int(MULTIPLIER * ene * sci);
+	}
 	/**Returns boolean whether the construction is completed**/
 	@property bool completed(){
 		return _completion >= buildCost();
@@ -38,6 +43,10 @@ abstract class Ship {
 	/**Returns build cost of the ship**/
 	@property double buildCost() const {
 		return capacity * 0.5;
+	}
+	/**Returns true when no units onboard**/
+	@property bool empty() const {
+		return _onboard <= 0;
 	}
 	/**Returns number of units onboard**/
 	@property int unitsOnboard() const {
@@ -58,13 +67,8 @@ abstract class Ship {
 }
 
 class MilitaryShip : Ship {
-	private int _onboard;
 	this(double eneEff, double sciEff, double completion) {
 		super(eneEff, sciEff, completion);
-	}
-	/**Returns true when no units onboard**/
-	@property bool empty() const {
-		return _onboard <= 0;
 	}
 	void addUnits(int units){
 		if(_onboard+units > capacity){
@@ -72,7 +76,7 @@ class MilitaryShip : Ship {
 		}
 		_onboard += units;
 	}
-
+	/** Perform attack on a given planet **/
 	void attackPlanet(Planet planet, double milEff){
 		debug writefln("Onboard before: %s", _onboard);
 		double force = _onboard * milEff;
@@ -80,16 +84,7 @@ class MilitaryShip : Ship {
 		_onboard = to!int(rest / milEff);
 		debug writefln("Onboard after: %s", _onboard);
 	}
-
-	/*int kill(int amount){
-		if(amount > _onboard){
-			amount -= _onboard;
-			_onboard = 0;
-			return amount;
-		}
-		_onboard -= amount;
-		return 0;
-	}*/
+	/** Return duplicate of the object **/
 	MilitaryShip dup() const {
 		MilitaryShip ms = new MilitaryShip(_eneEff, _sciEff, _completion);
 		ms.addUnits(_onboard);
@@ -98,11 +93,11 @@ class MilitaryShip : Ship {
 }
 
 class InhabitationShip : Ship {
-	private int _onboard;
 	this(double eneEff, double sciEff, double completion) {
 		super(eneEff, sciEff, completion);
-		_onboard = to!int(capacity);
+		_onboard = capacity;
 	}
+	/** Return duplicate of the object **/
 	InhabitationShip dup() const {
 		return new InhabitationShip(_eneEff, _sciEff, _completion);
 	}

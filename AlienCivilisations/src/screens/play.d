@@ -248,12 +248,23 @@ class Play : AppFrame {
 		infoTable.addChild(tw1);
 		infoTable.addChild(total);
 		//
+		TextWidget maxInfo = new TextWidget(null, to!dstring(temp));
+		maxInfo.fontSize(15);
+		maxInfo.textColor(0xFF0000);
+		maxInfo.visibility(Visibility.Gone);
+		//
 		ScrollBar slider = new ScrollBar(null, Orientation.Horizontal);
 		slider.position = 1;
 		slider.pageSize(1);
 		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
 			double percent = (slider.position + 1.0) / 100;
 			int result = to!int(_selectedPlanet.militaryUnits * percent);
+			if(result > Ship.capacity(_gameState.human)){
+				maxInfo.visibility(Visibility.Visible);
+				maxInfo.text = "Capacity exceeded. Ship will only hold it's max capacity;"d;
+			} else {
+				maxInfo.visibility(Visibility.Gone);
+			}
 			total.text = to!dstring(result);
 			return true;
 		};
@@ -289,6 +300,7 @@ class Play : AppFrame {
 		//Add children to layout
 		popupWindow.addChild(infoTable);
 		popupWindow.addChild(slider);
+		popupWindow.addChild(maxInfo);
 		popupWindow.addChild(mtw2);
 		popupWindow.addChild(mtw3);
 		popupWindow.addChild(buttonContainer);

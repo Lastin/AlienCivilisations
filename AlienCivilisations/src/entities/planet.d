@@ -12,6 +12,7 @@ import std.math;
 
 public enum int POPULATION_CONSTANT = 10000;
 enum double FOOD_CONSUMPTION_RATE = 1;
+enum double FOOD_PRODUCTION_RATE = 1.7;
 enum double CHILD_PER_PAID = 2.5;
 
 class Planet {
@@ -109,13 +110,14 @@ class Planet {
 	void resetPopulation() {
 		int ppa = to!int(capacity / 8 / 8);
 		_population = [ppa,ppa,ppa,ppa,ppa,ppa,ppa,ppa];
+		_food = ppa * 8;
 	}
 
 	/** Returns workforce points based on number of units within certain age groups and knowledge boost **/
 	double calculateWorkforce() {
 		KnowledgeTree kt = _owner.knowledgeTree;
 		double boost = kt.branch(BranchName.Energy).effectiveness * _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
-		double result = to!double(_population[2 .. 6].sum) * boost;
+		double result = to!double(_population[2 .. 7].sum) * boost;
 		debug writefln("Calulated workforce: %s", result);
 		return result;
 	}
@@ -127,7 +129,7 @@ class Planet {
 			writefln("Workforce before ships production: %s", workforce);
 		}
 		//Consume at most half of the workforce on production
-		workforce -= workforce - produceShips(workforce/2);
+		workforce = workforce/2 + produceShips(workforce/2);
 		debug writefln("Workforce after ships production: %s", workforce);
 		affectFood(workforce);
 		growPopulation();
@@ -141,30 +143,37 @@ class Planet {
 		//Consume food
 		_food -= populationSum * FOOD_CONSUMPTION_RATE;
 		double fpe = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
-		_food += workforce * fpe;
+		_food += workforce * FOOD_PRODUCTION_RATE * fpe;
+		debug writefln("Food = %s", _food);
+		_food = max(_food, 0);
 	}
 	/**
 	 * Population grows at exponential rate
 	 * 1 > 2 > 4 > 8 > 16
 	**/
 	private void growPopulation() {
-		double overPopulationFactor = 1;
-		if(populationSum > capacity){
-			int overflow =  populationSum - capacity;
-			overPopulationFactor = overflow / capacity;
-		}
 		//Age the population
 		for(size_t i = _population.length - 1; i>0; i--){
 			_population[i] = _population[i-1];
 		}
-		int reproductivePairs = _population[2 .. 3].sum / 2;
-		double foodFactor = populationSum * FOOD_CONSUMPTION_RATE / _food;
-		//Threshold to stop foodFactoring from going negative
-		if(foodFactor < 0){
-			foodFactor = 0.001;
+		double opf = 1;
+		if(populationSum > capacity){
+			int overflow = populationSum - capacity;
+			opf += overflow / capacity;
 		}
-		_population[0] = to!int(reproductivePairs * CHILD_PER_PAID * foodFactor / overPopulationFactor);
-		debug writefln("Newborn number: %s", _population[0]);
+		int reproductivePairs = _population[2 .. 4].sum / 2;
+		double foodFactor = _food / (populationSum * FOOD_CONSUMPTION_RATE);
+		//thresholding food factor
+		foodFactor = min(2, foodFactor);
+		foodFactor = max(0.1, foodFactor);
+		debug {
+			writefln("reproductivePairs = %s", reproductivePairs);
+			writefln("foodFactor = %s", foodFactor);
+			writefln("opf = %s", opf);
+			writeln(reproductivePairs * CHILD_PER_PAID * foodFactor / opf);
+		}
+		double newBorns = reproductivePairs * CHILD_PER_PAID;
+		_population[0] = to!int(newBorns * foodFactor / opf);
 		assert(_population[0] >= 0);
 	}
 
@@ -224,7 +233,7 @@ class Planet {
 		debug writeln(_population);
 		return force;
 	}
-	/** Produces ships in the queue **/
+	/** Produces ships from the queue **/
 	private double produceShips(double workforce) {
 		foreach(Ship s; _shipOrders) {
 			workforce = s.build(workforce);
@@ -246,9 +255,14 @@ class Planet {
 					throw new Exception("Number of requested units is larget than available on a planet");
 				}
 			}
-			_militaryUnits -= units;
 			MilitaryShip ns = new MilitaryShip(eneEff, sciEff, 0);
-			ns.addUnits(units);
+			if(ns.capacity < units){
+				ns.addUnits(ns.capacity);
+				_militaryUnits -= ns.capacity;
+			} else {
+				ns.addUnits(units);
+				_militaryUnits -= units;
+			}
 			_shipOrders ~= ns;
 		} else {
 			debug writeln("Added new inhabitation ship to the queue");
