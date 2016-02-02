@@ -116,7 +116,6 @@
     <Compile Include="src\handlers\gameManager.d" />
     <Compile Include="src\handlers\jsonParser.d" />
     <Compile Include="src\logic\ai.d" />
-    <Compile Include="src\logic\order.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

@@ -12,7 +12,6 @@ enum BranchName : ubyte {
 	Science
 }
 
-
 public class KnowledgeTree {
 	private {
 		Branch _energy, _food, _military, _science;
@@ -49,11 +48,11 @@ public class KnowledgeTree {
 	/** Returns branches which haven't reached max level **/
 	@property Branch[] possibleDevs() {
 		Branch[] nfd;
-		foreach(bn; EnumMembers!BranchName){
+		/*foreach(bn; EnumMembers!BranchName){
 			if(!branch(bn).full){
 				nfd ~= branch(bn);
 			}
-		}
+		}*/
 		return nfd;
 	}
 	void addDependencies(Branch branch){
@@ -72,18 +71,7 @@ public class KnowledgeTree {
 			branch.addDependency(_energy);
 		}
 	}
-	//Returns duplicate of the current object, without references to original
-	KnowledgeTree dup() const {
-		uint[4] points = 
-		[
-			_energy.points,
-			_food.points,
-			_military.points,
-			_science.points
-		];
-		return new KnowledgeTree(points);
-	}
-	override const string toString() {
+	override string toString() {
 		return format("energy: %s \nfood: %s \nmilitary: %s \nscience: %s",
 			_energy, _food, _military, _science);
 	}
@@ -111,5 +99,16 @@ public class KnowledgeTree {
 		if(count >= MAX_LEVEL - branch(toAdd).level)
 			return;
 		_orders ~= toAdd;
+	}
+	//Returns duplicate of the current object, without references to original
+	KnowledgeTree dup() const {
+		uint[4] points = 
+		[
+			_energy.points,
+			_food.points,
+			_military.points,
+			_science.points
+		];
+		return new KnowledgeTree(points);
 	}
 }

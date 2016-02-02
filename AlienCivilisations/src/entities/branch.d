@@ -70,4 +70,7 @@ class Branch {
 		_points += points;
 		return 0;
 	}
+	override string toString() {
+		return to!string(level());
+	}
 }

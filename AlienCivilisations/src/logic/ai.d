@@ -8,7 +8,7 @@ import src.handlers.containers;
 import src.entities.ship;
 import std.stdio;
 
-class AI : Player{
+class AI : Player {
 	/**THIS STATE IS ALWAYS REFERING TO REAL STATE OF THE GAME**/
 	private GameState* _realState;
 	this(GameState* realState, KnowledgeTree knowledgeTree, Ship[] ships = null) {
