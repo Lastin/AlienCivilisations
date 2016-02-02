@@ -8,6 +8,7 @@ import src.handlers.gameManager;
 import src.screens.menu;
 import std.stdio;
 import src.entities.ship;
+import src.entities.knowledgeTree;
 
 class Play : AppFrame {
 	private {
@@ -201,6 +202,20 @@ class Play : AppFrame {
 	/** 
 	 * Widgets and layouts sections
 	 **/
+	/*Returns knowledge tree development popup window*/
+	private Widget knowledgeTreePopup(){
+		Widget popup = defaultPopup("Knowledge Tree Development");
+		TableLayout tl = new TableLayout();
+		tl.colCount(4);
+		tl.addChild(new TextWidget("Energy").fontSize(25).fontWeight(FontWeight.Bold));
+		tl.addChild(new TextWidget("Food").fontSize(25).fontWeight(FontWeight.Bold));
+		tl.addChild(new TextWidget("Military").fontSize(25).fontWeight(FontWeight.Bold));
+		tl.addChild(new TextWidget("Science").fontSize(25).fontWeight(FontWeight.Bold));
+		//tl.addChild();
+		//TODO: finish this popup
+		return popup;
+
+	}
 	private Widget attackPlanetPopup(){
 		if(_gameState.human.militaryShips.length < 1){
 			string msg = 

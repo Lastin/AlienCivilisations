@@ -73,7 +73,7 @@ class CommandParser : VerticalLayout {
 				if(leaf < 0 || leaf > 5)
 					throw new Exception("Leaf out of bounds value: " ~ to!string(leaf));
 				int points = to!int(commandParts[4]);
-				branch.addPoints(points, leaf);
+				branch.addPoints(points);
 				message ~=  format("Added %s points to player: %s", points, player.name);
 			}
 		}

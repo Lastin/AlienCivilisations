@@ -3,6 +3,7 @@
 import src.entities.branch;
 import std.format;
 import std.typecons;
+import std.traits;
 
 enum BranchName : ubyte {
 	Energy,
@@ -11,24 +12,13 @@ enum BranchName : ubyte {
 	Science
 }
 
-enum LEAF_NAMES : string[] {
-	Energy = ["Fossil Fuels", "Hydro Power", "Nuclear", "Solar Power", "Wind"],
-	Food = ["Agricultural Economics", "Agricultural Engineering", "Argonomy", "Animal Science", "Horticulture"],
-	Military = ["Defence", "Offence", "Enervating", "Spying", "Intimidation"],
-	Science = ["Automation", "Biology", "Chemistry", "Mathematics", "Physics"]
-}
-
-struct Order {
-	BranchName branch;
-	int leaf;
-}
-
 
 public class KnowledgeTree {
-	private Branch _energy, _food, _military, _science;
-	private Order[] _orders;
-
-	this(int[][] points) {
+	private {
+		Branch _energy, _food, _military, _science;
+		BranchName[] _orders;
+	}
+	this(uint[4] points) {
 		_energy = 	new Branch(BranchName.Energy,	points[0]);
 		_food = 	new Branch(BranchName.Food, 	points[1]);
 		_military = new Branch(BranchName.Military, points[2]);
@@ -38,8 +28,7 @@ public class KnowledgeTree {
 		addDependencies(_military);
 		addDependencies(_science);
 	}
-
-	pure @property Branch branch(BranchName branch) {
+	@property Branch branch(BranchName branch) {
 		switch(branch){
 			case BranchName.Energy: 	return _energy;
 			case BranchName.Food: 		return _food;
@@ -48,7 +37,6 @@ public class KnowledgeTree {
 			default: 					throw new Exception("Unknown branch");
 		}
 	}
-
 	@property Branch branch(string branchName) {
 		switch(branchName){
 			case "Energy": 		return _energy;
@@ -58,24 +46,16 @@ public class KnowledgeTree {
 			default: 			throw new Exception("Unknown branch");
 		}
 	}
-
-	//Returns array of tuples containing branch and indexes of
-	//leaves which are below max development level
-	@property Tuple!(Branch, int[])[] possibleDevelopments() {
-		Tuple!(Branch, int[])[] possibilities;
-		Tuple!(Branch, int[])[] temp;
-		temp ~= tuple(_energy,	_energy.undevelopedLeafs);
-		temp ~= tuple(_food,	_food.undevelopedLeafs);
-		temp ~= tuple(_military,_military.undevelopedLeafs);
-		temp ~= tuple(_science,	_science.undevelopedLeafs);
-		foreach(Tuple!(Branch, int[]) each; temp){
-			if(each[1].length > 0){
-				possibilities ~= each;
+	/** Returns branches which haven't reached max level **/
+	@property Branch[] possibleDevs() {
+		Branch[] nfd;
+		foreach(bn; EnumMembers!BranchName){
+			if(!branch(bn).full){
+				nfd ~= branch(bn);
 			}
 		}
-		return possibilities;
+		return nfd;
 	}
-
 	void addDependencies(Branch branch){
 		if(branch.name == BranchName.Energy) {
 			branch.addDependency(_science);
@@ -92,36 +72,44 @@ public class KnowledgeTree {
 			branch.addDependency(_energy);
 		}
 	}
-
 	//Returns duplicate of the current object, without references to original
 	KnowledgeTree dup() const {
-		auto points = 
+		uint[4] points = 
 		[
-			_energy.leafsPoints,
-			_food.leafsPoints,
-			_military.leafsPoints,
-			_science.leafsPoints
+			_energy.points,
+			_food.points,
+			_military.points,
+			_science.points
 		];
 		return new KnowledgeTree(points);
 	}
-
 	override const string toString() {
 		return format("energy: %s \nfood: %s \nmilitary: %s \nscience: %s",
 			_energy, _food, _military, _science);
 	}
-
-	void makeOrder(BranchName bn, int leaf){
-		_orders ~= Order(bn, leaf);
-	}
-
+	/** Develops branches in queue using given points **/
 	int develop(int points){
 		while(points > 0 && _orders.length > 0){
-			Order head = _orders[0];
-			points = branch(head.branch).addPoints(points, head.leaf);
-			if(points > 0){
+			BranchName head = _orders[0];
+			int previousLevel = branch(head).level;
+			points = branch(head).addPoints(points);
+			if(previousLevel < branch(head).level) {
+				//remove from queue
 				_orders = _orders[1 .. $];
 			}
 		}
 		return points;
+	}
+	void addOrder(BranchName toAdd){
+		if(branch(toAdd).full)
+			return;
+		int count = 0;
+		foreach(bn; _orders) {
+			if(bn == toAdd)
+				count++;
+		}
+		if(count >= MAX_LEVEL - branch(toAdd).level)
+			return;
+		_orders ~= toAdd;
 	}
 }

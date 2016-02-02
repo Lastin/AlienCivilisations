@@ -85,7 +85,7 @@ class MilitaryShip : Ship {
 		debug writefln("Onboard after: %s", _onboard);
 	}
 	/** Return duplicate of the object **/
-	MilitaryShip dup() const {
+	override MilitaryShip dup() const {
 		MilitaryShip ms = new MilitaryShip(_eneEff, _sciEff, _completion);
 		ms.addUnits(_onboard);
 		return ms;
@@ -98,7 +98,7 @@ class InhabitationShip : Ship {
 		_onboard = capacity;
 	}
 	/** Return duplicate of the object **/
-	InhabitationShip dup() const {
+	override InhabitationShip dup() const {
 		return new InhabitationShip(_eneEff, _sciEff, _completion);
 	}
 }

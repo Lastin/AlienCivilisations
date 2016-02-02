@@ -13,19 +13,13 @@ class GameManager {
 	//Constant values
 	private immutable float _mapSize = 5000;
 	private immutable int _planetsCount = 16;
-	private immutable int[][] _startPoints =
-	[
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0]
-	];
+	private immutable uint[4] _sp = [0,0,0,0];
 	private GameState _gs;
 
 	this() {
 		Player[] players;
-		players ~= new Player("Human", new KnowledgeTree(_startPoints.to!(int[][])));
-		players ~= new AI(&_gs, new KnowledgeTree(_startPoints.to!(int[][])));
+		players ~= new Player("Human", new KnowledgeTree(_sp));
+		players ~= new AI(&_gs, new KnowledgeTree(_sp));
 		Map map = new Map(_mapSize, _planetsCount, players);
 		size_t queuePosition = uniform(0, players.length);
 		_gs = new GameState(map, players, queuePosition);
