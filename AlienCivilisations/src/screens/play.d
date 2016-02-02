@@ -9,6 +9,7 @@ import src.screens.menu;
 import std.stdio;
 import src.entities.ship;
 import src.entities.knowledgeTree;
+import src.entities.branch;
 
 class Play : AppFrame {
 	private {
@@ -139,6 +140,7 @@ class Play : AppFrame {
 			return true;
 		};
 		knowledgeTreeButton.click = delegate (Widget source){
+			switchPopup(knowledgeTreePopup());
 			return true;
 		};
 	}
@@ -206,13 +208,19 @@ class Play : AppFrame {
 	private Widget knowledgeTreePopup(){
 		Widget popup = defaultPopup("Knowledge Tree Development");
 		TableLayout tl = new TableLayout();
+		tl.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
 		tl.colCount(4);
-		tl.addChild(new TextWidget("Energy").fontSize(25).fontWeight(FontWeight.Bold));
-		tl.addChild(new TextWidget("Food").fontSize(25).fontWeight(FontWeight.Bold));
-		tl.addChild(new TextWidget("Military").fontSize(25).fontWeight(FontWeight.Bold));
-		tl.addChild(new TextWidget("Science").fontSize(25).fontWeight(FontWeight.Bold));
+		tl.addChild(new TextWidget("Energy").textColor(0xFFFFFF).fontSize(25).fontWeight(FontWeight.Bold));
+		tl.addChild(new TextWidget("Food").textColor(0xFFFFFF).fontSize(25).fontWeight(FontWeight.Bold));
+		tl.addChild(new TextWidget("Military").textColor(0xFFFFFF).fontSize(25).fontWeight(FontWeight.Bold));
+		tl.addChild(new TextWidget("Science").textColor(0xFFFFFF).fontSize(25).fontWeight(FontWeight.Bold));
+		foreach(Branch each; _gameState.human.knowledgeTree.branches) {
+			string level = to!string(each.level) ~ "/5";
+			tl.addChild(new TextWidget(level).textColor(0xFFFFFF).fontSize(20));
+		}
 		//tl.addChild();
 		//TODO: finish this popup
+		popup.addChild(tl);
 		return popup;
 
 	}

@@ -45,14 +45,18 @@ public class KnowledgeTree {
 			default: 			throw new Exception("Unknown branch");
 		}
 	}
+	/** Returns branches in alphabetical naming order **/
+	@property Branch[4] branches() {
+		return [_energy, _food, _military, _science];
+	}
 	/** Returns branches which haven't reached max level **/
-	@property Branch[] possibleDevs() {
+	@property Branch[] undevelopedBranches() {
 		Branch[] nfd;
-		/*foreach(bn; EnumMembers!BranchName){
+		foreach(bn; EnumMembers!BranchName){
 			if(!branch(bn).full){
 				nfd ~= branch(bn);
 			}
-		}*/
+		}
 		return nfd;
 	}
 	void addDependencies(Branch branch){
