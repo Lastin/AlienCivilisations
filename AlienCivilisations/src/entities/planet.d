@@ -50,7 +50,6 @@ class Planet {
 	@property bool breathableAtmosphere() {
 		return _breathableAtmosphere;
 	}
-
 	@property int capacity() {
 		return to!int(_radius / 10 * POPULATION_CONSTANT);
 	}
@@ -83,16 +82,6 @@ class Planet {
 	override public string toString() {
 		return format(": %s \n Y:%s", );
 	}
-
-	/*uint attack(uint force) {
-		if(force >= populationSum){
-			_owner = null;
-			return force - capacity;
-		}
-		subtractPopulation(force);
-		return 0;
-	}*/
-
 	Planet setOwner(Player player) {
 		_owner = player;
 		_shipOrders = null;
@@ -112,7 +101,6 @@ class Planet {
 		_population = [ppa,ppa,ppa,ppa,ppa,ppa,ppa,ppa];
 		_food = ppa * 8;
 	}
-
 	/** Returns workforce points based on number of units within certain age groups and knowledge boost **/
 	double calculateWorkforce() {
 		KnowledgeTree kt = _owner.knowledgeTree;
@@ -156,16 +144,20 @@ class Planet {
 		for(size_t i = _population.length - 1; i>0; i--){
 			_population[i] = _population[i-1];
 		}
+		if(populationSum == 0){
+			debug writeln("Population empty!");
+			owner = null;
+			return;
+		}
 		double opf = 1;
 		if(populationSum > capacity){
 			int overflow = populationSum - capacity;
 			opf += overflow / capacity;
 		}
+
+		double fpu = _food / (populationSum * FOOD_CONSUMPTION_RATE);
+		double foodFactor = fpu / (fpu + 1);
 		int reproductivePairs = _population[2 .. 4].sum / 2;
-		double foodFactor = _food / (populationSum * FOOD_CONSUMPTION_RATE);
-		//thresholding food factor
-		foodFactor = min(2, foodFactor);
-		foodFactor = max(0.1, foodFactor);
 		debug {
 			writefln("reproductivePairs = %s", reproductivePairs);
 			writefln("foodFactor = %s", foodFactor);
@@ -176,7 +168,6 @@ class Planet {
 		_population[0] = to!int(newBorns * foodFactor / opf);
 		assert(_population[0] >= 0);
 	}
-
 	/** Converts civil units into military units **/
 	uint convertUnits(int percent) {
 		uint p = max(0, min(percent, 100));
