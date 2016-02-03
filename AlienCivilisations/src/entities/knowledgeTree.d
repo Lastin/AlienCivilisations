@@ -22,10 +22,9 @@ public class KnowledgeTree {
 		_food = 	new Branch(BranchName.Food, 	points[1]);
 		_military = new Branch(BranchName.Military, points[2]);
 		_science = 	new Branch(BranchName.Science,	points[3]);
-		addDependencies(_energy);
-		addDependencies(_food);
-		addDependencies(_military);
-		addDependencies(_science);
+		foreach(branch; branches){
+			addDependencies(branch);
+		}
 	}
 	@property Branch branch(BranchName branch) {
 		switch(branch){
@@ -48,6 +47,10 @@ public class KnowledgeTree {
 	/** Returns branches in alphabetical naming order **/
 	@property Branch[4] branches() {
 		return [_energy, _food, _military, _science];
+	}
+	/** Returns development orders **/
+	@property BranchName[] orders(){
+		return _orders;
 	}
 	/** Returns branches which haven't reached max level **/
 	@property Branch[] undevelopedBranches() {

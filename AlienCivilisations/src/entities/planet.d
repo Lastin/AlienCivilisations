@@ -146,7 +146,7 @@ class Planet {
 		}
 		if(populationSum == 0){
 			debug writeln("Population empty!");
-			owner = null;
+			_owner = null;
 			return;
 		}
 		double opf = 1;

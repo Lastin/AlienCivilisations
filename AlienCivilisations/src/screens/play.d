@@ -207,28 +207,75 @@ class Play : AppFrame {
 	/*Returns knowledge tree development popup window*/
 	private Widget knowledgeTreePopup(){
 		Widget popup = defaultPopup("Knowledge Tree Development");
-		VerticalLayout vl = new VerticalLayout();
-		vl.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
 		TableLayout tl = new TableLayout();
-		tl.colCount(4);
+		tl.colCount(5);
+		tl.padding(10);
+		tl.addChild(new HSpacer());
 		Branch[] branches = _gameState.human.knowledgeTree.branches;
 		foreach(Branch each; branches){
-			writeln(each.name);
-			tl.addChild(new TextWidget(each.name).fontWeight(FontWeight.Bold).fontSize(16));
+			TextWidget bn = new TextWidget(null, to!dstring(each.name));
+			bn.fontWeight(FontWeight.Bold);
+			bn.padding(5);
+			bn.fontSize(15);
+			bn.textColor(0xFFFFFF);
+			bn.backgroundColor(0x333333);
+			tl.addChild(bn);
 		}
+		TextWidget desc1 = new TextWidget(null, "LEVEL"d);
+		desc1.fontWeight(FontWeight.Bold);
+		desc1.padding(5);
+		desc1.fontSize(15);
+		desc1.textColor(0xFFFFFF);
+		desc1.backgroundColor(0x333333);
+		tl.addChild(desc1);
 		foreach(Branch each; branches){
-			tl.addChild(new TextWidget("test").fontWeight(FontWeight.Bold).fontSize(16));
+			TextWidget lvl = new TextWidget(null, to!dstring(each.level) ~ "/5"d);
+			lvl.padding(5);
+			lvl.fontSize(14);
+			lvl.textColor(0xFFFFFF);
+			tl.addChild(lvl);
 		}
+		TextWidget desc2 = new TextWidget(null, "EFFECT"d);
+		desc2.fontWeight(FontWeight.Bold);
+		desc2.padding(5);
+		desc2.fontSize(15);
+		desc2.textColor(0xFFFFFF);
+		desc2.backgroundColor(0x333333);
+		tl.addChild(desc2);
 		foreach(Branch each; branches){
-			tl.addChild(new Button(null, "Upgrade"d));
+			TextWidget eff = new TextWidget(null, to!dstring(each.effectiveness));
+			eff.padding(5);
+			eff.fontSize(14);
+			eff.textColor(0xFFFFFF);
+			tl.addChild(eff);
 		}
-		//TODO: finish this popup
-
-		vl.addChild(new VSpacer());
-		vl.addChild(tl);
-		vl.addChild(new VSpacer());
-		popup.addChild(vl);
-
+		tl.addChild(new HSpacer());
+		foreach(Branch each; branches){
+			auto btn = new Button(null, "Upgrade"d);
+			if(each.full){
+				btn.enabled(false);
+				btn.text("FULL");
+			}
+			tl.addChild(btn);
+		}
+		popup.addChild(tl);
+		ListWidget lw = new ListWidget();
+		WidgetListAdapter wla = new WidgetListAdapter();
+		lw.adapter = wla;
+		BranchName[] orders = _gameState.human.knowledgeTree.orders;
+		TextWidget ot = new TextWidget(null, "Development orders");
+		foreach(order ;_gameState.human.knowledgeTree.orders){
+			VerticalLayout vl = new VerticalLayout();
+			vl.padding(2);
+			vl.margins(2);
+			vl.layoutWidth(FILL_PARENT);
+			vl.backgroundColor(0x737373);
+			auto tw = new TextWidget(null, to!dstring(order)).textColor(0xFFFFFF);
+			vl.addChild(tw);
+			wla.add(vl);
+		}
+		popup.addChild(ot);
+		popup.addChild(lw);
 		return popup;
 
 	}
