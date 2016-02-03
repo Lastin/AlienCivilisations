@@ -49,8 +49,31 @@ public class KnowledgeTree {
 		return [_energy, _food, _military, _science];
 	}
 	/** Returns development orders **/
-	@property BranchName[] orders(){
-		return _orders;
+	@property Tuple!(BranchName, int)[] orders(){
+		Tuple!(BranchName, int)[] orderPairs;
+		int[4] levels = [_energy.level, _food.level, _military.level, _science.level];
+		foreach(order; _orders){
+			switch(order){
+				case BranchName.Energy:
+					levels[0]++;
+					orderPairs ~= tuple(order, levels[0]);
+					break;
+				case BranchName.Food:
+					levels[1]++;
+					orderPairs ~= tuple(order, levels[1]);
+					break;
+				case BranchName.Military:
+					levels[2]++;
+					orderPairs ~= tuple(order, levels[2]);
+					break;
+				case BranchName.Science:
+					levels[3]++;
+					orderPairs ~= tuple(order, levels[3]);
+					break;
+				default: break;
+			}
+		}
+		return orderPairs;
 	}
 	/** Returns branches which haven't reached max level **/
 	@property Branch[] undevelopedBranches() {
@@ -95,17 +118,18 @@ public class KnowledgeTree {
 		}
 		return points;
 	}
-	void addOrder(BranchName toAdd){
+	bool addOrder(BranchName toAdd){
 		if(branch(toAdd).full)
-			return;
+			return false;
 		int count = 0;
 		foreach(bn; _orders) {
 			if(bn == toAdd)
 				count++;
 		}
 		if(count >= MAX_LEVEL - branch(toAdd).level)
-			return;
+			return false;
 		_orders ~= toAdd;
+		return true;
 	}
 	//Returns duplicate of the current object, without references to original
 	KnowledgeTree dup() const {

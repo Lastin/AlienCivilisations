@@ -10,6 +10,7 @@ import std.stdio;
 import src.entities.ship;
 import src.entities.knowledgeTree;
 import src.entities.branch;
+import std.format;
 
 class Play : AppFrame {
 	private {
@@ -250,35 +251,51 @@ class Play : AppFrame {
 			tl.addChild(eff);
 		}
 		tl.addChild(new HSpacer());
-		foreach(Branch each; branches){
-			auto btn = new Button(null, "Upgrade"d);
-			if(each.full){
-				btn.enabled(false);
-				btn.text("FULL");
-			}
-			tl.addChild(btn);
-		}
-		popup.addChild(tl);
+		//ORDER LIST AND BUTTONS TO UPGRADE
 		ListWidget lw = new ListWidget();
 		WidgetListAdapter wla = new WidgetListAdapter();
 		lw.adapter = wla;
-		BranchName[] orders = _gameState.human.knowledgeTree.orders;
+		Button[] buttons;
+		foreach(i, Branch each; branches){
+			buttons ~= new Button(null, "Upgrade"d);
+			if(each.full){
+				buttons[i].enabled(false);
+				buttons[i].text("FULL");
+			}
+			buttons[i].click = delegate (Widget source){
+				BranchName bn = each.name;
+				if(_gameState.human.knowledgeTree.addOrder(bn)){
+					//wla.add();
+					//TODO: add freshly added order to list
+				}
+				return true;
+			};
+			tl.addChild(buttons[i]);
+		}
+		popup.addChild(tl);
+
+		auto orders = _gameState.human.knowledgeTree.orders;
 		TextWidget ot = new TextWidget(null, "Development orders");
-		foreach(order ;_gameState.human.knowledgeTree.orders){
-			VerticalLayout vl = new VerticalLayout();
-			vl.padding(2);
-			vl.margins(2);
-			vl.layoutWidth(FILL_PARENT);
-			vl.backgroundColor(0x737373);
-			auto tw = new TextWidget(null, to!dstring(order)).textColor(0xFFFFFF);
-			vl.addChild(tw);
-			wla.add(vl);
+		ot.fontWeight(FontWeight.Bold);
+		ot.padding(5);
+		ot.fontSize(15);
+		ot.textColor(0xFFFFFF);
+		ot.backgroundColor(0x333333);
+		foreach(order ; orders){
+			auto text = format("Upgrade %s to level %s", order[0], order[1]);
+			TextWidget element = new TextWidget(null, to!dstring(text));
+			element.padding(2);
+			element.margins(2);
+			element.textColor(0xFFFFFF);
+			element.backgroundColor(0x737373);
+			wla.add(element);
 		}
 		popup.addChild(ot);
 		popup.addChild(lw);
 		return popup;
-
 	}
+
+	/** Returns widget with options to attack a planet **/
 	private Widget attackPlanetPopup(){
 		if(_gameState.human.militaryShips.length < 1){
 			string msg = 

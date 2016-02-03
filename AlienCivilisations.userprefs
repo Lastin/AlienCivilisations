@@ -2,8 +2,9 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/screens/play.d">
     <Files>
-      <File FileName="AlienCivilisations/src/screens/play.d" Line="277" Column="22" />
-      <File FileName="AlienCivilisations/src/entities/knowledgeTree.d" Line="52" Column="33" />
+      <File FileName="AlienCivilisations/src/screens/play.d" Line="266" Column="31" />
+      <File FileName="AlienCivilisations/src/entities/knowledgeTree.d" Line="130" Column="16" />
+      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/core/types.d" Line="402" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
