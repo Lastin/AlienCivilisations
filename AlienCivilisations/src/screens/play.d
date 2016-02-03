@@ -257,21 +257,26 @@ class Play : AppFrame {
 		lw.adapter = wla;
 		Button[] buttons;
 		foreach(i, Branch each; branches){
-			buttons ~= new Button(null, "Upgrade"d);
+			buttons ~= new Button(to!string(i), "Upgrade"d);
 			if(each.full){
 				buttons[i].enabled(false);
 				buttons[i].text("FULL");
 			}
-			buttons[i].click = delegate (Widget source){
-				BranchName bn = each.name;
-				if(_gameState.human.knowledgeTree.addOrder(bn)){
-					//wla.add();
-					//TODO: add freshly added order to list
-				}
-				return true;
-			};
 			tl.addChild(buttons[i]);
 		}
+		auto dgt = delegate (BranchName bn){
+			if(_gameState.human.knowledgeTree.addOrder(bn)){
+				//TODO: add refreshing the list
+			}
+			return true;
+		};
+
+		// Assign buttons actions, because inside the loop same lambda is assigned to all
+		buttons[0].click = delegate (Widget source) => dgt(BranchName.Energy);
+		buttons[1].click = delegate (Widget source) => dgt(BranchName.Food);
+		buttons[2].click = delegate (Widget source) => dgt(BranchName.Military);
+		buttons[3].click = delegate (Widget source) => dgt(BranchName.Science);
+
 		popup.addChild(tl);
 
 		auto orders = _gameState.human.knowledgeTree.orders;
