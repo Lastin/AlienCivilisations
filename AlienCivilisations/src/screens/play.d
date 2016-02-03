@@ -207,20 +207,28 @@ class Play : AppFrame {
 	/*Returns knowledge tree development popup window*/
 	private Widget knowledgeTreePopup(){
 		Widget popup = defaultPopup("Knowledge Tree Development");
+		VerticalLayout vl = new VerticalLayout();
+		vl.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
 		TableLayout tl = new TableLayout();
-		tl.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
 		tl.colCount(4);
-		tl.addChild(new TextWidget("Energy").textColor(0xFFFFFF).fontSize(25).fontWeight(FontWeight.Bold));
-		tl.addChild(new TextWidget("Food").textColor(0xFFFFFF).fontSize(25).fontWeight(FontWeight.Bold));
-		tl.addChild(new TextWidget("Military").textColor(0xFFFFFF).fontSize(25).fontWeight(FontWeight.Bold));
-		tl.addChild(new TextWidget("Science").textColor(0xFFFFFF).fontSize(25).fontWeight(FontWeight.Bold));
-		foreach(Branch each; _gameState.human.knowledgeTree.branches) {
-			string level = to!string(each.level) ~ "/5";
-			tl.addChild(new TextWidget(level).textColor(0xFFFFFF).fontSize(20));
+		Branch[] branches = _gameState.human.knowledgeTree.branches;
+		foreach(Branch each; branches){
+			writeln(each.name);
+			tl.addChild(new TextWidget(each.name).fontWeight(FontWeight.Bold).fontSize(16));
 		}
-		//tl.addChild();
+		foreach(Branch each; branches){
+			tl.addChild(new TextWidget("test").fontWeight(FontWeight.Bold).fontSize(16));
+		}
+		foreach(Branch each; branches){
+			tl.addChild(new Button(null, "Upgrade"d));
+		}
 		//TODO: finish this popup
-		popup.addChild(tl);
+
+		vl.addChild(new VSpacer());
+		vl.addChild(tl);
+		vl.addChild(new VSpacer());
+		popup.addChild(vl);
+
 		return popup;
 
 	}

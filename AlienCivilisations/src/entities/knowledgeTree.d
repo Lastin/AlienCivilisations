@@ -5,11 +5,11 @@ import std.format;
 import std.typecons;
 import std.traits;
 
-enum BranchName : ubyte {
-	Energy,
-	Food,
-	Military,
-	Science
+enum BranchName : string {
+	Energy = "Energy",
+	Food = "Food",
+	Military = "Military",
+	Science = "Science"
 }
 
 public class KnowledgeTree {
