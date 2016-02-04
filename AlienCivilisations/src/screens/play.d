@@ -222,7 +222,7 @@ class Play : AppFrame {
 			bn.backgroundColor(0x333333);
 			tl.addChild(bn);
 		}
-		TextWidget desc1 = new TextWidget(null, "LEVEL"d);
+		TextWidget desc1 = new TextWidget(null, "BRANCH LEVEL"d);
 		desc1.fontWeight(FontWeight.Bold);
 		desc1.padding(5);
 		desc1.fontSize(15);
@@ -236,7 +236,7 @@ class Play : AppFrame {
 			lvl.textColor(0xFFFFFF);
 			tl.addChild(lvl);
 		}
-		TextWidget desc2 = new TextWidget(null, "EFFECT"d);
+		TextWidget desc2 = new TextWidget(null, "EFFECTIVENESS"d);
 		desc2.fontWeight(FontWeight.Bold);
 		desc2.padding(5);
 		desc2.fontSize(15);
@@ -250,11 +250,41 @@ class Play : AppFrame {
 			eff.textColor(0xFFFFFF);
 			tl.addChild(eff);
 		}
+		TextWidget desc3 = new TextWidget(null, "CURRENT POINTS"d);
+		desc3.fontWeight(FontWeight.Bold);
+		desc3.padding(5);
+		desc3.fontSize(15);
+		desc3.textColor(0xFFFFFF);
+		desc3.backgroundColor(0x333333);
+		tl.addChild(desc3);
+		foreach(Branch each; branches){
+			TextWidget eff = new TextWidget(null, to!dstring(each.points));
+			eff.padding(5);
+			eff.fontSize(14);
+			eff.textColor(0xFFFFFF);
+			tl.addChild(eff);
+		}
+		TextWidget desc4 = new TextWidget(null, "NEXT LVL IN"d);
+		desc4.fontWeight(FontWeight.Bold);
+		desc4.padding(5);
+		desc4.fontSize(15);
+		desc4.textColor(0xFFFFFF);
+		desc4.backgroundColor(0x333333);
+		tl.addChild(desc4);
+		foreach(Branch each; branches){
+			dstring pointsNeeded = each.full ? "FULL"d : to!dstring(each.nextExp);
+			TextWidget eff = new TextWidget(null, to!dstring(pointsNeeded));
+			eff.padding(5);
+			eff.fontSize(14);
+			eff.textColor(0xFFFFFF);
+			tl.addChild(eff);
+		}
 		tl.addChild(new HSpacer());
-		//ORDER LIST AND BUTTONS TO UPGRADE
+		//upgrade buttons
 		ListWidget lw = new ListWidget();
 		WidgetListAdapter wla = new WidgetListAdapter();
 		lw.adapter = wla;
+		lw.maxHeight = 200;
 		Button[] buttons;
 		foreach(i, Branch each; branches){
 			buttons ~= new Button(to!string(i), "Upgrade"d);
@@ -266,7 +296,16 @@ class Play : AppFrame {
 		}
 		auto dgt = delegate (BranchName bn){
 			if(_gameState.human.knowledgeTree.addOrder(bn)){
+				auto lastOrder = _gameState.human.knowledgeTree.orders[$-1];
 				//TODO: add refreshing the list
+				auto text = format("Upgrade %s to level %s", lastOrder[0], lastOrder[1]);
+				TextWidget element = new TextWidget(null, to!dstring(text));
+				element.padding(2);
+				element.margins(2);
+				element.textColor(0xFFFFFF);
+				element.backgroundColor(0x737373);
+				wla.add(element);
+				popup.childById("queueEmpty").visibility(Visibility.Gone);
 			}
 			return true;
 		};
@@ -276,27 +315,39 @@ class Play : AppFrame {
 		buttons[1].click = delegate (Widget source) => dgt(BranchName.Food);
 		buttons[2].click = delegate (Widget source) => dgt(BranchName.Military);
 		buttons[3].click = delegate (Widget source) => dgt(BranchName.Science);
-
 		popup.addChild(tl);
 
-		auto orders = _gameState.human.knowledgeTree.orders;
-		TextWidget ot = new TextWidget(null, "Development orders");
+		//separator
+		popup.addChild(new VSpacer().backgroundColor(0x333333));
+		//DEVELOPMENT ORDERS
+		TextWidget ot = new TextWidget(null, "Development orders"d);
 		ot.fontWeight(FontWeight.Bold);
 		ot.padding(5);
 		ot.fontSize(15);
 		ot.textColor(0xFFFFFF);
-		ot.backgroundColor(0x333333);
-		foreach(order ; orders){
-			auto text = format("Upgrade %s to level %s", order[0], order[1]);
-			TextWidget element = new TextWidget(null, to!dstring(text));
+		popup.addChild(ot);
+
+		auto orders = _gameState.human.knowledgeTree.orders;
+		if(orders.length < 1){
+			TextWidget element = new TextWidget("queueEmpty", "Queue is empty"d);
 			element.padding(2);
 			element.margins(2);
 			element.textColor(0xFFFFFF);
 			element.backgroundColor(0x737373);
-			wla.add(element);
+			popup.addChild(element);
+		} else {
+			foreach(order ; orders){
+				auto text = format("Upgrade %s to level %s", order[0], order[1]);
+				TextWidget element = new TextWidget(null, to!dstring(text));
+				element.padding(2);
+				element.margins(2);
+				element.textColor(0xFFFFFF);
+				element.backgroundColor(0x737373);
+				wla.add(element);
+			}
 		}
-		popup.addChild(ot);
 		popup.addChild(lw);
+		//
 		return popup;
 	}
 

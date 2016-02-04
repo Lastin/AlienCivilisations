@@ -70,6 +70,12 @@ class Branch {
 		_points += points;
 		return 0;
 	}
+	/** Returns number of experience points to next level **/
+	uint nextExp(){
+		if(full)
+			return 0;
+		return MULTIPLIERS[level+1] * POPULATION_CONSTANT - _points;
+	}
 	override string toString() {
 		return to!string(level());
 	}
