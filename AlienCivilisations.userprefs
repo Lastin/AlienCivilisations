@@ -1,9 +1,8 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/entities/knowledgeTree.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/logic/ai.d">
     <Files>
-      <File FileName="AlienCivilisations/src/entities/player.d" Line="67" Column="67" />
-      <File FileName="AlienCivilisations/src/entities/knowledgeTree.d" Line="37" Column="37" />
+      <File FileName="AlienCivilisations/src/logic/ai.d" Line="3" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

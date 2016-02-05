@@ -7,6 +7,7 @@ import src.entities.player;
 import src.handlers.containers;
 import src.entities.ship;
 import std.stdio;
+import core.thread;
 
 class AI : Player {
 	/**THIS STATE IS ALWAYS REFERING TO REAL STATE OF THE GAME**/
@@ -15,7 +16,24 @@ class AI : Player {
 		super("AI", knowledgeTree, ships);
 		_realState = realState;
 	}
-	void makeMove(){
+	void makeMove() {
 		debug writeln("AI making the move");
+		
+	}
+}
+
+class Evaluator : Thread {
+	GameState _stateDup;
+	this(GameState realState) {
+		super(&run);
+		_stateDup = realState.dup();
+	}
+	private void run() {
+
+	}
+	void bestMove() {
+		foreach(Branch each; knowledgeTree.undevelopedBranches){
+			
+		}
 	}
 }
