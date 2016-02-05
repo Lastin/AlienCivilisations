@@ -32,8 +32,5 @@ class Evaluator : Thread {
 
 	}
 	void bestMove() {
-		foreach(Branch each; knowledgeTree.undevelopedBranches){
-			
-		}
 	}
 }

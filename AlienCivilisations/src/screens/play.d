@@ -11,6 +11,7 @@ import src.entities.ship;
 import src.entities.knowledgeTree;
 import src.entities.branch;
 import std.format;
+import src.logic.ai;
 
 class Play : AppFrame {
 	private {
@@ -64,6 +65,10 @@ class Play : AppFrame {
 		//set background
 		_animatedBackground = new AnimatedBackground(&_cameraPosition, _gameState);
 		_drawableRef = _animatedBackground;
+		//check if AI starts and makes it's turn if true
+		if(cast(AI)_gm.state.currentPlayer) {
+			_gm.endTurn();
+		}
 	}
 	~this(){
 		_animatedBackground.destroy();
@@ -284,7 +289,7 @@ class Play : AppFrame {
 		ListWidget lw = new ListWidget();
 		WidgetListAdapter wla = new WidgetListAdapter();
 		lw.adapter = wla;
-		lw.maxHeight = 200;
+		lw.maxHeight = 100;
 		Button[] buttons;
 		foreach(i, Branch each; branches){
 			buttons ~= new Button(to!string(i), "Upgrade"d);
@@ -305,7 +310,10 @@ class Play : AppFrame {
 				element.textColor(0xFFFFFF);
 				element.backgroundColor(0x737373);
 				wla.add(element);
-				popup.childById("queueEmpty").visibility(Visibility.Gone);
+				if(auto nimsg = popup.childById("queueEmpty")) {
+					nimsg.visibility(Visibility.Gone);
+				}
+
 			}
 			return true;
 		};
@@ -765,7 +773,6 @@ class Play : AppFrame {
 		window.removePopup(_currentPopup);
 		if(!popup){
 			_currentPopup = null;
-
 		} else {
 			_currentPopup = window.showPopup(popup, this);
 		}

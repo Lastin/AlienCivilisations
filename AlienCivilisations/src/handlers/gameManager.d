@@ -30,13 +30,22 @@ class GameManager {
 	}
 
 	void endTurn(){
-		debug writefln("Ending turn of player: %s", _gs.currentPlayer.name);
+		debug {
+			writeln("=======================================================");
+			writefln("Ending turn of player: %s", _gs.currentPlayer.name);
+		}
 		_gs.currentPlayer.completeTurn(_gs.map.planets);
 		_gs.moveQPosition();
+		debug writeln("=======================================================");
 		if(AI ai = cast(AI)_gs.currentPlayer){
+			debug {
+				writeln("=======================================================");
+				writeln("AI move");
+			}
 			ai.makeMove();
 			_gs.currentPlayer.completeTurn(_gs.map.planets);
 			_gs.moveQPosition();
+			debug writeln("=======================================================");
 		}
 		debug writefln("Current player: %s", _gs.currentPlayer.name);
 	}

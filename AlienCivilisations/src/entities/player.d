@@ -65,12 +65,12 @@ class Player {
 	/** Function executing actions on the end of the turn **/
 	void completeTurn(Planet[] allPlanets) {
 		Planet[] myPlanets = planets(allPlanets);
-		uint totalPopulation = 0;
+		int totalPopulation = 0;
 		foreach(Planet planet; myPlanets) {
-			totalPoints += planet.population;
+			totalPopulation += planet.populationSum;
 			planet.step();
 		}
-		knowledgeTree.develop(totalPopulation * knowledgeTree.totalEff);
+		knowledgeTree.develop(totalPopulation);
 		//TODO: add development of the knowledge tree
 	}
 

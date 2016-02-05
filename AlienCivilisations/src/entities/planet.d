@@ -80,7 +80,7 @@ class Planet {
 	}
 
 	override public string toString() {
-		return format(": %s \n Y:%s", );
+		return format("Position: %s \n Y:%s", _position.x, _position.y);
 	}
 	Planet setOwner(Player player) {
 		_owner = player;
@@ -113,15 +113,20 @@ class Planet {
 	void step() {
 		double workforce = calculateWorkforce();
 		debug {
-			writefln("Before population: %s", _population);
-			writefln("Workforce before ships production: %s", workforce);
+			writeln("-----------------------------------------");
+			writefln("Finishing step on planet %s", _name);
+			writefln("Population: %s", _population);
+			writefln("Workforce: %s", workforce);
 		}
 		//Consume at most half of the workforce on production
 		workforce = workforce/2 + produceShips(workforce/2);
 		debug writefln("Workforce after ships production: %s", workforce);
 		affectFood(workforce);
 		growPopulation();
-		debug writefln("After population: %s", _population);
+		debug {
+			writefln("New population: %s", _population);
+			writeln("-----------------------------------------");
+		}
 	}
 	/** 
 	 * Food supply at best increases at arythmetic rate
@@ -129,10 +134,15 @@ class Planet {
 	**/
 	private void affectFood(double workforce) {
 		//Consume food
-		_food -= populationSum * FOOD_CONSUMPTION_RATE;
 		double fpe = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
+		debug {
+			writefln("Food: %s", _food);
+			writefln("Consumed: %s", populationSum * FOOD_CONSUMPTION_RATE);
+			writefln("Produced: %s", workforce * FOOD_PRODUCTION_RATE * fpe);
+		}
+		_food -= populationSum * FOOD_CONSUMPTION_RATE;
 		_food += workforce * FOOD_PRODUCTION_RATE * fpe;
-		debug writefln("Food = %s", _food);
+		debug writefln("New food = %s", _food);
 		_food = max(_food, 0);
 	}
 	/**
@@ -151,6 +161,7 @@ class Planet {
 		}
 		double opf = 1;
 		if(populationSum > capacity){
+			debug writeln("[ Overpopulation takes effect! ]");
 			int overflow = populationSum - capacity;
 			opf += overflow / capacity;
 		}
@@ -159,10 +170,9 @@ class Planet {
 		double foodFactor = fpu / (fpu + 1);
 		int reproductivePairs = _population[2 .. 4].sum / 2;
 		debug {
-			writefln("reproductivePairs = %s", reproductivePairs);
-			writefln("foodFactor = %s", foodFactor);
-			writefln("opf = %s", opf);
-			writeln(reproductivePairs * CHILD_PER_PAID * foodFactor / opf);
+			writefln("Reproductive pairs: %s", reproductivePairs);
+			writefln("Food factor: %s", foodFactor);
+			writefln("OPF = %s", opf);
 		}
 		double newBorns = reproductivePairs * CHILD_PER_PAID;
 		_population[0] = to!int(newBorns * foodFactor / opf);
@@ -193,8 +203,9 @@ class Planet {
 	/** Subtract value, evenly distributing across all ages where possible **/
 	double destroyPopulation(double force) {
 		debug {
+			writeln("-----------------------------------------");
 			writefln("Destroying population using force: %s", force);
-			writeln(_population);
+			writefln("Population: %s",_population);
 		}
 		if(force >= populationSum) {
 			force -= populationSum;
@@ -221,7 +232,10 @@ class Planet {
 				}
 			}
 		}
-		debug writeln(_population);
+		debug { 
+			writefln("New population: %s",_population);
+			writeln("-----------------------------------------");
+		}
 		return force;
 	}
 	/** Produces ships from the queue **/
@@ -241,7 +255,7 @@ class Planet {
 		double sciEff = _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
 		if(type == ShipType.Military) {
 			debug {
-				writefln("Added order for new military ship with %s units", units);
+				writefln("Planet %s. Ordered military ship: %s units", _name, units);
 				if(units > _militaryUnits){
 					throw new Exception("Number of requested units is larget than available on a planet");
 				}
@@ -256,8 +270,8 @@ class Planet {
 			}
 			_shipOrders ~= ns;
 		} else {
-			debug writeln("Added new inhabitation ship to the queue");
 			_shipOrders ~= new InhabitationShip(eneEff, sciEff, 0);
+			debug writefln("Planet %s. Ordered inhabitation ship", _name);
 		}
 	}
 
@@ -272,7 +286,7 @@ class Planet {
 	}
 
 	void cancelOrder(int index){
-		debug writefln("Removing order %s", index);
+		debug writefln("Removing order #%s", index);
 		_shipOrders = _shipOrders.remove(index);
 	}
 }

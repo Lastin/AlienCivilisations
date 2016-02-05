@@ -9,8 +9,8 @@ import std.conv;
 public enum int MAX_LEVEL = 5;
 class Branch {
 	private {
-		enum double DEPENDENCY_EFFECT = 0.3;
-		enum int[5] MULTIPLIERS = [2,4,8,16,32];
+		enum double DEPENDENCY_EFFECT = 0.1;
+		enum int[5] MULTIPLIERS = [4,8,32,128,256];
 		BranchName _name;
 	} 
 
@@ -38,7 +38,7 @@ class Branch {
 	}
 	/** Returns effectiveness of the branch **/
 	@property double effectiveness() const {
-		double effness = 1 + level();
+		double effness = 1 + level() * 0.2;
 		foreach(const Branch dependency; _dependencies){
 			effness += dependency.level * DEPENDENCY_EFFECT;
 		}
@@ -59,8 +59,9 @@ class Branch {
 	/** Adds points to branch, until it reaches next level.
 	 Left over points are returned. **/
 	int addPoints(uint points) {
+		debug writefln("Developing branch: %s with points: %s", _name, points);
 		if(level() >= MAX_LEVEL) return points;
-		uint nlp = MULTIPLIERS[level()] * POPULATION_CONSTANT;
+		uint nlp = MULTIPLIERS[level] * POPULATION_CONSTANT;
 		uint pointsNeeded = nlp - _points;
 		if(pointsNeeded < points) {
 			_points += pointsNeeded;
@@ -74,7 +75,7 @@ class Branch {
 	uint nextExp(){
 		if(full)
 			return 0;
-		return MULTIPLIERS[level+1] * POPULATION_CONSTANT - _points;
+		return MULTIPLIERS[level] * POPULATION_CONSTANT - _points;
 	}
 	override string toString() {
 		return to!string(level());

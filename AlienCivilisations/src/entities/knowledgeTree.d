@@ -4,6 +4,8 @@ import src.entities.branch;
 import std.format;
 import std.typecons;
 import std.traits;
+import std.stdio;
+import std.conv;
 
 enum BranchName : string {
 	Energy = "Energy",
@@ -16,6 +18,7 @@ public class KnowledgeTree {
 	private {
 		Branch _energy, _food, _military, _science;
 		BranchName[] _orders;
+		double lambda = 0.1;
 	}
 	this(uint[4] points) {
 		_energy = 	new Branch(BranchName.Energy,	points[0]);
@@ -78,7 +81,7 @@ public class KnowledgeTree {
 	/** Returns branches which haven't reached max level **/
 	@property double totalEff(){
 		double total = 0;
-		foreach(Branch bn; EnumMembers!BranchName) {
+		foreach(bn; EnumMembers!BranchName) {
 			total += branch(bn).effectiveness;
 		}
 		return total;
@@ -113,16 +116,25 @@ public class KnowledgeTree {
 			_energy, _food, _military, _science);
 	}
 	/** Develops branches in queue using given points **/
-	int develop(int points){
-		while(points > 0 && _orders.length > 0){
+	int develop(int population){
+		uint points = to!uint(population * totalEff * lambda);
+		debug {
+			writeln("--------------------------------------");
+			writeln("Developing knowledge tree");
+			writefln("Population total: %s", population);
+			writefln("Points: %s", points);
+		}
+		while(points > 0 && _orders.length > 0) {
+			debug writefln("[Orders Iteration] Points: %s", points);
 			BranchName head = _orders[0];
 			int previousLevel = branch(head).level;
 			points = branch(head).addPoints(points);
 			if(previousLevel < branch(head).level) {
-				//remove from queue
+				//remove finished from queue
 				_orders = _orders[1 .. $];
 			}
 		}
+		debug writeln("--------------------------------------");
 		return points;
 	}
 	bool addOrder(BranchName toAdd){
