@@ -76,6 +76,13 @@ public class KnowledgeTree {
 		return orderPairs;
 	}
 	/** Returns branches which haven't reached max level **/
+	@property double totalEff(){
+		double total = 0;
+		foreach(Branch bn; EnumMembers!BranchName) {
+			total += branch(bn).effectiveness;
+		}
+		return total;
+	}
 	@property Branch[] undevelopedBranches() {
 		Branch[] nfd;
 		foreach(bn; EnumMembers!BranchName){
