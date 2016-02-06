@@ -1,8 +1,8 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/entities/branch.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/entities/planet.d">
     <Files>
-      <File FileName="AlienCivilisations/src/entities/branch.d" Line="13" Column="40" />
+      <File FileName="AlienCivilisations/src/entities/planet.d" Line="168" Column="17" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

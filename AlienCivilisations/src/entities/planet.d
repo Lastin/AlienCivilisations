@@ -162,12 +162,16 @@ class Planet {
 		double opf = 1;
 		if(populationSum > capacity){
 			debug writeln("[ Overpopulation takes effect! ]");
-			int overflow = populationSum - capacity;
-			opf += overflow / capacity;
+			double overflow = populationSum - capacity;
+			double lambda = 9.5;
+			opf -= (overflow / capacity) * lambda;
+			if(opf <= 0){
+				opf = 0.1;
+			}
 		}
 
 		double fpu = _food / (populationSum * FOOD_CONSUMPTION_RATE);
-		double foodFactor = fpu / (fpu + 1);
+		double foodFactor = (fpu / (fpu + 1)) * 2;
 		int reproductivePairs = _population[2 .. 4].sum / 2;
 		debug {
 			writefln("Reproductive pairs: %s", reproductivePairs);
@@ -175,7 +179,7 @@ class Planet {
 			writefln("OPF = %s", opf);
 		}
 		double newBorns = reproductivePairs * CHILD_PER_PAID;
-		_population[0] = to!int(newBorns * foodFactor / opf);
+		_population[0] = to!int(newBorns * foodFactor * opf);
 		assert(_population[0] >= 0);
 	}
 	/** Converts civil units into military units **/
