@@ -10,7 +10,7 @@ public enum int MAX_LEVEL = 5;
 class Branch {
 	private {
 		enum double DEPENDENCY_EFFECT = 0.1;
-		enum int[5] MULTIPLIERS = [4,8,32,128,256];
+		enum int[5] MULTIPLIERS = [2,4,16,64,256];
 		BranchName _name;
 	} 
 

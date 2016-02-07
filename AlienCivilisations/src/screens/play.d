@@ -12,6 +12,7 @@ import src.entities.knowledgeTree;
 import src.entities.branch;
 import std.format;
 import src.logic.ai;
+import std.math;
 
 class Play : AppFrame {
 	private {
@@ -370,23 +371,45 @@ class Play : AppFrame {
 		Widget popupWindow = defaultPopup("Execute military attack");
 		ListWidget shipsList = new ListWidget;
 		WidgetListAdapter wla = new WidgetListAdapter();
+		shipsList.adapter = wla;
+		bool[] selected;
 		foreach(MilitaryShip ship; _gameState.human.militaryShips) {
 			HorizontalLayout hl = new HorizontalLayout();
+			hl.addChild(new CheckBox("checkBox"));
 			hl.addChild(new TextWidget(null, "Military units onboard: " ~ to!dstring(ship.unitsOnboard)).textColor(0xFFFFFF));
 			hl.backgroundColor(0x737373);
 			hl.padding(2);
 			hl.margins(2);
 			wla.add(hl);
+			selected ~= false;
 		}
 		shipsList.itemClick = delegate (Widget source, int index) {
-			MilitaryShip s = _gameState.human.militaryShips[index];
+			selected[index] = !selected[index];
+			auto cb = cast(CheckBox)wla.itemWidget(index).childById("checkBox");
+			cb.checked = selected[index];
+			/*MilitaryShip s = _gameState.human.militaryShips[index];
 			_gameState.human.attackPlanet(s, _selectedPlanet);
 			debug {
 				writefln("Attacked planet: %s", _selectedPlanet.name);
 				writefln("Using ship: %s", index);
+			}*/
+			return true;
+		};
+		popupWindow.addChild(shipsList);
+		//Confirmation button
+		Button confirmBtn = new Button(null, "Attack the planet using selected ships."d);
+		confirmBtn.click = delegate (Widget source) {
+			foreach(i, ship; _gameState.human.militaryShips){
+				if(selected[i]){
+					_gameState.human.attackPlanet(ship, _selectedPlanet);
+				}
 			}
 			return true;
 		};
+		HorizontalLayout btnContainer = new HorizontalLayout();
+		btnContainer.addChild(new HSpacer());
+		btnContainer.addChild(confirmBtn);
+		popupWindow.addChild(btnContainer);
 		return popupWindow;
 	}
 	/** Returns widget for putting an order of ship on the planet **/
@@ -399,32 +422,49 @@ class Play : AppFrame {
 		tw1.fontWeight(FontWeight.Bold);
 		tw1.fontSize(15);
 		tw1.textColor(0xFFFFFF);
-		int temp = _selectedPlanet.militaryUnits * 1/100;
-		TextWidget total = new TextWidget(null, to!dstring(temp));
+		//
+		TextWidget total = new TextWidget();
 		total.fontSize(15);
 		total.textColor(0xFFFFFF);
 		//
 		infoTable.addChild(tw1);
 		infoTable.addChild(total);
 		//
-		TextWidget maxInfo = new TextWidget(null, to!dstring(temp));
+		TextWidget maxInfo = new TextWidget();
 		maxInfo.fontSize(15);
 		maxInfo.textColor(0xFF0000);
-		maxInfo.visibility(Visibility.Gone);
+		maxInfo.visibility(Visibility.Invisible);
 		//
 		ScrollBar slider = new ScrollBar(null, Orientation.Horizontal);
-		slider.position = 1;
 		slider.pageSize(1);
-		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event){
+		//Set slider properties dependent on player stats
+		int maxCapacity = Ship.capacity(_gameState.human);
+		if(_selectedPlanet.militaryUnits < 100) {
+			slider.minValue = 100 / _selectedPlanet.militaryUnits;
+		}
+		else if(_selectedPlanet.militaryUnits > maxCapacity) {
+			double temp = to!double(maxCapacity) / _selectedPlanet.militaryUnits;
+			debug writefln("Temp: %s", temp);
+			slider.maxValue = to!int(temp * 100.0);
+			maxInfo.text = "Units to be added to a new ship limited to the max capacity."d;
+			maxInfo.visibility(Visibility.Visible);
+		}
+		slider.position = slider.minValue;
+		auto sliderToUnits = delegate {
 			double percent = (slider.position + 1.0) / 100;
-			int result = to!int(_selectedPlanet.militaryUnits * percent);
-			if(result > Ship.capacity(_gameState.human)){
+			return to!int(_selectedPlanet.militaryUnits * percent);
+		};
+		total.text(to!dstring(sliderToUnits()));
+		//set slider change event
+		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event) {
+			/*
+			if(sliderToUnits() > Ship.capacity(_gameState.human)){
 				maxInfo.visibility(Visibility.Visible);
-				maxInfo.text = "Capacity exceeded. Ship will only hold it's max capacity;"d;
+				maxInfo.text = "Capacity exceeded. Ship will only hold it's max capacity"d;
 			} else {
-				maxInfo.visibility(Visibility.Gone);
-			}
-			total.text = to!dstring(result);
+				maxInfo.visibility(Visibility.Invisible);
+			}*/
+			total.text(to!dstring(sliderToUnits()));
 			return true;
 		};
 		//Extra info

@@ -67,6 +67,7 @@ abstract class Ship {
 }
 
 class MilitaryShip : Ship {
+	private double lambda = 10.0;
 	this(double eneEff, double sciEff, double completion) {
 		super(eneEff, sciEff, completion);
 	}
@@ -79,7 +80,7 @@ class MilitaryShip : Ship {
 	/** Perform attack on a given planet **/
 	void attackPlanet(Planet planet, double milEff){
 		debug writefln("Onboard before: %s", _onboard);
-		double force = _onboard * milEff;
+		double force = _onboard * milEff * lambda;
 		double rest = planet.destroyPopulation(force);
 		_onboard = to!int(rest / milEff);
 		debug writefln("Onboard after: %s", _onboard);

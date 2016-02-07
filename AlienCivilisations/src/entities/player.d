@@ -71,13 +71,12 @@ class Player {
 			planet.step();
 		}
 		knowledgeTree.develop(totalPopulation);
-		//TODO: add development of the knowledge tree
 	}
 
 	void attackPlanet(MilitaryShip ship, Planet planet){
-		//TODO: add attacking option
 		double milEff = _knowledgeTree.branch(BranchName.Military).effectiveness;
 		ship.attackPlanet(planet, milEff);
+		//TODO: remove ship after attacking if empty
 	}
 
 	void inhabitPlanet(Planet planet){

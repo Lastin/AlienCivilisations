@@ -1,8 +1,11 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/entities/planet.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/entities/ship.d">
     <Files>
-      <File FileName="AlienCivilisations/src/entities/planet.d" Line="168" Column="17" />
+      <File FileName="AlienCivilisations/src/screens/play.d" Line="447" Column="37" />
+      <File FileName="AlienCivilisations/src/entities/player.d" Line="79" Column="47" />
+      <File FileName="AlienCivilisations/src/entities/ship.d" Line="81" Column="50" />
+      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/core/types.d" Line="402" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
