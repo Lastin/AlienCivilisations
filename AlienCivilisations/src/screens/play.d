@@ -100,7 +100,6 @@ class Play : AppFrame {
 			_gm.endTurn();
 			updatePlanetInfo(_selectedPlanet);
 			updatePlayerStats();
-			JsonParser.saveState(_gameState, _cameraPosition);
 			return true;
 		};
 		inhabitButton.click = delegate (Widget source) {
@@ -213,10 +212,8 @@ class Play : AppFrame {
 		return true;
 	}
 
-	/** 
-	 * Widgets and layouts sections
-	 **/
-	/*Returns knowledge tree development popup window*/
+	/*Widgets and layouts sections*/
+	/** Returns knowledge tree development popup window **/
 	private Widget knowledgeTreePopup(){
 		Widget popup = defaultPopup("Knowledge Tree Development");
 		TableLayout tl = new TableLayout();
@@ -905,6 +902,9 @@ class Play : AppFrame {
 	@property override bool animating() { return true; }
 	@property override DrawableRef backgroundDrawable() const {
 		return cast(DrawableRef)_drawableRef;//(cast(Play)this)._drawableRef;
+	}
+	@property Vector2d cameraPosition() {
+		return _cameraPosition;
 	}
 }
 

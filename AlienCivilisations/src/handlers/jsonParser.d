@@ -16,11 +16,16 @@ class JsonParser {
 		JSONValue save = ["game" : "AlienCivilisations"];
 		save.object["date"] = __DATE__;
 		save.object["cameraPosition"] = vecToJSON(camPos);
-		save.object["queuePosition"] = state.queuePosition;
-		save.object["players"] = playersToJSON(state.players);
-		save.object["map"] = mapToJSON(state.map);
+		save.object["gameState"] = stateToJSON(state);
 		writeln(save.toPrettyString());
 		return true;
+	}
+	/** Parses GameState object and its contents into JSON **/
+	static JSONValue stateToJSON(GameState state) {
+		JSONValue jState = ["queuePosition" : state.queuePosition];
+		jState.object["players"] = playersToJSON(state.players);
+		jState.object["map"] = mapToJSON(state.map);
+		return jState;
 	}
 	/** Converts Map object and its contents into JSONValue **/
 	static JSONValue mapToJSON(Map map) {
