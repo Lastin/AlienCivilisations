@@ -18,8 +18,8 @@ class GameManager {
 
 	this() {
 		Player[] players;
-		players ~= new Player("Human", new KnowledgeTree(_sp));
-		players ~= new AI(&_gs, new KnowledgeTree(_sp));
+		players ~= new Player(0, "Human", new KnowledgeTree(_sp));
+		players ~= new AI(1, &_gs, new KnowledgeTree(_sp));
 		Map map = new Map(_mapSize, _planetsCount, players);
 		size_t queuePosition = uniform(0, players.length);
 		_gs = new GameState(map, players, queuePosition);

@@ -43,7 +43,6 @@ class Play : AppFrame {
 		initialiseObjects();
 		assignButtonsActions();
 		updatePlayerStats();
-		JsonParser.saveState(_gameState);
 	}
 
 	void initialiseObjects() {
@@ -97,7 +96,11 @@ class Play : AppFrame {
 			return false;
 		};
 		endTurnButton.click = delegate (Widget source) {
+			switchPopup(null);
 			_gm.endTurn();
+			updatePlanetInfo(_selectedPlanet);
+			updatePlayerStats();
+			JsonParser.saveState(_gameState, _cameraPosition);
 			return true;
 		};
 		inhabitButton.click = delegate (Widget source) {
@@ -361,7 +364,6 @@ class Play : AppFrame {
 		//
 		return popup;
 	}
-
 	/** Returns widget with options to attack a planet **/
 	private Widget attackPlanetPopup(){
 		if(_gameState.human.militaryShips.length < 1){

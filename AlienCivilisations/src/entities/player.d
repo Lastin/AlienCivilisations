@@ -9,11 +9,15 @@ import std.conv;
 import std.algorithm.mutation;
 
 class Player {
-	private immutable string _name;
-	private KnowledgeTree _knowledgeTree;
-	private Ship[] _ships;
+	private {
+		immutable string _name;
+		KnowledgeTree _knowledgeTree;
+		Ship[] _ships;
+		immutable int _uniqueId;
+	}
 
-	this(string name, KnowledgeTree knowledgeTree, Ship[] ships = null) {
+	this(int uniqueId, string name, KnowledgeTree knowledgeTree, Ship[] ships = null) {
+		_uniqueId = uniqueId;
 		_name = name;
 		_knowledgeTree = knowledgeTree;
 		_ships = ships;
@@ -57,6 +61,9 @@ class Player {
 			}
 		}
 		return inhShips;
+	}
+	@property int uniqueId() {
+		return _uniqueId;
 	}
 
 	void addShip(Ship ship){

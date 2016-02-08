@@ -12,8 +12,8 @@ import core.thread;
 class AI : Player {
 	/**THIS STATE IS ALWAYS REFERING TO REAL STATE OF THE GAME**/
 	private GameState* _realState;
-	this(GameState* realState, KnowledgeTree knowledgeTree, Ship[] ships = null) {
-		super("AI", knowledgeTree, ships);
+	this(int uniqueId, GameState* realState, KnowledgeTree knowledgeTree, Ship[] ships = null) {
+		super(uniqueId, "AI", knowledgeTree, ships);
 		_realState = realState;
 	}
 	void makeMove() {

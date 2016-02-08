@@ -55,6 +55,9 @@ class GameState {
 	@property AI ai(){
 		return cast(AI)_players[1];
 	}
+	@property size_t queuePosition() const {
+		return _queuePosition;
+	}
 	/** Moves queue position to next available position **/
 	void moveQPosition() {
 		if(++_queuePosition == _players.length){
@@ -85,9 +88,9 @@ class GameState {
 		Player[] duplicates;
 		foreach(Player origin; _players) {
 			if(AI ai = cast(AI)origin){
-				duplicates ~= new AI(&this, origin.knowledgeTree.dup, duplicateShips(origin.ships));
+				duplicates ~= new AI(origin.uniqueId, &this, origin.knowledgeTree.dup, duplicateShips(origin.ships));
 			} else {
-				duplicates ~= new Player(origin.name, origin.knowledgeTree.dup, duplicateShips(origin.ships));
+				duplicates ~= new Player(origin.uniqueId, origin.name, origin.knowledgeTree.dup, duplicateShips(origin.ships));
 			}
 		}
 		return duplicates;

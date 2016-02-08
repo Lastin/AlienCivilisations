@@ -52,6 +52,18 @@ abstract class Ship {
 	@property int unitsOnboard() const {
 		return _onboard;
 	}
+	@property double eneEff() const {
+		return _eneEff;
+	}
+	@property double sciEff() const {
+		return _sciEff;
+	}
+	@property double completion() const {
+		return _completion;
+	}
+	@property double onboard() const {
+		return _onboard;
+	}
 	/**Adds workforce to completion, eventually completing the construction**/
 	double build(double workforce){
 		if(workforce >= buildCost - _completion){
