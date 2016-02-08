@@ -13,6 +13,7 @@ import src.entities.branch;
 import std.format;
 import src.logic.ai;
 import std.math;
+import src.handlers.jsonParser;
 
 class Play : AppFrame {
 	private {
@@ -42,6 +43,7 @@ class Play : AppFrame {
 		initialiseObjects();
 		assignButtonsActions();
 		updatePlayerStats();
+		JsonParser.saveState(_gameState);
 	}
 
 	void initialiseObjects() {

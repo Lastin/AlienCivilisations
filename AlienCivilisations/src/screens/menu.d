@@ -4,6 +4,7 @@ import dlangui;
 import std.stdio;
 import src.screens.play;
 import core.thread;
+import src.handlers.jsonParser;
 
 class Menu : HorizontalLayout {
 	this(Play play = null) {
