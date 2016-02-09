@@ -22,6 +22,7 @@ extern (C) int UIAppMain(string[] args) {
 	vh.setMainMenu();
 	window.onClose = delegate () {
 		vh.destroy();
+		releaseResourcesOnAppExit();
 	};
 	window.backgroundColor = 0;
 	window.show();

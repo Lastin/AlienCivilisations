@@ -1,11 +1,11 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/handlers/ViewHandler.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/handlers/viewHandler.d">
     <Files>
-      <File FileName="AlienCivilisations/src/main.d" Line="24" Column="3" />
-      <File FileName="AlienCivilisations/src/screens/menu.d" Line="63" Column="4" />
-      <File FileName="AlienCivilisations/src/handlers/ViewHandler.d" Line="9" Column="18" />
-      <File FileName="AlienCivilisations/src/screens/play.d" Line="79" Column="3" />
+      <File FileName="AlienCivilisations/src/main.d" Line="24" Column="1" />
+      <File FileName="AlienCivilisations/src/screens/play.d" Line="83" Column="30" />
+      <File FileName="AlienCivilisations/src/handlers/viewHandler.d" Line="16" Column="11" />
+      <File FileName="AlienCivilisations/src/screens/menu.d" Line="29" Column="23" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

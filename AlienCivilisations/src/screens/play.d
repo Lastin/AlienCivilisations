@@ -21,6 +21,7 @@ class Play : AppFrame {
 		ViewHandler _vh;
 		//Vectors used for camera
 		bool _middleDown = false;
+		bool _drawing = true;
 		Vector2d _startPosition;
 		Vector2d _endPosition;
 		Vector2d _cameraPosition;
@@ -75,9 +76,10 @@ class Play : AppFrame {
 			_gm.endTurn();
 		}
 	}
-	~this(){
-		_animatedBackground.destroy();
+	~this() {
 		super.destroy();
+		_drawing = false;
+		_animatedBackground.destroy();
 	}
 	/** Assigns functions to buttons **/
 	private void assignButtonsActions(){
@@ -902,9 +904,14 @@ class Play : AppFrame {
 		//_animation.animate(interval);
 		invalidate();
 	}
-	@property override bool animating() { return true; }
+	@property override bool animating() {
+		return _drawing;
+	}
 	@property override DrawableRef backgroundDrawable() const {
 		return cast(DrawableRef)_drawableRef;//(cast(Play)this)._drawableRef;
+	}
+	@property AnimatedBackground animatedBackground() {
+		return _animatedBackground;
 	}
 	@property Vector2d cameraPosition() {
 		return _cameraPosition;

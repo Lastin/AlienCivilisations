@@ -65,10 +65,6 @@ class Menu : HorizontalLayout {
 		};
 		switchMenuView(MenuView.Main);
 	}
-
-	void setPlayObject(Play play){
-
-	}
 	/** Changes the visibility of buttons based on the desired look of menu **/
 	void switchMenuView(MenuView view) {
 		if(view == MenuView.Main){
