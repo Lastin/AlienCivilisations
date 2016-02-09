@@ -9,63 +9,83 @@ import std.file;
 import std.path;
 import std.algorithm;
 import std.array;
+import src.handlers.viewHanlder;
+
+enum MenuView : ubyte {
+	Main,
+	Pause
+}
 
 class Menu : HorizontalLayout {
-	this(Play play = null) {
+	private {
+		Widget _btnsContainer;
+		Button _newBtn;
+		Button _loadBtn;
+		Button _contBtn;
+		Button _saveBtn;
+		Button _menuBtn;
+		Button _exitBtn;
+	}
+	this(ViewHandler vh) {
 		backgroundImageId = "background";
 		setLayout();
-		Rect padding = Rect(100, 15, 100, 15);
-		Button exitButton;
-		if(play) {
-			Button contButton = new Button(null, "CONTINUE"d);
-			Button saveButton = new Button(null, "SAVE"d);
-			Button menuButton = new Button(null, "BACK TO MENU"d);
-			contButton.padding(padding).margins(10).fontSize(20);
-			saveButton.padding(padding).margins(10).fontSize(20);
-			menuButton.padding(padding).margins(10).fontSize(20);
-			childById("vl1").childById("hl1").childById("vr1").addChild(contButton);
-			childById("vl1").childById("hl1").childById("vr1").addChild(saveButton);
-			childById("vl1").childById("hl1").childById("vr1").addChild(menuButton);
-			contButton.click = delegate (Widget source) {
-				window.mainWidget = play;
-				return true;
-			};
-			menuButton.click = delegate (Widget source) {
-				window.mainWidget = new Menu();
-				return true;
-			};
-			saveButton.click = delegate (Widget source) {
-				contButton.visibility(Visibility.Gone);
-				saveButton.visibility(Visibility.Gone);
-				menuButton.visibility(Visibility.Gone);
-				return true;
-			};
-		} else {
-			Button playButton = new Button(null, "START GAME"d);
-			Button loadButton = new Button(null, "LOAD"d);
-			playButton.padding(padding).margins(10).fontSize(20);
-			loadButton.padding(padding).margins(10).fontSize(20);
-			playButton.click = delegate (Widget source) {
-				//Thread play = new Thread(&loadPlay).start();
-				//nplay.initialiseObjects();
-				window.mainWidget = new Play();
-				return true;
-			};
-			childById("vl1").childById("hl1").childById("vr1").addChild(playButton);
-			childById("vl1").childById("hl1").childById("vr1").addChild(loadButton);
-		}
-		exitButton = new Button(null, "EXIT"d);
-		exitButton.padding(padding).margins(10).fontSize(20);
-		exitButton.click = delegate (Widget source) {
+		//Fetch objects from layout
+		Widget btnsContainer = childById("vl1").childById("hl1").childById("btnsContainer");
+		_newBtn = cast(Button)btnsContainer.childById("newBtn");
+		_loadBtn = cast(Button)btnsContainer.childById("loadBtn");
+		_contBtn = cast(Button)btnsContainer.childById("contBtn");
+		_saveBtn = cast(Button)btnsContainer.childById("saveBtn");
+		_menuBtn = cast(Button)btnsContainer.childById("menuBtn");
+		_exitBtn = cast(Button)btnsContainer.childById("exitBtn");
+		//Set button actions
+		_newBtn.click = delegate (Widget source) {
+			vh.setNewPlay();
+			return true;
+		};
+		_loadBtn.click = delegate (Widget source) {
+			readSlots();
+			return true;
+		};
+		_contBtn.click = delegate (Widget source) {
+			vh.setPlay();
+			return true;
+		};
+		_saveBtn.click = delegate (Widget source) {
+			_btnsContainer.visibility(Visibility.Gone);
+			//TODO: add saving functions
+			return true;
+		};
+		_menuBtn.click = delegate (Widget source) {
+			switchMenuView(MenuView.Main);
+			return true;
+		};
+		_exitBtn.click = delegate (Widget source) {
 			window.close();
 			return true;
 		};
-		childById("vl1").childById("hl1").childById("vr1").addChild(exitButton);
-		childById("vl1").childById("hl1").childById("vr1").addChild(new VSpacer());
-		//testing
-		readSlots();
+		switchMenuView(MenuView.Main);
 	}
 
+	void setPlayObject(Play play){
+
+	}
+	/** Changes the visibility of buttons based on the desired look of menu **/
+	void switchMenuView(MenuView view) {
+		if(view == MenuView.Main){
+			_newBtn.visibility(Visibility.Visible);
+			_loadBtn.visibility(Visibility.Visible);
+			_contBtn.visibility(Visibility.Gone);
+			_saveBtn.visibility(Visibility.Gone);
+			_menuBtn.visibility(Visibility.Gone);
+		} else {
+			_newBtn.visibility(Visibility.Gone);
+			_loadBtn.visibility(Visibility.Gone);
+			_contBtn.visibility(Visibility.Visible);
+			_saveBtn.visibility(Visibility.Visible);
+			_menuBtn.visibility(Visibility.Visible);
+		}
+	}
+	/** Sets the layout of the main widget in window to menu **/
 	private void setLayout() {
 		layoutWidth(FILL_PARENT);
 		layoutHeight(FILL_PARENT);
@@ -80,7 +100,7 @@ class Menu : HorizontalLayout {
 				TextWidget {
 					text: "Alien Civilisations"
 					textColor: "white"
-					fontSize: 500%
+					fontSize: 400%
 					fontWeight: 800
 					padding: 40
 				}
@@ -95,7 +115,49 @@ class Menu : HorizontalLayout {
 					layoutWidth: fill
 					HSpacer {}
 					VerticalLayout {
-						id: vr1
+						id: btnsContainer
+						Button {
+							id: newBtn
+							text: "NEW GAME"
+							margins: 10
+							fontSize: 150%
+							padding: Rect {100, 15, 100, 15}
+						}
+						Button {
+							id: loadBtn
+							text: "LOAD SAVE"
+							margins: 10
+							fontSize: 150%
+							padding: Rect {100, 15, 100, 15}
+						}
+						Button {
+							id: contBtn
+							text: "CONTINUE"
+							margins: 10
+							fontSize: 150%
+							padding: Rect {100, 15, 100, 15}
+						}
+						Button {
+							id: saveBtn
+							text: "SAVE"
+							margins: 10
+							fontSize: 150%
+							padding: Rect {100, 15, 100, 15}
+						}
+						Button {
+							id: menuBtn
+							text: "MAIN MENU"
+							margins: 10
+							fontSize: 150%
+							padding: Rect {100, 15, 100, 15}
+						}
+						Button {
+							id: exitBtn
+							text: "EXIT GAME"
+							margins: 10
+							fontSize: 150%
+							padding: Rect {100, 15, 100, 15}
+						}
 						margins: 10
 					}
 					HSpacer {}
@@ -106,7 +168,7 @@ class Menu : HorizontalLayout {
 		addChild(parseML(layout));
 		addChild(new HSpacer());
 	}
-
+	/** Reads the save files and shows the widget to save/read files **/
 	private void showSaveWidget(){
 		Widget sw = childById("vl1").childById("saveWidget");
 		ListWidget lw = new ListWidget();
@@ -114,7 +176,7 @@ class Menu : HorizontalLayout {
 		lw.adapter = wla;
 		sw.visibility(Visibility.Visible);
 	}
-
+	/** Reads files from save directory **/
 	private File[] readSlots() {
 		string saveLocation = expandTilde("~/Documents/ACSaves");
 		if(!exists(saveLocation))

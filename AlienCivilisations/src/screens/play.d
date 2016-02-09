@@ -14,9 +14,11 @@ import std.format;
 import src.logic.ai;
 import std.math;
 import src.handlers.jsonParser;
+import src.handlers.viewHanlder;
 
 class Play : AppFrame {
 	private {
+		ViewHandler _vh;
 		//Vectors used for camera
 		bool _middleDown = false;
 		Vector2d _startPosition;
@@ -38,7 +40,8 @@ class Play : AppFrame {
 		PopupWidget _currentPopup;
 	}
 
-	this(){
+	this(ViewHandler vh){
+		_vh = vh;
 		addChild(getLayout());
 		initialiseObjects();
 		assignButtonsActions();
@@ -90,7 +93,7 @@ class Play : AppFrame {
 		keyEvent = delegate (Widget source, KeyEvent event) {
 			if(event.action == KeyAction.KeyDown &&
 				event.keyCode == KeyCode.ESCAPE) {
-				window.mainWidget = new Menu(this);
+				_vh.setPauseMenu(this);
 				return true;
 			}
 			return false;

@@ -4,6 +4,7 @@ import dlangui;
 import std.stdio;
 import src.screens.menu;
 import src.screens.play;
+import src.handlers.viewHanlder;
 
 mixin APP_ENTRY_POINT;
 
@@ -17,7 +18,11 @@ extern (C) int UIAppMain(string[] args) {
 													WindowFlag.Resizable,
 													width,
 													height);
-	window.mainWidget = new Menu();
+	ViewHandler vh = new ViewHandler(window);
+	vh.setMainMenu();
+	window.onClose = delegate () {
+		vh.destroy();
+	};
 	window.backgroundColor = 0;
 	window.show();
 	return Platform.instance.enterMessageLoop();
