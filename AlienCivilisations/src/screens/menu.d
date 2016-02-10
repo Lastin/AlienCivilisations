@@ -231,14 +231,14 @@ class Menu : HorizontalLayout {
 				try {
 					File file = SaveHandler.readSlot(i);
 					JSONValue json = JsonParser.parseFile(file);
-					dstring saveDate = to!dstring(json["date"].toString);
-					string p1 = json["gameState"]["players"][0]["name"].toString;
-					string p2 = json["gameState"]["players"][1]["name"].toString;
+					dstring saveDate = to!dstring(json["date"].str);
+					string p1 = json["gameState"]["players"][0]["name"].str;
+					string p2 = json["gameState"]["players"][1]["name"].str;
 					dstring players = to!dstring(p1 ~ " VS. " ~ p2);
 					whom.text(players);
 					date.text(saveDate);
 				} catch(JSONException exception) {
-					debug writefln(exception.toString);
+					debug writeln(exception.toString);
 					date.text("Read error"d);
 				}
 			} else {
@@ -279,7 +279,11 @@ class Menu : HorizontalLayout {
 				JSONValue json = JsonParser.parsePlay(_vh.play);
 				SaveHandler.saveJSON(slot, json);
 				usedSlots[slot] = true;
-				dstring saveDate = to!dstring(json["date"].toString);
+				string p1 = json["gameState"]["players"][0]["name"].str;
+				string p2 = json["gameState"]["players"][1]["name"].str;
+				dstring players = to!dstring(p1 ~ " VS. " ~ p2);
+				dstring saveDate = to!dstring(json["date"].str);
+				wla.itemWidget(slot).childById("whom").text(players);
 				wla.itemWidget(slot).childById("date").text(saveDate);
 				loadSlot.visibility(Visibility.Visible);
 				deleteSlot.visibility(Visibility.Visible);
@@ -293,9 +297,11 @@ class Menu : HorizontalLayout {
 		deleteSlot.click = delegate (Widget source) {
 			int slot = lw.selectedItemIndex;
 			SaveHandler.deleteSave(slot);
+			wla.itemWidget(slot).childById("whom").text(to!dstring(format("Slot %s", slot)));
 			wla.itemWidget(slot).childById("date").text("Empty"d);
 			deleteSlot.visibility(Visibility.Invisible);
 			loadSlot.visibility(Visibility.Invisible);
+			usedSlots[slot] = false;
 			return true;
 		};
 		_saveWidget.visibility(Visibility.Visible);

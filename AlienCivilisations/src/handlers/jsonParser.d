@@ -11,13 +11,16 @@ import src.entities.ship;
 import src.entities.map;
 import src.entities.planet;
 import src.screens.play;
+import std.conv;
+import std.typecons;
+import std.algorithm : sort;
 
 class JsonParser {
 	static JSONValue parsePlay(Play play) {
 		GameState state = play.gameState;
 		Vector2d camPos = play.cameraPosition;
 		JSONValue save = ["game" : "AlienCivilisations"];
-		save.object["date"] = __DATE__;
+		save.object["date"] = __TIME__ ~ " " ~ __DATE__;
 		save.object["cameraPosition"] = vecToJSON(camPos);
 		save.object["gameState"] = stateToJSON(state);
 		writeln(save.toPrettyString());
@@ -50,7 +53,11 @@ class JsonParser {
 		jsonPlanet.object["population"] = JSONValue([planet.population]);
 		jsonPlanet.object["food"] = planet.food;
 		jsonPlanet.object["militaryUnits"] = planet.militaryUnits;
-		jsonPlanet.object["shipOrders"] = shipsToJSON(planet.shipOrders);
+		JSONValue[] jShipOrders = shipsToJSON(planet.shipOrders);
+		foreach(i, jorder; jShipOrders) {
+			jorder.object["index"] = i;
+		}
+		jsonPlanet.object["shipOrders"] = jShipOrders;
 		return jsonPlanet;
 	}
 	/** Converts Vector2d object into JSONValue **/
@@ -75,7 +82,7 @@ class JsonParser {
 		foreach(ship; ships){
 			JSONValue json = ["type" : ""];
 			if(MilitaryShip ms = cast(MilitaryShip)ship) {
-				json["type"] = "MilitaryShip";
+				json["type"] = "Military";
 			} else {
 				json["type"] = "Inhabitation";
 			}
@@ -98,8 +105,10 @@ class JsonParser {
 		}
 		jkt.object["orders"] =  JSONValue();
 		jkt.object["orders"].type = JSON_TYPE.ARRAY;
-		foreach(order; kt.orders) {
-			jkt["orders"].array ~= JSONValue(order[0]);
+		foreach(i, order; kt.orders) {
+			JSONValue jorder = ["index" : i];
+			jorder.object["branch"] = order[0];
+			jkt["orders"].array ~= jorder;
 		}
 		return jkt;
 	}
@@ -107,5 +116,77 @@ class JsonParser {
 	static JSONValue parseFile(File file) {
 		string fileString = readText(file.name);
 		return parseJSON(fileString);
+	}
+
+	static GameState jsonToState(JSONValue json) {
+		try {
+			Player[] players;
+			JSONValue[] jplayers = json["gameState"]["players"].array;
+			foreach(JSONValue jplayer; jplayers){
+				players ~= jsonToPlayer(jplayer);
+			}
+			Map map = jsonToMap(json["gameState"]["map"]);
+			int queuePosition = to!int(json["gameState"]["queuePosition"].integer);
+			GameState gs = new GameState(map, players, queuePosition);
+		} catch(JSONException e) {
+			writeln(e.toString);
+		}
+
+		return null;
+	}
+
+	static Map jsonToMap(JSONValue jmap) {
+		JSONValue[] jplanets = jmap["planets"].array;
+		foreach(jplanet; jplanets) {
+
+		}
+		return null;
+	}
+
+	static Player jsonToPlayer(JSONValue jplayer) {
+		int uniqueId = to!int(jplayer["uniqueId"].integer);
+		string name = jplayer["name"].str;
+		KnowledgeTree kt = jsonToKT(jplayer["knowledgeTree"]);
+		Ship[] ships;
+		JSONValue[] jships = jplayer["ships"].array;
+		foreach(JSONValue jship; jships) {
+			ships ~= jsonToShip(jship);
+		}
+		return new Player(uniqueId, name, kt, ships);
+	}
+
+	static Ship jsonToShip(JSONValue jship) {
+		double eneEff = jship["eneEff"].floating;
+		double sciEff = jship["sciEff"].floating;
+		double completion = jship["completion"].floating;
+		string type = jship["type"].str;
+		if(type == "Military") {
+			int onboard = to!int(jship["onboard"].integer);
+			MilitaryShip ms = new MilitaryShip(eneEff, sciEff, completion);
+			ms.addUnits(onboard);
+			return ms;
+		} else {
+			return new InhabitationShip(eneEff, sciEff, completion);
+		}
+	}
+	static KnowledgeTree jsonToKT(JSONValue jkt) {
+		uint ene = to!uint(jkt["branches"]["Energy"].integer);
+		uint foo = to!uint(jkt["branches"]["Food"].integer);
+		uint mil = to!uint(jkt["branches"]["Military"].integer);
+		uint sci = to!uint(jkt["branches"]["Science"].integer);
+		uint[4] points = [ene, foo, mil, sci];
+		Tuple!(BranchName, int)[] orders;
+		JSONValue[] jorders = jkt["orders"].array;
+		foreach(jorder; jorders){
+			BranchName branch = to!BranchName(jorder["branch"].str);
+			int index = to!int(jorder["index"].integer);
+			orders ~= tuple(branch, index);
+		}
+		sort!q{a[1] < b[1]}(orders);
+		KnowledgeTree kt = new KnowledgeTree(points);
+		foreach_reverse(order; orders) {
+			kt.addOrder(order[0]);
+		}
+		return kt;
 	}
 }
