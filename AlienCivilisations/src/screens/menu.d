@@ -12,6 +12,7 @@ import std.array;
 import src.handlers.viewHanlder;
 import std.format;
 import std.json;
+import src.handlers.saveHandler;
 
 enum MenuView : ubyte {
 	Main,
@@ -134,7 +135,7 @@ class Menu : HorizontalLayout {
 							text: "Write to slot"
 						}
 						Button {
-							id: saveLoadCancel
+							id: cancelBtn
 							text: "Cancel"
 						}
 					}
@@ -200,37 +201,57 @@ class Menu : HorizontalLayout {
 	}
 	/** Reads the save files and shows the widget to save/read files **/
 	private void showSaveWidget(bool saving = false) {
-		string saveLocation = expandTilde("~/Documents/ACSaves");
+		//Fetch buttons from layout
 		Button loadSlot = cast(Button)_saveWidget.childById("loadSlot");
 		Button deleteSlot = cast(Button)_saveWidget.childById("deleteSlot");
 		Button saveToSlot = cast(Button)_saveWidget.childById("saveToSlot");
-		Button saveLoadCancel = cast(Button)_saveWidget.childById("saveLoadCancel");
+		Button cancelBtn = cast(Button)_saveWidget.childById("cancelBtn");
+		//Hide and show proper content
 		loadSlot.visibility(Visibility.Invisible);
 		deleteSlot.visibility(Visibility.Invisible);
 		saveToSlot.visibility(Visibility.Invisible);
 		_btnsContainer.visibility(Visibility.Gone);
-		saveLoadCancel.click = delegate (Widget source) {
-			_saveWidget.visibility(Visibility.Gone);
-			_btnsContainer.visibility(Visibility.Visible);
-			return true;
-		};
+		//Initialise adapter and add elements
 		ListWidget lw = cast(ListWidget)_saveWidget.childById("slotsList");
 		WidgetListAdapter wla = new WidgetListAdapter();
 		lw.adapter = wla;
+		bool[15] usedSlots = SaveHandler.usedSlots();
+		foreach(int i, used; usedSlots) {
+			HorizontalLayout listElement = new HorizontalLayout();
+			listElement.backgroundColor(0x737373);
+			listElement.layoutWidth(FILL_PARENT);
+			listElement.padding(2);
+			listElement.margins(2);
+			auto whom = new TextWidget("whom", ""d).textColor(0xFFFFFF).fontSize(14);
+			listElement.addChild(whom);
+			listElement.addChild(new HSpacer());
+			auto date = new TextWidget("date", ""d).textColor(0xFFFFFF).fontSize(14);
+			listElement.addChild(date);
+			if(used) {
+				try {
+					File file = SaveHandler.readSlot(i);
+					JSONValue json = JsonParser.parseFile(file);
+					dstring saveDate = to!dstring(json["date"].toString);
+					string p1 = json["gameState"]["players"][0]["name"].toString;
+					string p2 = json["gameState"]["players"][1]["name"].toString;
+					dstring players = to!dstring(p1 ~ " VS. " ~ p2);
+					whom.text(players);
+					date.text(saveDate);
+				} catch(JSONException exception) {
+					debug writefln(exception.toString);
+					date.text("Read error"d);
+				}
+			} else {
+				whom.text(to!dstring(format("Slot %s", i)));
+				date.text("Empty"d);
+			}
+			wla.add(listElement);
+		}
+		//Set actions on selection change
 		int previousSelected = -1;
-		bool[] usedSlots;
 		lw.itemSelected  = delegate (Widget source, int itemIndex) {
 			if(saving){
 				saveToSlot.visibility(Visibility.Visible);
-				saveToSlot.click = delegate (Widget source) {
-					if(_vh.play){
-						JSONValue json = JsonParser.parsePlay(_vh.play);
-						std.file.write(saveLocation ~ format("/slot%s.acsave", itemIndex), json.toPrettyString());
-						usedSlots[itemIndex] = true;
-						wla.itemWidget(itemIndex).childById("details").text = to!dstring(json["date"].toString);
-					}
-					return true;
-				};
 			}
 			if(previousSelected > -1){
 				lw.itemWidget(previousSelected).backgroundColor(0x737373);
@@ -239,14 +260,6 @@ class Menu : HorizontalLayout {
 			if(usedSlots[itemIndex]) {
 				loadSlot.visibility(Visibility.Visible);
 				deleteSlot.visibility(Visibility.Visible);
-				loadSlot.click = delegate (Widget source) {
-					//TODO: load from file
-					return true;
-				};
-				deleteSlot.click = delegate (Widget source) {
-					//TODO: load from file
-					return true;
-				};
 			} else {
 				loadSlot.visibility(Visibility.Invisible);
 				deleteSlot.visibility(Visibility.Invisible);
@@ -254,47 +267,37 @@ class Menu : HorizontalLayout {
 			previousSelected = itemIndex;
 			return true;
 		};
-		for(int i=0; i<15; i++){
-			HorizontalLayout listElement = new HorizontalLayout();
-			listElement.backgroundColor(0x737373);
-			listElement.layoutWidth(FILL_PARENT);
-			listElement.padding(2);
-			listElement.margins(2);
-			listElement.addChild(new TextWidget(null, to!dstring(format("Slot %s", i))).textColor(0xFFFFFF));
-			listElement.addChild(new HSpacer());
-
-			string fileName = format("/slot%s.acsave", i);
-			if(exists(saveLocation ~ fileName)){
-				try {
-					auto slot = new File(saveLocation ~ fileName);
-					JSONValue json = JsonParser.parseFile(slot);
-					listElement.addChild(new TextWidget(null, to!dstring(json["date"].toString)).textColor(0xFFFFFF));
-					usedSlots ~= true;
-				} catch(JSONException exception) {
-					debug writefln(exception.toString);
-					listElement.addChild(new TextWidget(null, "Read error"d).textColor(0xFFFFFF));
-				}
-			} else {
-				listElement.addChild(new TextWidget("details", "Empty"d).textColor(0xFFFFFF));
-				usedSlots ~= false;
+		//Set buttons actions
+		cancelBtn.click = delegate (Widget source) {
+			_saveWidget.visibility(Visibility.Gone);
+			_btnsContainer.visibility(Visibility.Visible);
+			return true;
+		};
+		saveToSlot.click = delegate (Widget source) {
+			if(_vh.play) {
+				int slot = lw.selectedItemIndex;
+				JSONValue json = JsonParser.parsePlay(_vh.play);
+				SaveHandler.saveJSON(slot, json);
+				usedSlots[slot] = true;
+				dstring saveDate = to!dstring(json["date"].toString);
+				wla.itemWidget(slot).childById("date").text(saveDate);
+				loadSlot.visibility(Visibility.Visible);
+				deleteSlot.visibility(Visibility.Visible);
 			}
-			wla.add(listElement);
-		}
+			return true;
+		};
+		loadSlot.click = delegate (Widget source) {
+			//TODO: load from file
+			return true;
+		};
+		deleteSlot.click = delegate (Widget source) {
+			int slot = lw.selectedItemIndex;
+			SaveHandler.deleteSave(slot);
+			wla.itemWidget(slot).childById("date").text("Empty"d);
+			deleteSlot.visibility(Visibility.Invisible);
+			loadSlot.visibility(Visibility.Invisible);
+			return true;
+		};
 		_saveWidget.visibility(Visibility.Visible);
 	}
-	private size_t slotIndex(string name, File[] slots) {
-		foreach(i, slot; slots){
-			if(slot.name == name)
-				return i;
-		}
-		return -1;
-	}
-	/** Reads files from save directory **/
-	/*private File[] readSlots() {
-		string saveLocation = expandTilde("~/Documents/ACSaves");
-		if(!exists(saveLocation))
-			mkdirRecurse(saveLocation);
-		auto files = dirEntries(saveLocation, SpanMode.shallow).filter!(f => f.name.endsWith(".acsave"));
-		return files;
-	}*/
 }

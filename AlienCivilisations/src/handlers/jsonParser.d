@@ -104,8 +104,8 @@ class JsonParser {
 		return jkt;
 	}
 	/** Parses file in json format to associative array **/
-	static JSONValue parseFile(File* fileHandle) {
-		string fileString = readText(fileHandle.name);
+	static JSONValue parseFile(File file) {
+		string fileString = readText(file.name);
 		return parseJSON(fileString);
 	}
 }

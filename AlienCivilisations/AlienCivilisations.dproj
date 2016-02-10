@@ -117,6 +117,7 @@
     <Compile Include="src\handlers\jsonParser.d" />
     <Compile Include="src\logic\ai.d" />
     <Compile Include="src\handlers\viewHandler.d" />
+    <Compile Include="src\handlers\saveHandler.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
