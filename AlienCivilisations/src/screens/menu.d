@@ -10,6 +10,8 @@ import std.path;
 import std.algorithm;
 import std.array;
 import src.handlers.viewHanlder;
+import std.format;
+import std.json;
 
 enum MenuView : ubyte {
 	Main,
@@ -18,7 +20,9 @@ enum MenuView : ubyte {
 
 class Menu : HorizontalLayout {
 	private {
+		ViewHandler _vh;
 		Widget _btnsContainer;
+		Widget _saveWidget;
 		Button _newBtn;
 		Button _loadBtn;
 		Button _contBtn;
@@ -27,23 +31,26 @@ class Menu : HorizontalLayout {
 		Button _exitBtn;
 	}
 	this(ViewHandler vh) {
+		_vh = vh;
 		backgroundImageId = "background";
 		setLayout();
 		//Fetch objects from layout
-		Widget btnsContainer = childById("vl1").childById("hl1").childById("btnsContainer");
-		_newBtn = cast(Button)btnsContainer.childById("newBtn");
-		_loadBtn = cast(Button)btnsContainer.childById("loadBtn");
-		_contBtn = cast(Button)btnsContainer.childById("contBtn");
-		_saveBtn = cast(Button)btnsContainer.childById("saveBtn");
-		_menuBtn = cast(Button)btnsContainer.childById("menuBtn");
-		_exitBtn = cast(Button)btnsContainer.childById("exitBtn");
+		_btnsContainer = childById("vl1").childById("hl1").childById("btnsContainer");
+		_saveWidget = childById("vl1").childById("saveWidget");
+		_saveWidget.visibility(Visibility.Gone);
+		_newBtn = cast(Button)_btnsContainer.childById("newBtn");
+		_loadBtn = cast(Button)_btnsContainer.childById("loadBtn");
+		_contBtn = cast(Button)_btnsContainer.childById("contBtn");
+		_saveBtn = cast(Button)_btnsContainer.childById("saveBtn");
+		_menuBtn = cast(Button)_btnsContainer.childById("menuBtn");
+		_exitBtn = cast(Button)_btnsContainer.childById("exitBtn");
 		//Set button actions
 		_newBtn.click = delegate (Widget source) {
 			vh.setNewPlay();
 			return true;
 		};
 		_loadBtn.click = delegate (Widget source) {
-			readSlots();
+			showSaveWidget();
 			return true;
 		};
 		_contBtn.click = delegate (Widget source) {
@@ -51,8 +58,7 @@ class Menu : HorizontalLayout {
 			return true;
 		};
 		_saveBtn.click = delegate (Widget source) {
-			_btnsContainer.visibility(Visibility.Gone);
-			//TODO: add saving functions
+			showSaveWidget(true);
 			return true;
 		};
 		_menuBtn.click = delegate (Widget source) {
@@ -64,6 +70,10 @@ class Menu : HorizontalLayout {
 			return true;
 		};
 		switchMenuView(MenuView.Main);
+	}
+	~this(){
+		_saveWidget.destroy();
+		super.destroy();
 	}
 	/** Changes the visibility of buttons based on the desired look of menu **/
 	void switchMenuView(MenuView view) {
@@ -104,6 +114,30 @@ class Menu : HorizontalLayout {
 					id: "saveWidget"
 					backgroundColor: 0x80969696
 					margins: 20
+					ListWidget {
+						id: "slotsList"
+					}
+					HorizontalLayout {
+						layoutWidth: fill
+						Button {
+							id: loadSlot
+							text: "Load save"
+						}
+						HSpacer {}
+						Button {
+							id: deleteSlot
+							text: "Delete save"
+						}
+						HSpacer {}
+						Button {
+							id: saveToSlot
+							text: "Write to slot"
+						}
+						Button {
+							id: saveLoadCancel
+							text: "Cancel"
+						}
+					}
 				}
 				HorizontalLayout {
 					id: hl1
@@ -165,22 +199,102 @@ class Menu : HorizontalLayout {
 		addChild(new HSpacer());
 	}
 	/** Reads the save files and shows the widget to save/read files **/
-	private void showSaveWidget(){
-		Widget sw = childById("vl1").childById("saveWidget");
-		ListWidget lw = new ListWidget();
+	private void showSaveWidget(bool saving = false) {
+		string saveLocation = expandTilde("~/Documents/ACSaves");
+		Button loadSlot = cast(Button)_saveWidget.childById("loadSlot");
+		Button deleteSlot = cast(Button)_saveWidget.childById("deleteSlot");
+		Button saveToSlot = cast(Button)_saveWidget.childById("saveToSlot");
+		Button saveLoadCancel = cast(Button)_saveWidget.childById("saveLoadCancel");
+		loadSlot.visibility(Visibility.Invisible);
+		deleteSlot.visibility(Visibility.Invisible);
+		saveToSlot.visibility(Visibility.Invisible);
+		_btnsContainer.visibility(Visibility.Gone);
+		saveLoadCancel.click = delegate (Widget source) {
+			_saveWidget.visibility(Visibility.Gone);
+			_btnsContainer.visibility(Visibility.Visible);
+			return true;
+		};
+		ListWidget lw = cast(ListWidget)_saveWidget.childById("slotsList");
 		WidgetListAdapter wla = new WidgetListAdapter();
 		lw.adapter = wla;
-		sw.visibility(Visibility.Visible);
+		int previousSelected = -1;
+		bool[] usedSlots;
+		lw.itemSelected  = delegate (Widget source, int itemIndex) {
+			if(saving){
+				saveToSlot.visibility(Visibility.Visible);
+				saveToSlot.click = delegate (Widget source) {
+					if(_vh.play){
+						JSONValue json = JsonParser.parsePlay(_vh.play);
+						std.file.write(saveLocation ~ format("/slot%s.acsave", itemIndex), json.toPrettyString());
+						usedSlots[itemIndex] = true;
+						wla.itemWidget(itemIndex).childById("details").text = to!dstring(json["date"].toString);
+					}
+					return true;
+				};
+			}
+			if(previousSelected > -1){
+				lw.itemWidget(previousSelected).backgroundColor(0x737373);
+			}
+			wla.itemWidget(itemIndex).backgroundColor(0x999999);
+			if(usedSlots[itemIndex]) {
+				loadSlot.visibility(Visibility.Visible);
+				deleteSlot.visibility(Visibility.Visible);
+				loadSlot.click = delegate (Widget source) {
+					//TODO: load from file
+					return true;
+				};
+				deleteSlot.click = delegate (Widget source) {
+					//TODO: load from file
+					return true;
+				};
+			} else {
+				loadSlot.visibility(Visibility.Invisible);
+				deleteSlot.visibility(Visibility.Invisible);
+			}
+			previousSelected = itemIndex;
+			return true;
+		};
+		for(int i=0; i<15; i++){
+			HorizontalLayout listElement = new HorizontalLayout();
+			listElement.backgroundColor(0x737373);
+			listElement.layoutWidth(FILL_PARENT);
+			listElement.padding(2);
+			listElement.margins(2);
+			listElement.addChild(new TextWidget(null, to!dstring(format("Slot %s", i))).textColor(0xFFFFFF));
+			listElement.addChild(new HSpacer());
+
+			string fileName = format("/slot%s.acsave", i);
+			if(exists(saveLocation ~ fileName)){
+				try {
+					auto slot = new File(saveLocation ~ fileName);
+					JSONValue json = JsonParser.parseFile(slot);
+					listElement.addChild(new TextWidget(null, to!dstring(json["date"].toString)).textColor(0xFFFFFF));
+					usedSlots ~= true;
+				} catch(JSONException exception) {
+					debug writefln(exception.toString);
+					listElement.addChild(new TextWidget(null, "Read error"d).textColor(0xFFFFFF));
+				}
+			} else {
+				listElement.addChild(new TextWidget("details", "Empty"d).textColor(0xFFFFFF));
+				usedSlots ~= false;
+			}
+			wla.add(listElement);
+		}
+		_saveWidget.visibility(Visibility.Visible);
+	}
+	private size_t slotIndex(string name, File[] slots) {
+		foreach(i, slot; slots){
+			if(slot.name == name)
+				return i;
+		}
+		return -1;
 	}
 	/** Reads files from save directory **/
-	private File[] readSlots() {
+	/*private File[] readSlots() {
 		string saveLocation = expandTilde("~/Documents/ACSaves");
 		if(!exists(saveLocation))
 			mkdirRecurse(saveLocation);
-		auto files = dirEntries(saveLocation, SpanMode.shallow).filter!(f => f.name.endsWith(".save"));
-		File[] slots;
-		foreach(f; files)
-			writeln(f.name);
-		return slots;
-	}
+		auto files = dirEntries(saveLocation, SpanMode.shallow).filter!(f => f.name.endsWith(".acsave"));
+		return files;
+	}*/
 }

@@ -916,6 +916,9 @@ class Play : AppFrame {
 	@property Vector2d cameraPosition() {
 		return _cameraPosition;
 	}
+	@property GameState gameState() {
+		return _gameState;
+	}
 }
 
 class AnimatedBackground : Drawable {

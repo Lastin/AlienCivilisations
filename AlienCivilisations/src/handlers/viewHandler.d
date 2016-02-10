@@ -15,7 +15,7 @@ class ViewHandler {
 	}
 	~this() {
 		if(_play){
-			_play.destroy();
+			//_play.destroy();
 		}
 		_menu.destroy;
 	}
@@ -35,5 +35,8 @@ class ViewHandler {
 	void setPlay() {
 		if(_play)
 			_window.mainWidget = _play;
+	}
+	@property Play play() {
+		return _play;
 	}
 }

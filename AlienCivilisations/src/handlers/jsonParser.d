@@ -10,25 +10,28 @@ import src.entities.branch;
 import src.entities.ship;
 import src.entities.map;
 import src.entities.planet;
+import src.screens.play;
 
 class JsonParser {
-	static bool saveState(GameState state, Vector2d camPos) {
+	static JSONValue parsePlay(Play play) {
+		GameState state = play.gameState;
+		Vector2d camPos = play.cameraPosition;
 		JSONValue save = ["game" : "AlienCivilisations"];
 		save.object["date"] = __DATE__;
 		save.object["cameraPosition"] = vecToJSON(camPos);
 		save.object["gameState"] = stateToJSON(state);
 		writeln(save.toPrettyString());
-		return true;
+		return save;
 	}
 	/** Parses GameState object and its contents into JSON **/
-	static JSONValue stateToJSON(GameState state) {
+	private static JSONValue stateToJSON(GameState state) {
 		JSONValue jState = ["queuePosition" : state.queuePosition];
 		jState.object["players"] = playersToJSON(state.players);
 		jState.object["map"] = mapToJSON(state.map);
 		return jState;
 	}
 	/** Converts Map object and its contents into JSONValue **/
-	static JSONValue mapToJSON(Map map) {
+	private static JSONValue mapToJSON(Map map) {
 		JSONValue jMap = ["size" : map.size];
 		jMap.object["planets"] = JSONValue();
 		jMap["planets"].type = JSON_TYPE.ARRAY;
@@ -38,7 +41,7 @@ class JsonParser {
 		return jMap;
 	}
 	/** Converts Planet object into JSONValue **/
-	static JSONValue planetToJSON(Planet planet, ) {
+	private static JSONValue planetToJSON(Planet planet, ) {
 		JSONValue jsonPlanet = ["name" : planet.name];
 		jsonPlanet.object["position"] = vecToJSON(planet.position);
 		jsonPlanet.object["radius"] = planet.radius;
@@ -51,11 +54,11 @@ class JsonParser {
 		return jsonPlanet;
 	}
 	/** Converts Vector2d object into JSONValue **/
-	static JSONValue vecToJSON(Vector2d vec) {
+	private static JSONValue vecToJSON(Vector2d vec) {
 		return JSONValue(["x": vec.x, "y": vec.y]);
 	}
 	/** Converts Player object and its knowledge tree and ships into JSONValue **/
-	static JSONValue[] playersToJSON(Player[] players){
+	private static JSONValue[] playersToJSON(Player[] players){
 		JSONValue[] jPlayers;
 		foreach(player; players) {
 			JSONValue p = ["name" : player.name];
@@ -67,7 +70,7 @@ class JsonParser {
 		return jPlayers;
 	} 
 	/** Converts array of Ship objects into JSONValue **/
-	static JSONValue[] shipsToJSON(Ship[] ships) {
+	private static JSONValue[] shipsToJSON(Ship[] ships) {
 		JSONValue[] jShips;
 		foreach(ship; ships){
 			JSONValue json = ["type" : ""];
@@ -85,7 +88,7 @@ class JsonParser {
 		return jShips;
 	}
 	/** Converts KnowledgeTree object into JSONValue **/
-	static JSONValue ktToJSON(KnowledgeTree kt) {
+	private static JSONValue ktToJSON(KnowledgeTree kt) {
 		JSONValue jkt = JSONValue();
 		jkt.type = JSON_TYPE.OBJECT;
 		jkt.object["branches"] = JSONValue();
@@ -100,6 +103,9 @@ class JsonParser {
 		}
 		return jkt;
 	}
-
-
+	/** Parses file in json format to associative array **/
+	static JSONValue parseFile(File* fileHandle) {
+		string fileString = readText(fileHandle.name);
+		return parseJSON(fileString);
+	}
 }
