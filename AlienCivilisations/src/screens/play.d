@@ -95,6 +95,7 @@ class Play : AppFrame {
 		keyEvent = delegate (Widget source, KeyEvent event) {
 			if(event.action == KeyAction.KeyDown &&
 				event.keyCode == KeyCode.ESCAPE) {
+				switchPopup(null);
 				_vh.setPauseMenu(this);
 				return true;
 			}

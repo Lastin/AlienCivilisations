@@ -13,6 +13,7 @@ import src.handlers.viewHanlder;
 import std.format;
 import std.json;
 import src.handlers.saveHandler;
+import src.handlers.containers;
 
 enum MenuView : ubyte {
 	Main,
@@ -292,6 +293,10 @@ class Menu : HorizontalLayout {
 		};
 		loadSlot.click = delegate (Widget source) {
 			//TODO: load from file
+			int slot = lw.selectedItemIndex;
+			auto save = SaveHandler.readSlot(slot);
+			JSONValue jstate = JsonParser.parseFile(save);
+			GameState gs = JsonParser.jsonToState(jstate);
 			return true;
 		};
 		deleteSlot.click = delegate (Widget source) {

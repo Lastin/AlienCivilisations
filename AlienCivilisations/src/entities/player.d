@@ -65,7 +65,7 @@ class Player {
 	@property int uniqueId() {
 		return _uniqueId;
 	}
-
+	/** Adds a ship to list of player'savailable ships **/
 	void addShip(Ship ship){
 		_ships ~= ship;
 	}
@@ -79,14 +79,14 @@ class Player {
 		}
 		knowledgeTree.develop(totalPopulation);
 	}
-
+	/** Attacks given planet using given military ship with force based on player knowledge tree and ship units **/
 	void attackPlanet(MilitaryShip ship, Planet planet){
 		double milEff = _knowledgeTree.branch(BranchName.Military).effectiveness;
 		ship.attackPlanet(planet, milEff);
 		//TODO: remove ship after attacking if empty
 	}
-
-	void inhabitPlanet(Planet planet){
+	/** Inhabits given planet using first available inhabitation ship **/
+	void inhabitPlanet(Planet planet) {
 		InhabitationShip[] ihabits = inhabitationShips();
 		if(planet.owner || ihabits.length < 1)
 			return;
@@ -98,5 +98,13 @@ class Player {
 				return;
 			}
 		}
+	}
+	/** Returns player with given unique id, or null if none found **/
+	static Player findPlayerWithId(int id, Player[] players) {
+		foreach(player; players) {
+			if(id == player.uniqueId)
+				return player;
+		}
+		return null;
 	}
 }

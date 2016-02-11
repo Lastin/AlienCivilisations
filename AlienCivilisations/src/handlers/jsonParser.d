@@ -14,6 +14,7 @@ import src.screens.play;
 import std.conv;
 import std.typecons;
 import std.algorithm : sort;
+import std.format;
 
 class JsonParser {
 	static JSONValue parsePlay(Play play) {
@@ -50,7 +51,7 @@ class JsonParser {
 		jsonPlanet.object["radius"] = planet.radius;
 		jsonPlanet.object["breathableAtmosphere"] = planet.breathableAtmosphere;
 		jsonPlanet.object["ownerId"] = planet.owner ? planet.owner.uniqueId : -1;
-		jsonPlanet.object["population"] = JSONValue([planet.population]);
+		jsonPlanet.object["population"] = planet.population.idup;
 		jsonPlanet.object["food"] = planet.food;
 		jsonPlanet.object["militaryUnits"] = planet.militaryUnits;
 		JSONValue[] jShipOrders = shipsToJSON(planet.shipOrders);
@@ -86,10 +87,10 @@ class JsonParser {
 			} else {
 				json["type"] = "Inhabitation";
 			}
-			json.object["eneEff"] = ship.eneEff;
-			json.object["sciEff"] = ship.sciEff;
-			json.object["completion"] = ship.completion;
-			json.object["onboard"] = ship.onboard;
+			json.object["eneEff"] = JSONValue(ship.eneEff);
+			json.object["sciEff"] = JSONValue(ship.sciEff);
+			json.object["completion"] = JSONValue(ship.completion);
+			json.object["onboard"] = JSONValue(ship.onboard);
 			jShips ~= json;
 		}
 		return jShips;
@@ -99,9 +100,9 @@ class JsonParser {
 		JSONValue jkt = JSONValue();
 		jkt.type = JSON_TYPE.OBJECT;
 		jkt.object["branches"] = JSONValue();
-		jkt["branches"].type = JSON_TYPE.ARRAY;
+		jkt["branches"].type = JSON_TYPE.OBJECT;
 		foreach(branch; kt.branches) {
-			jkt["branches"].array ~= JSONValue([branch.name : branch.points]);
+			jkt["branches"].object[branch.name] = branch.points;
 		}
 		jkt.object["orders"] =  JSONValue();
 		jkt.object["orders"].type = JSON_TYPE.ARRAY;
@@ -125,22 +126,54 @@ class JsonParser {
 			foreach(JSONValue jplayer; jplayers){
 				players ~= jsonToPlayer(jplayer);
 			}
-			Map map = jsonToMap(json["gameState"]["map"]);
+			Map map = jsonToMap(json["gameState"]["map"], players);
 			int queuePosition = to!int(json["gameState"]["queuePosition"].integer);
-			GameState gs = new GameState(map, players, queuePosition);
+			return new GameState(map, players, queuePosition);
 		} catch(JSONException e) {
 			writeln(e.toString);
 		}
-
 		return null;
 	}
 
-	static Map jsonToMap(JSONValue jmap) {
+	static Map jsonToMap(JSONValue jmap, Player[] players) {
 		JSONValue[] jplanets = jmap["planets"].array;
+		Planet[] planets;
 		foreach(jplanet; jplanets) {
-
+			planets ~= jsonToPlanet(jplanet, players);
 		}
-		return null;
+		float size = safeFloat(jmap["size"]);
+		return new Map(size, planets);
+	}
+
+	static Planet jsonToPlanet(JSONValue jplanet, Player[] players) {
+		string name = jplanet["name"].str;
+		Vector2d pos = jsonToVec(jplanet["position"]);
+		float radius = safeFloat(jplanet["radius"]);
+		bool ba = jplanet["breathableAtmosphere"].type == JSON_TYPE.TRUE;
+		JSONValue[] jpop = jplanet["population"].array;
+		uint[8] pop = [0,0,0,0,0,0,0,0];
+		for(int i = 0; i<8; i++) {
+			pop[i] = to!uint(jpop[i].integer);
+   		}
+		double food = safeFloat(jplanet["food"]);
+		uint mu = to!uint(jplanet["militaryUnits"].integer);
+		JSONValue[] jsonSO = jplanet["shipOrders"].array;
+		Ship[] shipOrders;
+		foreach(jship; jsonSO) {
+			shipOrders ~= jsonToShip(jship);
+		}
+		Planet planet = new Planet(name, pos, radius, ba, pop, food, mu, shipOrders);
+		int ownerIndex = to!int(jplanet["ownerId"].integer);
+		if(ownerIndex > -1) {
+			planet.setOwner(Player.findPlayerWithId(ownerIndex, players));
+		}
+		return planet;
+	}
+
+	static Vector2d jsonToVec(JSONValue jvec) {
+		float x = safeFloat(jvec["x"]);
+		float y = safeFloat(jvec["y"]);
+		return Vector2d(x, y);
 	}
 
 	static Player jsonToPlayer(JSONValue jplayer) {
@@ -156,9 +189,9 @@ class JsonParser {
 	}
 
 	static Ship jsonToShip(JSONValue jship) {
-		double eneEff = jship["eneEff"].floating;
-		double sciEff = jship["sciEff"].floating;
-		double completion = jship["completion"].floating;
+		double eneEff = safeFloat(jship["eneEff"]);
+		double sciEff = safeFloat(jship["sciEff"]);
+		double completion = safeFloat(jship["completion"]);
 		string type = jship["type"].str;
 		if(type == "Military") {
 			int onboard = to!int(jship["onboard"].integer);
@@ -188,5 +221,18 @@ class JsonParser {
 			kt.addOrder(order[0]);
 		}
 		return kt;
+	}
+	/**  **/
+	static float safeFloat(JSONValue value) {
+		try {
+			if(value.type == JSON_TYPE.INTEGER){
+				return value.integer;
+			}
+			return value.floating;
+		} catch (JSONException e) {
+			debug writeln(e.toString);
+			debug writefln("Couldn't convert float safely, type: %s", value.type);
+		}
+		return 0.0;
 	}
 }
