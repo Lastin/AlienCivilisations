@@ -124,7 +124,6 @@ class Play : AppFrame {
 					"Production uses resources otherwise spent on food production!";
 				switchPopup(infoPopup(title, message));
 			} else {
-				//TODO: check correctness of this function
 				_gameState.human.inhabitPlanet(_selectedPlanet);
 				updatePlanetInfo(_selectedPlanet);
 				updatePlayerStats();
@@ -498,7 +497,6 @@ class Play : AppFrame {
 		buttonContainer.addChild(apply);
 		buttonContainer.addChild(cancel);
 		apply.click = delegate(Widget action){
-			//TODO: add action to order ship
 			double percent = (slider.position + 1.0) / 100;
 			int result = to!int(_selectedPlanet.militaryUnits * percent);
 			_selectedPlanet.addShipOrder(ShipType.Military, result);

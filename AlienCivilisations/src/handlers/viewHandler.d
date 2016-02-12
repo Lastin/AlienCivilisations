@@ -48,10 +48,10 @@ class ViewHandler {
 		if(_play)
 			_play.destroy();
 		auto saveFile = SaveHandler.readSlot(slot);
-		JSONValue jsave = JsonParser.parseFile(saveFile);
-		GameState gs = JsonParser.jsonToState(jsave);
+		JSONValue jsave = JSONParser.fileToJSON(saveFile);
+		GameState gs = JSONParser.jsonToState(jsave);
 		GameManager gm = new GameManager(gs);
-		Vector2d camPos = JsonParser.jsonToVec(jsave["cameraPosition"]);
+		Vector2d camPos = JSONParser.jsonToVec(jsave["cameraPosition"]);
 		_play = new Play(this, gm, camPos);
 		resumePlay();
 	}

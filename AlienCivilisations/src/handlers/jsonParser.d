@@ -16,8 +16,9 @@ import std.typecons;
 import std.algorithm : sort;
 import std.format;
 
-class JsonParser {
-	static JSONValue parsePlay(Play play) {
+class JSONParser {
+	/** Parses object Play into json structure preserving camera position and game state **/
+	static JSONValue playToJSON(Play play) {
 		GameState state = play.gameState;
 		Vector2d camPos = play.cameraPosition;
 		JSONValue save = ["game" : "AlienCivilisations"];
@@ -113,12 +114,12 @@ class JsonParser {
 		}
 		return jkt;
 	}
-	/** Parses file in json format to associative array **/
-	static JSONValue parseFile(File file) {
+	/** Parses file in json format to associative array of type JSONValue **/
+	static JSONValue fileToJSON(File file) {
 		string fileString = readText(file.name);
 		return parseJSON(fileString);
 	}
-
+	/** Parses valid json structure to GameState **/
 	static GameState jsonToState(JSONValue json) {
 		try {
 			Player[] players;
@@ -134,7 +135,7 @@ class JsonParser {
 		}
 		return null;
 	}
-
+	/** Parses valid json structure to src.entities.Map **/
 	static Map jsonToMap(JSONValue jmap, Player[] players) {
 		JSONValue[] jplanets = jmap["planets"].array;
 		Planet[] planets;
@@ -144,7 +145,7 @@ class JsonParser {
 		float size = safeFloat(jmap["size"]);
 		return new Map(size, planets);
 	}
-
+	/** Parses valid json structure to Planet, adds owner if one's id was saved. Order queue is not currently sorted **/
 	static Planet jsonToPlanet(JSONValue jplanet, Player[] players) {
 		string name = jplanet["name"].str;
 		Vector2d pos = jsonToVec(jplanet["position"]);
@@ -162,6 +163,7 @@ class JsonParser {
 		foreach(jship; jsonSO) {
 			shipOrders ~= jsonToShip(jship);
 		}
+		//TODO: add saving queue index, and then sorting orders using it.
 		Planet planet = new Planet(name, pos, radius, ba, pop, food, mu, shipOrders);
 		int ownerIndex = to!int(jplanet["ownerId"].integer);
 		if(ownerIndex > -1) {
@@ -169,13 +171,13 @@ class JsonParser {
 		}
 		return planet;
 	}
-
+	/** Parses valid json structure to Vector2d struct **/
 	static Vector2d jsonToVec(JSONValue jvec) {
 		float x = safeFloat(jvec["x"]);
 		float y = safeFloat(jvec["y"]);
 		return Vector2d(x, y);
 	}
-
+	/** Parses valid json structure to Player **/
 	static Player jsonToPlayer(JSONValue jplayer) {
 		int uniqueId = to!int(jplayer["uniqueId"].integer);
 		string name = jplayer["name"].str;
@@ -187,7 +189,7 @@ class JsonParser {
 		}
 		return new Player(uniqueId, name, kt, ships);
 	}
-
+	/** Parses valid json structure to Ship **/
 	static Ship jsonToShip(JSONValue jship) {
 		double eneEff = safeFloat(jship["eneEff"]);
 		double sciEff = safeFloat(jship["sciEff"]);
@@ -202,6 +204,7 @@ class JsonParser {
 			return new InhabitationShip(eneEff, sciEff, completion);
 		}
 	}
+	/** Parses valid json structure to KnowledgeTree. Orders are sorted by index **/
 	static KnowledgeTree jsonToKT(JSONValue jkt) {
 		uint ene = to!uint(jkt["branches"]["Energy"].integer);
 		uint foo = to!uint(jkt["branches"]["Food"].integer);
@@ -215,14 +218,15 @@ class JsonParser {
 			int index = to!int(jorder["index"].integer);
 			orders ~= tuple(branch, index);
 		}
-		sort!q{a[1] < b[1]}(orders);
+		sort!q{a[1] > b[1]}(orders);
 		KnowledgeTree kt = new KnowledgeTree(points);
 		foreach_reverse(order; orders) {
 			kt.addOrder(order[0]);
 		}
 		return kt;
 	}
-	/**  **/
+	/** Ensures parsing JSONValue to floating point number, whether it was saved as integer in json
+	Return 0.0 if format has been mismatched **/
 	static float safeFloat(JSONValue value) {
 		try {
 			if(value.type == JSON_TYPE.INTEGER){

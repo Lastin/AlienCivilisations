@@ -227,7 +227,7 @@ class Menu : HorizontalLayout {
 			if(used) {
 				try {
 					File file = SaveHandler.readSlot(i);
-					JSONValue json = JsonParser.parseFile(file);
+					JSONValue json = JSONParser.fileToJSON(file);
 					dstring saveDate = to!dstring(json["date"].str);
 					string p1 = json["gameState"]["players"][0]["name"].str;
 					string p2 = json["gameState"]["players"][1]["name"].str;
@@ -273,7 +273,7 @@ class Menu : HorizontalLayout {
 		saveToSlot.click = delegate (Widget source) {
 			if(_vh.play) {
 				int slot = lw.selectedItemIndex;
-				JSONValue json = JsonParser.parsePlay(_vh.play);
+				JSONValue json = JSONParser.playToJSON(_vh.play);
 				SaveHandler.saveJSON(slot, json);
 				usedSlots[slot] = true;
 				string p1 = json["gameState"]["players"][0]["name"].str;
@@ -288,7 +288,6 @@ class Menu : HorizontalLayout {
 			return true;
 		};
 		loadSlot.click = delegate (Widget source) {
-			//TODO: load from file
 			int slot = lw.selectedItemIndex;
 			_vh.loadPlay(slot);
 			return true;

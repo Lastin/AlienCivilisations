@@ -41,9 +41,7 @@ abstract class Ship {
 		return _completion >= buildCost();
 	}
 	/**Returns build cost of the ship**/
-	@property double buildCost() const {
-		return capacity * 0.5;
-	}
+	@property double buildCost();
 	/**Returns true when no units onboard**/
 	@property bool empty() const {
 		return _onboard <= 0;
@@ -66,6 +64,7 @@ abstract class Ship {
 	}
 	/**Adds workforce to completion, eventually completing the construction**/
 	double build(double workforce){
+		debug writefln("MS: cost: %s | force: %s", buildCost, workforce);
 		if(workforce >= buildCost - _completion){
 			workforce = buildCost - _completion;
 			_completion = buildCost;
@@ -97,6 +96,9 @@ class MilitaryShip : Ship {
 		_onboard = to!int(rest / milEff);
 		debug writefln("Onboard after: %s", _onboard);
 	}
+	override @property double buildCost() {
+		return capacity * 3.5;
+	}
 	/** Return duplicate of the object **/
 	override MilitaryShip dup() const {
 		MilitaryShip ms = new MilitaryShip(_eneEff, _sciEff, _completion);
@@ -109,6 +111,9 @@ class InhabitationShip : Ship {
 	this(double eneEff, double sciEff, double completion) {
 		super(eneEff, sciEff, completion);
 		_onboard = capacity;
+	}
+	override @property double buildCost() {
+		return capacity * 1.5;
 	}
 	/** Return duplicate of the object **/
 	override InhabitationShip dup() const {
