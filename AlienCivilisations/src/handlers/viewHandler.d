@@ -18,11 +18,14 @@ class ViewHandler {
 	this(Window window) {
 		_window = window;
 	}
-	~this() {
-		if(_play){
-			//_play.destroy();
+	void destroyResources() {
+		if(_play) {
+			_play.removeAllChildren();
+			_play.animatedBackground.releaseRef();
+			//_play.animatedBackground.destroy();
 		}
-		_menu.destroy;
+		_menu.removeAllChildren();
+		_window.close();
 	}
 	void setMainMenu() {
 		_menu = new Menu(this);

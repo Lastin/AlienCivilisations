@@ -89,11 +89,6 @@ class Play : AppFrame {
 			_gm.endTurn();
 		}
 	}
-	~this() {
-		_drawing = false;
-		_animatedBackground.destroy();
-		super.destroy();
-	}
 	/** Assigns functions to buttons **/
 	private void assignButtonsActions(){
 		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");

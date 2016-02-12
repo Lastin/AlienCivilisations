@@ -20,8 +20,9 @@ extern (C) int UIAppMain(string[] args) {
 													height);
 	ViewHandler vh = new ViewHandler(window);
 	vh.setMainMenu();
+	//auto closeActions = window.onClose;
 	window.onClose = delegate () {
-		vh.destroy();
+		vh.destroyResources();
 		releaseResourcesOnAppExit();
 	};
 	window.backgroundColor = 0;

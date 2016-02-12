@@ -73,10 +73,6 @@ class Menu : HorizontalLayout {
 		};
 		switchMenuView(MenuView.Main);
 	}
-	~this(){
-		_saveWidget.destroy();
-		super.destroy();
-	}
 	/** Changes the visibility of buttons based on the desired look of menu **/
 	void switchMenuView(MenuView view) {
 		if(view == MenuView.Main){
