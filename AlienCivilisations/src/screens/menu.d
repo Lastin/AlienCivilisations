@@ -56,7 +56,7 @@ class Menu : HorizontalLayout {
 			return true;
 		};
 		_contBtn.click = delegate (Widget source) {
-			vh.setPlay();
+			vh.resumePlay();
 			return true;
 		};
 		_saveBtn.click = delegate (Widget source) {
@@ -294,9 +294,7 @@ class Menu : HorizontalLayout {
 		loadSlot.click = delegate (Widget source) {
 			//TODO: load from file
 			int slot = lw.selectedItemIndex;
-			auto save = SaveHandler.readSlot(slot);
-			JSONValue jstate = JsonParser.parseFile(save);
-			GameState gs = JsonParser.jsonToState(jstate);
+			_vh.loadPlay(slot);
 			return true;
 		};
 		deleteSlot.click = delegate (Widget source) {

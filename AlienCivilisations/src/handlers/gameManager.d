@@ -25,6 +25,10 @@ class GameManager {
 		_gs = new GameState(map, players, queuePosition);
 	}
 
+	this(GameState gs) {
+		_gs = gs;
+	}
+
 	@property GameState state(){
 		return _gs;
 	}

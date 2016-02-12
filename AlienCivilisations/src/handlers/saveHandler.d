@@ -17,6 +17,9 @@ class SaveHandler {
 	}
 	static void saveJSON(int slot, JSONValue json) {
 		string fp = fullPath(slot);
+		string fullSP = expandTilde(saveDir);
+		if(!exists(fullSP))
+			mkdirRecurse(fullSP);
 		string jsonString = json.toPrettyString();
 		std.file.write(fp, jsonString);
 	}

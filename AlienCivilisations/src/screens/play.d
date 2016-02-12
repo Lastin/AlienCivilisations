@@ -41,16 +41,27 @@ class Play : AppFrame {
 		PopupWidget _currentPopup;
 	}
 
-	this(ViewHandler vh){
+	this(ViewHandler vh, GameManager gm = null){
 		_vh = vh;
 		addChild(getLayout());
-		initialiseObjects();
+		if(!gm) {
+			_gm = new GameManager();
+			initialiseObjects(true);
+		} else {
+			_gm = gm;
+			initialiseObjects(false);
+		}
 		assignButtonsActions();
 		updatePlayerStats();
 	}
 
-	void initialiseObjects() {
-		_gm = new GameManager();
+	this(ViewHandler vh, GameManager gm, Vector2d camPos) {
+		this(vh, gm);
+		_cameraPosition = camPos;
+		_endPosition = _cameraPosition.dup;
+	}
+
+	void initialiseObjects(bool initCam = true) {
 		_gameState = _gm.state;
 		_mainContainer = childById("verticalContainer").childById("horizontalContainer");
 		_playerStatsContainer = _mainContainer.childById("vr1").childById("hr1");
@@ -61,12 +72,14 @@ class Play : AppFrame {
 		_solAdapter = new WidgetListAdapter();
 		_shipOrdersList.ownAdapter = _solAdapter;
 		//set camera positions
-		float tempX = _gameState.human.planets(_gameState.map.planets)[0].position.x;
-		float tempY = _gameState.human.planets(_gameState.map.planets)[0].position.y;
-		_cameraPosition = Vector2d(tempX - _mainContainer.width / 2, tempY - _mainContainer.height / 2);
-		_endPosition = _cameraPosition.dup;
-		debug {
-			writefln("camera initial position: %s %s", tempX, tempY);
+		if(initCam) {
+			float tempX = _gameState.human.planets(_gameState.map.planets)[0].position.x;
+			float tempY = _gameState.human.planets(_gameState.map.planets)[0].position.y;
+			_cameraPosition = Vector2d(tempX - _mainContainer.width / 2, tempY - _mainContainer.height / 2);
+			_endPosition = _cameraPosition.dup;
+			debug {
+				writefln("camera initial position: %s %s", tempX, tempY);
+			}
 		}
 		//set background
 		_animatedBackground = new AnimatedBackground(&_cameraPosition, _gameState);
@@ -77,9 +90,9 @@ class Play : AppFrame {
 		}
 	}
 	~this() {
-		super.destroy();
 		_drawing = false;
 		_animatedBackground.destroy();
+		super.destroy();
 	}
 	/** Assigns functions to buttons **/
 	private void assignButtonsActions(){
