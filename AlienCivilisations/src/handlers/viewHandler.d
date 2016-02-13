@@ -5,9 +5,10 @@ import dlangui.platforms.common.platform;
 import std.stdio;
 import src.handlers.saveHandler;
 import std.json;
-import src.handlers.containers;
 import src.handlers.gameManager;
 import src.handlers.jsonParser;
+import src.containers.gameState;
+import src.containers.vector2d;
 
 class ViewHandler {
 	private {

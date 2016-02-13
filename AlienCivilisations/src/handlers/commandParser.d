@@ -3,9 +3,9 @@
 import dlangui;
 import src.handlers.gameManager;
 import std.format;
-import src.handlers.containers;
 import src.entities.player;
 import src.entities.branch;
+import src.containers.gameState;
 
 class CommandParser : VerticalLayout {
 	private {

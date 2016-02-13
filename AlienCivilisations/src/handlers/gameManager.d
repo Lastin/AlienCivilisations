@@ -2,12 +2,12 @@
 
 import src.entities.map;
 import src.entities.player;
-import src.handlers.containers;
 import src.logic.ai;
 import std.random;
 import std.conv;
 import src.entities.knowledgeTree;
 import std.stdio;
+import src.containers.gameState;
 
 class GameManager {
 	//Constant values

@@ -13,7 +13,6 @@ import src.handlers.viewHanlder;
 import std.format;
 import std.json;
 import src.handlers.saveHandler;
-import src.handlers.containers;
 
 enum MenuView : ubyte {
 	Main,

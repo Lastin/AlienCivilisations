@@ -3,7 +3,6 @@
 import dlangui;
 import src.entities.planet;
 import src.entities.player;
-import src.handlers.containers;
 import src.handlers.gameManager;
 import src.screens.menu;
 import std.stdio;
@@ -15,6 +14,8 @@ import src.logic.ai;
 import std.math;
 import src.handlers.jsonParser;
 import src.handlers.viewHanlder;
+import src.containers.vector2d;
+import src.containers.gameState;
 
 class Play : AppFrame {
 	private {

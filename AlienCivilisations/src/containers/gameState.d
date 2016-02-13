@@ -1,31 +1,10 @@
-﻿module src.handlers.containers;
-
-import std.math;
+﻿module src.containers.gameState;
 import src.entities.map;
 import src.entities.player;
+import src.logic.ai;
 import src.entities.ship;
 import src.entities.planet;
-import src.entities.knowledgeTree;
-import src.logic.ai;
-
-struct Vector2d {
-	float x;
-	float y;
-	this(float x_param, float y_param) {
-		x = x_param;
-		y = y_param;
-	}
-
-	float getEuclideanDistance(Vector2d vecA) {
-		auto xdiff = vecA.x - x;
-		auto ydiff = vecA.y - y;
-		return sqrt(xdiff^^2 + ydiff^^2);
-	}
-
-	Vector2d dup() const {
-		return Vector2d(x, y);
-	}
-}
+import src.containers.vector2d;
 
 /** Container for current, or hypothetical game state, holding references to all essential data **/
 class GameState {
@@ -34,7 +13,7 @@ class GameState {
 		Player[] _players;
 		size_t _queuePosition;
 	}
-
+	
 	this(Map map, Player[] players, size_t queuePosition) {
 		_map = map;
 		_players = players;
@@ -74,7 +53,7 @@ class GameState {
 		duplicateState = new GameState(mapDup, playersDup, _queuePosition);
 		return duplicateState;
 	}
-
+	
 	/** Function used by duplicatePlayers function **/
 	private Ship[] duplicateShips(Ship[] originShips) {
 		Ship[] duplicates;
@@ -83,7 +62,7 @@ class GameState {
 		}
 		return duplicates;
 	}
-
+	
 	private Player[] duplicatePlayers() {
 		Player[] duplicates;
 		foreach(Player origin; _players) {
@@ -95,10 +74,10 @@ class GameState {
 		}
 		return duplicates;
 	}
-
-	private Planet[] duplicatePlanets(Player[] playersDup){
+	
+	private Planet[] duplicatePlanets(Player[] playersDup) {
 		Planet[] duplicates;
-		foreach(Planet origin; map.planets){
+		foreach(Planet origin; _map.planets){
 			string name = origin.name;
 			Vector2d pos = origin.position;
 			float r = origin.radius;
@@ -107,19 +86,22 @@ class GameState {
 			double food = origin.food;
 			uint mu = origin.militaryUnits;
 			Ship[] so = origin.shipOrders.dup;
-			duplicates ~= new Planet(name, pos, r, ba, pop, food, mu, so);
-			duplicates[$].setOwner(newOwner(origin, playersDup));
+			Planet pDup = new Planet(name, pos, r, ba, pop, food, mu, so);
+			int originOwnerId = origin.owner ? origin.owner.uniqueId : -1;
+			Player newOwner = findOwner(playersDup, originOwnerId);
+			pDup.setOwner(newOwner);
+			duplicates ~= pDup;
 		}
 		return duplicates;
 	}
-
-	private Player newOwner(Planet planet, Player[] playersDup) {
-		if(!planet.owner){
+	
+	private Player findOwner(Player[] playersDups, int ownerId) {
+		if(ownerId == -1){
 			return null;
 		} else {
-			foreach(i, Player p; playersDup){
-				if(p == planet.owner)
-					return playersDup[i];
+			foreach(p; playersDups){
+				if(p.uniqueId == ownerId)
+					return p;
 			}
 			throw new Exception("Cannot find planet owner");
 		}

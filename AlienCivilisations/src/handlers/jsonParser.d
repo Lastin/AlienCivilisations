@@ -4,7 +4,6 @@ import std.json;
 import std.file;
 import std.stdio;
 import src.entities.player;
-import src.handlers.containers;
 import src.entities.knowledgeTree;
 import src.entities.branch;
 import src.entities.ship;
@@ -15,6 +14,8 @@ import std.conv;
 import std.typecons;
 import std.algorithm : sort;
 import std.format;
+import src.containers.gameState;
+import src.containers.vector2d;
 
 class JSONParser {
 	/** Parses object Play into json structure preserving camera position and game state **/

@@ -2,10 +2,10 @@
 
 import src.entities.planet;
 import src.entities.player;
-import src.handlers.containers;
 import std.conv;
 import std.random;
 import std.stdio;
+import src.containers.vector2d;
 
 class Map {
 	private immutable float _size;

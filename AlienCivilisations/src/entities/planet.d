@@ -1,6 +1,5 @@
 ﻿module src.entities.planet;
 
-import src.handlers.containers;
 import std.algorithm;
 import std.conv;
 import src.entities.player;
@@ -9,6 +8,7 @@ import std.format;
 import src.entities.knowledgeTree;
 import std.stdio;
 import std.math;
+import src.containers.vector2d;
 
 public enum int POPULATION_CONSTANT = 10000;
 enum double FOOD_CONSUMPTION_RATE = 1;
