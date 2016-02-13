@@ -16,13 +16,13 @@ import src.handlers.jsonParser;
 import src.handlers.viewHanlder;
 import src.containers.vector2d;
 import src.containers.gameState;
+import std.datetime;
 
 class Play : AppFrame {
 	private {
 		ViewHandler _vh;
 		//Vectors used for camera
 		bool _middleDown = false;
-		bool _drawing = true;
 		Vector2d _startPosition;
 		Vector2d _endPosition;
 		Vector2d _cameraPosition;
@@ -910,10 +910,10 @@ class Play : AppFrame {
 	}
 	override void animate(long interval) {
 		//_animation.animate(interval);
-		invalidate();
+		//invalidate();
 	}
 	@property override bool animating() {
-		return _drawing;
+		return true;
 	}
 	@property override DrawableRef backgroundDrawable() const {
 		return cast(DrawableRef)_drawableRef;//(cast(Play)this)._drawableRef;
@@ -949,6 +949,7 @@ class AnimatedBackground : Drawable {
 	}
 
 	override void drawTo(DrawBuf buf, Rect rc, uint state = 0, int tilex0 = 0, int tiley0 = 0) {
+		SysTime frameStart = Clock.currTime();
 		Rect noisePos;
 		int startX, startY;
 		for(int i=0, offset=7; i<3; i++, offset -= 2) {
