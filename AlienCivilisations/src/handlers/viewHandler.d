@@ -23,10 +23,11 @@ class ViewHandler {
 		if(_play) {
 			_play.removeAllChildren();
 			_play.animatedBackground.releaseRef();
-			//_play.animatedBackground.destroy();
+			_play.animatedBackground.destroy();
+			_play = null;
 		}
 		_menu.removeAllChildren();
-		_window.close();
+		_menu = null;
 	}
 	void setMainMenu() {
 		_menu = new Menu(this);

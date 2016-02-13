@@ -16,7 +16,8 @@ import src.handlers.saveHandler;
 
 enum MenuView : ubyte {
 	Main,
-	Pause
+	Pause,
+	Save
 }
 
 class Menu : HorizontalLayout {
@@ -30,6 +31,8 @@ class Menu : HorizontalLayout {
 		Button _saveBtn;
 		Button _menuBtn;
 		Button _exitBtn;
+		int _previousSelected = -1;
+		bool _saving = false;
 	}
 	this(ViewHandler vh) {
 		_vh = vh;
@@ -51,7 +54,9 @@ class Menu : HorizontalLayout {
 			return true;
 		};
 		_loadBtn.click = delegate (Widget source) {
-			showSaveWidget();
+			//showSaveWidget();
+			_saving = false;
+			switchMenuView(MenuView.Save);
 			return true;
 		};
 		_contBtn.click = delegate (Widget source) {
@@ -59,7 +64,9 @@ class Menu : HorizontalLayout {
 			return true;
 		};
 		_saveBtn.click = delegate (Widget source) {
-			showSaveWidget(true);
+			//showSaveWidget(true);
+			_saving = true;
+			switchMenuView(MenuView.Save);
 			return true;
 		};
 		_menuBtn.click = delegate (Widget source) {
@@ -70,6 +77,7 @@ class Menu : HorizontalLayout {
 			window.close();
 			return true;
 		};
+		initSaveMenu();
 		switchMenuView(MenuView.Main);
 	}
 	/** Changes the visibility of buttons based on the desired look of menu **/
@@ -80,13 +88,21 @@ class Menu : HorizontalLayout {
 			_contBtn.visibility(Visibility.Gone);
 			_saveBtn.visibility(Visibility.Gone);
 			_menuBtn.visibility(Visibility.Gone);
-		} else {
+			_saveWidget.visibility(Visibility.Gone);
+			_btnsContainer.visibility(Visibility.Visible);
+		} else if(view == MenuView.Pause) {
 			_newBtn.visibility(Visibility.Gone);
 			_loadBtn.visibility(Visibility.Gone);
 			_contBtn.visibility(Visibility.Visible);
 			_saveBtn.visibility(Visibility.Visible);
 			_menuBtn.visibility(Visibility.Visible);
+			_saveWidget.visibility(Visibility.Gone);
+			_btnsContainer.visibility(Visibility.Visible);
+		} else {
+			_saveWidget.visibility(Visibility.Visible);
+			_btnsContainer.visibility(Visibility.Gone);
 		}
+
 	}
 	/** Sets the layout of the main widget in window to menu **/
 	private void setLayout() {
@@ -196,7 +212,7 @@ class Menu : HorizontalLayout {
 		addChild(new HSpacer());
 	}
 	/** Reads the save files and shows the widget to save/read files **/
-	private void showSaveWidget(bool saving = false) {
+	private void initSaveMenu() {
 		//Fetch buttons from layout
 		Button loadSlot = cast(Button)_saveWidget.childById("loadSlot");
 		Button deleteSlot = cast(Button)_saveWidget.childById("deleteSlot");
@@ -206,7 +222,7 @@ class Menu : HorizontalLayout {
 		loadSlot.visibility(Visibility.Invisible);
 		deleteSlot.visibility(Visibility.Invisible);
 		saveToSlot.visibility(Visibility.Invisible);
-		_btnsContainer.visibility(Visibility.Gone);
+		//_btnsContainer.visibility(Visibility.Gone);
 		//Initialise adapter and add elements
 		ListWidget lw = cast(ListWidget)_saveWidget.childById("slotsList");
 		WidgetListAdapter wla = new WidgetListAdapter();
@@ -244,13 +260,12 @@ class Menu : HorizontalLayout {
 			wla.add(listElement);
 		}
 		//Set actions on selection change
-		int previousSelected = -1;
 		lw.itemSelected  = delegate (Widget source, int itemIndex) {
-			if(saving){
+			if(_saving){
 				saveToSlot.visibility(Visibility.Visible);
 			}
-			if(previousSelected > -1){
-				lw.itemWidget(previousSelected).backgroundColor(0x737373);
+			if(_previousSelected > -1){
+				lw.itemWidget(_previousSelected).backgroundColor(0x737373);
 			}
 			wla.itemWidget(itemIndex).backgroundColor(0x999999);
 			if(usedSlots[itemIndex]) {
@@ -260,7 +275,7 @@ class Menu : HorizontalLayout {
 				loadSlot.visibility(Visibility.Invisible);
 				deleteSlot.visibility(Visibility.Invisible);
 			}
-			previousSelected = itemIndex;
+			_previousSelected = itemIndex;
 			return true;
 		};
 		//Set buttons actions
@@ -289,6 +304,8 @@ class Menu : HorizontalLayout {
 		loadSlot.click = delegate (Widget source) {
 			int slot = lw.selectedItemIndex;
 			_vh.loadPlay(slot);
+			_saveWidget.visibility(Visibility.Gone);
+			_btnsContainer.visibility(Visibility.Visible);
 			return true;
 		};
 		deleteSlot.click = delegate (Widget source) {

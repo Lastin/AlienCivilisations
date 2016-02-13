@@ -12,6 +12,7 @@ import std.concurrency;
 import std.parallelism;
 import std.datetime;
 import src.containers.gameState;
+import std.algorithm;
 
 class AI : Player {
 	/**THIS STATE IS ALWAYS REFERING TO REAL STATE OF THE GAME**/
@@ -28,7 +29,9 @@ class AI : Player {
 			writeln("AI making decisions");
 			writefln("CPUs: %s", totalCPUs);
 		}
-		Branch[] ub = knowledgeTree.undevelopedBranches;
+
+
+
 		//#1: undeveloped branches
 		//#2: free planets > use inhabitation ships
 		//#3: enemy planets > attack with military ships
@@ -36,19 +39,58 @@ class AI : Player {
 		//#5: order miliaty ships
 		GameState[] possibleMoves;
 		//Make order for each undeveloped branch
+		Branch[] ub = knowledgeTree.undevelopedBranches;
 		foreach(possibleDev; ub) {
 			possibleMoves ~= _realState.dup;
 			possibleMoves[$].ai.knowledgeTree.addOrder(possibleDev.name);
 		}
-
+		if(ub.length == 0) {
+			//If all branches are developed
+			Planet[] fp = _realState.map.freePlanets;
+			if(fp.length > 0) {
+				if(inhabitationShips.length == 0) {
+					for(int i=0; i<fp.length; i++) {
+						//try to produce different numbers of ships
+					}
+				} else {
+					//Utilise all ships
+					sort!q{a.capacity > b.capacity}(fp);
+					foreach(ship; inhabitationShips) {
+						
+					}
+				}
+			}
+		}
 	}
 	/** returns planet least affected by producing military ship **/
-	private Planet lfpM(Planet[] planets) {
+	private Planet lfpM(GameState gs) {
+		//Planet[] planets
 		return null;
 	}
 	/** returns planet least affected by producing inhabitation ship **/
-	private Planet lfpI(Planet[] planets) {
+	private Planet lfpI(GameState gs) {
 		return null;
 	}
-
+	void negaMax(GameState gs, int depth, real beta, real alpha){
+		/*
+		//create list of possible moves
+		Move bestMove = ?;
+		foreach(move; possibleMoves) {
+			//create duplicate
+			GameState dup = gs.dup;
+			//switch player
+			gs.moveQPosition();
+			//recurse and invert values get score
+			real score = -negaMax(dup, --depth, -beta, -alpha).max;
+			if(bestMove == null || score > bestMove.getMax()) {
+				//if no move made or last move best so far
+				bestMove = dup;
+			}
+			alpha = max(alpha, score);
+			if(alpha >= beta)
+				break;
+		}
+		return bestMove;
+		*/
+	}
 }

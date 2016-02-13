@@ -119,6 +119,7 @@
     <Compile Include="src\handlers\saveHandler.d" />
     <Compile Include="src\containers\gameState.d" />
     <Compile Include="src\containers\vector2d.d" />
+    <Compile Include="src\containers\move.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

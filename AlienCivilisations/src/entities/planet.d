@@ -21,6 +21,7 @@ class Planet {
 		immutable Vector2d _position;
 		immutable float _radius;
 		immutable bool _breathableAtmosphere;
+		immutable int _uniqueId;
 		Player _owner;
 		uint[8] _population = [0,0,0,0,0,0,0,0];
 		double _food = 0;
@@ -28,16 +29,17 @@ class Planet {
 		Ship[] _shipOrders;
 	}
 
-	this(string name, Vector2d position, float radius, bool breathableAtmosphere) {
+	this(int uniqueId, string name, Vector2d position, float radius, bool breathableAtmosphere) {
+		_uniqueId = uniqueId;
 		_breathableAtmosphere = breathableAtmosphere;
 		_name = name;
 		_position = position;
 		_radius = radius;
 	}
 	/** (Cloning) Constructor for creating planet from existing values **/
-	this(string name, Vector2d position, float radius, bool breathableAtmosphere,
+	this(int uniqueId, string name, Vector2d position, float radius, bool breathableAtmosphere,
 		uint[8] population, double food, uint militaryUnits, Ship[] shipOrders) {
-		this(name, position, radius, breathableAtmosphere);
+		this(uniqueId, name, position, radius, breathableAtmosphere);
 		_population = population;
 		_food = food;
 		_militaryUnits = militaryUnits;
@@ -77,6 +79,9 @@ class Planet {
 
 	@property Ship[] shipOrders() {
 		return _shipOrders;
+	}
+	@property int uniqueId() {
+		return _uniqueId;
 	}
 
 	override public string toString() {

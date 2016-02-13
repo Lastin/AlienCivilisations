@@ -49,6 +49,7 @@ class JSONParser {
 	/** Converts Planet object into JSONValue **/
 	private static JSONValue planetToJSON(Planet planet, ) {
 		JSONValue jsonPlanet = ["name" : planet.name];
+		jsonPlanet.object["uniqueId"] = planet.uniqueId;
 		jsonPlanet.object["position"] = vecToJSON(planet.position);
 		jsonPlanet.object["radius"] = planet.radius;
 		jsonPlanet.object["breathableAtmosphere"] = planet.breathableAtmosphere;
@@ -149,6 +150,7 @@ class JSONParser {
 	/** Parses valid json structure to Planet, adds owner if one's id was saved. Order queue is not currently sorted **/
 	static Planet jsonToPlanet(JSONValue jplanet, Player[] players) {
 		string name = jplanet["name"].str;
+		int uniqueId = to!int(jplanet["uniqueId"].integer);
 		Vector2d pos = jsonToVec(jplanet["position"]);
 		float radius = safeFloat(jplanet["radius"]);
 		bool ba = jplanet["breathableAtmosphere"].type == JSON_TYPE.TRUE;
@@ -165,7 +167,7 @@ class JSONParser {
 			shipOrders ~= jsonToShip(jship);
 		}
 		//TODO: add saving queue index, and then sorting orders using it.
-		Planet planet = new Planet(name, pos, radius, ba, pop, food, mu, shipOrders);
+		Planet planet = new Planet(uniqueId, name, pos, radius, ba, pop, food, mu, shipOrders);
 		int ownerIndex = to!int(jplanet["ownerId"].integer);
 		if(ownerIndex > -1) {
 			planet.setOwner(Player.findPlayerWithId(ownerIndex, players));

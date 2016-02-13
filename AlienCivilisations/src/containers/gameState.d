@@ -79,6 +79,7 @@ class GameState {
 		Planet[] duplicates;
 		foreach(Planet origin; _map.planets){
 			string name = origin.name;
+			int uniqueId = origin.uniqueId;
 			Vector2d pos = origin.position;
 			float r = origin.radius;
 			bool ba = origin.breathableAtmosphere;
@@ -86,7 +87,7 @@ class GameState {
 			double food = origin.food;
 			uint mu = origin.militaryUnits;
 			Ship[] so = origin.shipOrders.dup;
-			Planet pDup = new Planet(name, pos, r, ba, pop, food, mu, so);
+			Planet pDup = new Planet(uniqueId, name, pos, r, ba, pop, food, mu, so);
 			int originOwnerId = origin.owner ? origin.owner.uniqueId : -1;
 			Player newOwner = findOwner(playersDup, originOwnerId);
 			pDup.setOwner(newOwner);
