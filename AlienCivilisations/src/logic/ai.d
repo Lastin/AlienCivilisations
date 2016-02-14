@@ -10,9 +10,9 @@ import core.thread;
 import src.entities.branch;
 import std.concurrency;
 import std.parallelism;
-import std.datetime;
 import src.containers.gameState;
 import std.algorithm;
+import std.conv;
 
 class AI : Player {
 	/**THIS STATE IS ALWAYS REFERING TO REAL STATE OF THE GAME**/
@@ -29,22 +29,22 @@ class AI : Player {
 			writeln("AI making decisions");
 			writefln("CPUs: %s", totalCPUs);
 		}
-
-
-
 		//#1: undeveloped branches
 		//#2: free planets > use inhabitation ships
 		//#3: enemy planets > attack with military ships
 		//#4: order inhabitation ship
 		//#5: order miliaty ships
 		GameState[] possibleMoves;
+		long[20] scores;
+		scores[] = long.min;
 		//Make order for each undeveloped branch
 		Branch[] ub = knowledgeTree.undevelopedBranches;
-		foreach(possibleDev; ub) {
-			possibleMoves ~= _realState.dup;
-			possibleMoves[$].ai.knowledgeTree.addOrder(possibleDev.name);
-		}
-		if(ub.length == 0) {
+		if(ub.length > 0) {
+			foreach(possibleDev; ub) {
+				GameState hyp = _realState.dup;
+				addKTOrder(hyp, possibleDev.name);
+			}
+		} else {
 			//If all branches are developed
 			Planet[] fp = _realState.map.freePlanets;
 			if(fp.length > 0) {
@@ -62,35 +62,68 @@ class AI : Player {
 			}
 		}
 	}
-	/** returns planet least affected by producing military ship **/
-	private Planet lfpM(GameState gs) {
-		//Planet[] planets
-		return null;
-	}
-	/** returns planet least affected by producing inhabitation ship **/
-	private Planet lfpI(GameState gs) {
-		return null;
-	}
-	void negaMax(GameState gs, int depth, real beta, real alpha){
-		/*
-		//create list of possible moves
-		Move bestMove = ?;
-		foreach(move; possibleMoves) {
-			//create duplicate
-			GameState dup = gs.dup;
-			//switch player
-			gs.moveQPosition();
-			//recurse and invert values get score
-			real score = -negaMax(dup, --depth, -beta, -alpha).max;
-			if(bestMove == null || score > bestMove.getMax()) {
-				//if no move made or last move best so far
-				bestMove = dup;
-			}
-			alpha = max(alpha, score);
-			if(alpha >= beta)
-				break;
+
+	long negaMax(GameState gs, int depth, real beta, real alpha, PlayerEnum currentPlayer){
+		PlayerEnum dead = gs.deadPlayer;
+		long bestScore = 0;
+		//Non-terminal node
+		if(depth > 0 && dead == PlayerEnum.None) {
+
 		}
-		return bestMove;
-		*/
+		//Terminal node
+		if(depth == 0)
+			return evaluateState(gs);
+		if(dead == PlayerEnum.Both)
+			return 0;
+		if(dead == currentPlayer)
+			return long.max;
+		if(dead == currentPlayer)
+			return long.min;
+		return bestScore;
+	}
+	/** returns index of planet least affected by construction of ship of given type **/
+	private int leastAffectedPlanet(GameState gs, ShipType st) {
+		immutable int moves = 5;
+		Planet[] playerPlanets = gs.currentPlayer.planets(gs.map.planets);
+		int index = -1;
+		//The smaller the effect the better
+		double effect = double.infinity;
+		foreach(int i, planet; playerPlanets) {
+			//Backup essential values
+			uint[8] pop = planet.population.dup;
+			double food = planet.food;
+			uint mu = planet.militaryUnits;
+			Ship[] so = planet.shipOrders.dup;
+			//Population before x moves
+			double sumBefore = to!double(planet.populationSum);
+			for(int j=0; j<moves; j++) {
+				planet.step();
+			}
+			//Population after x moves
+			double sumUnaffected = to!double(planet.populationSum);
+			//Restore values and place order
+			planet.restore(pop, food, mu, so);
+			planet.addShipOrder(st, 0);
+			//Make same number of moves with order
+			for(int j=0; j<moves; j++) {
+				planet.step();
+			}
+			double sumAffected = to!double(planet.populationSum);
+			double ratio = sumBefore / sumAffected - sumBefore / sumUnaffected;
+			if(ratio < effect) {
+				effect = ratio;
+				index = i;
+			}
+			//important to restore values of planet again to one before
+			planet.restore(pop, food, mu, so);
+		}
+		return index;
+	}
+	/** Adds kt development order for current player **/
+	private void addKTOrder(GameState gs, BranchName bn) {
+		gs.currentPlayer.knowledgeTree.addOrder(bn);
+	}
+	private long evaluateState(GameState gs) {
+		return 0;
 	}
 }

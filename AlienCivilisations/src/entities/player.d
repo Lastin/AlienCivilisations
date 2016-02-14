@@ -43,6 +43,17 @@ class Player {
 	@property Ship[] ships(){
 		return _ships;
 	}
+	@property uint populationSum(Planet[] planets) {
+		uint sum = 0;
+		foreach(planet; planets) {
+			if(planet.owner == this)
+				sum += planet.populationSum;
+		}
+		return sum;
+	}
+	@property bool dead(Planet[] planets) {
+		return populationSum(planets) == 0 && inhabitationShips.length == 0;
+	}
 
 	@property MilitaryShip[] militaryShips(){
 		MilitaryShip[] milShips;

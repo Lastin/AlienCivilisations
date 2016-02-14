@@ -115,7 +115,7 @@ class Planet {
 		return result;
 	}
 	/** Function affects planet's attributes. Should be called after player finishes move **/
-	void step() {
+	void step(bool limited = false) {
 		double workforce = calculateWorkforce();
 		debug {
 			writeln("-----------------------------------------");
@@ -124,7 +124,7 @@ class Planet {
 			writefln("Workforce: %s", workforce);
 		}
 		//Consume at most half of the workforce on production
-		workforce = workforce/2 + produceShips(workforce/2);
+		workforce = workforce/2 + produceShips(workforce/2, limited);
 		debug writefln("Workforce after ships production: %s", workforce);
 		affectFood(workforce);
 		growPopulation();
@@ -248,17 +248,19 @@ class Planet {
 		return force;
 	}
 	/** Produces ships from the queue **/
-	private double produceShips(double workforce) {
+	private double produceShips(double workforce, bool limited) {
 		foreach(Ship s; _shipOrders) {
 			workforce = s.build(workforce);
 			if(s.completed){
-				_owner.addShip(s);
+				if(!limited) {
+					_owner.addShip(s);
+				}
 				_shipOrders = _shipOrders[1 .. $];
 			}
 		}
 		return workforce;
 	}
-
+	/** Adds order for ship to queue **/
 	void addShipOrder(ShipType type, int units = 0) {
 		double eneEff = _owner.knowledgeTree.branch(BranchName.Energy).effectiveness;
 		double sciEff = _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
@@ -283,7 +285,7 @@ class Planet {
 			debug writefln("Planet %s. Ordered inhabitation ship", _name);
 		}
 	}
-
+	/** Returns number of steps needed to complete the ship **/
 	int stepsToCompleteOrder(Ship ship) {
 		int steps = 0;
 		foreach(Ship s; _shipOrders) {
@@ -293,9 +295,23 @@ class Planet {
 		}
 		return steps;
 	}
-
+	/** Removes order at index from queue **/
 	void cancelOrder(int index){
 		debug writefln("Removing order #%s", index);
 		_shipOrders = _shipOrders.remove(index);
+	}
+	/** Cancels all orders and destroys objects **/
+	void cancelAllOrders() {
+		for(int i=0; i<_shipOrders.length; i++) {
+			_shipOrders[i].destroy();
+			_shipOrders[i] = null;
+		}
+		_shipOrders = null;
+	}
+	void restore(uint[8] pop, double food, uint mu, Ship[] so) {
+		_population = pop;
+		_food = food;
+		_militaryUnits = mu;
+		_shipOrders = so;
 	}
 }

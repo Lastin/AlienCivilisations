@@ -6,6 +6,12 @@ import src.entities.ship;
 import src.entities.planet;
 import src.containers.vector2d;
 
+enum PlayerEnum : ubyte {
+	None,
+	Human,
+	AI,
+	Both
+}
 /** Container for current, or hypothetical game state, holding references to all essential data **/
 class GameState {
 	private {
@@ -36,6 +42,17 @@ class GameState {
 	}
 	@property size_t queuePosition() const {
 		return _queuePosition;
+	}
+	@property PlayerEnum deadPlayer() {
+		bool humanDead = human.dead(_map.planets);
+		bool aiDead = ai.dead(_map.planets);
+		if(!aiDead && !humanDead)
+			return PlayerEnum.None;
+		if(!aiDead && humanDead)
+			return PlayerEnum.Human;
+		if(!humanDead && aiDead)
+			return PlayerEnum.AI;
+		return PlayerEnum.Both;
 	}
 	/** Moves queue position to next available position **/
 	void moveQPosition() {
