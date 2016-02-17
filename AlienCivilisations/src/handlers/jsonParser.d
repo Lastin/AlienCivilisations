@@ -162,11 +162,19 @@ class JSONParser {
 		double food = safeFloat(jplanet["food"]);
 		uint mu = to!uint(jplanet["militaryUnits"].integer);
 		JSONValue[] jsonSO = jplanet["shipOrders"].array;
-		Ship[] shipOrders;
+		Tuple!(Ship, int)[] shipOrdersIndexed;
 		foreach(jship; jsonSO) {
-			shipOrders ~= jsonToShip(jship);
+			Ship s = jsonToShip(jship);
+			int index = to!int(jship["index"].integer);
+			//shipOrders ~= jsonToShip(jship);
+			shipOrdersIndexed ~= tuple(s, index);
 		}
-		//TODO: add saving queue index, and then sorting orders using it.
+		sort!("a[1] < b[1]")(shipOrdersIndexed);
+		Ship[] shipOrders;
+		foreach(shipOrder; shipOrdersIndexed) {
+			shipOrders ~= shipOrder[0];
+		}
+		debug writefln("Added %s orders to planet %s", shipOrders.length, name);
 		Planet planet = new Planet(uniqueId, name, pos, radius, ba, pop, food, mu, shipOrders);
 		int ownerIndex = to!int(jplanet["ownerId"].integer);
 		if(ownerIndex > -1) {

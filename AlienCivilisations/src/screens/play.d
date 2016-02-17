@@ -22,7 +22,7 @@ class Play : AppFrame {
 	private {
 		ViewHandler _vh;
 		//Vectors used for camera
-		bool _middleDown = false;
+		bool _rightDown = false;
 		Vector2d _startPosition;
 		Vector2d _endPosition;
 		Vector2d _cameraPosition;
@@ -190,19 +190,19 @@ class Play : AppFrame {
 				}*/
 			}
 		}
-		if(event.button == MouseButton.Middle){
+		if(event.button == MouseButton.Right){
 			if(event.action == MouseAction.ButtonUp) {
-				_middleDown = false;
+				_rightDown = false;
 				_endPosition.x = _cameraPosition.x;
 				_endPosition.y = _cameraPosition.y;
 			}
 			else if(event.action == MouseAction.ButtonDown) {
-				_middleDown = true;
+				_rightDown = true;
 				_startPosition.x = event.x;
 				_startPosition.y = event.y;
 			}
 		}
-		else if(_middleDown && event.action == MouseAction.Move) {
+		else if(_rightDown && event.action == MouseAction.Move) {
 			_cameraPosition.x = to!int(_endPosition.x + (_startPosition.x - event.x));
 			_cameraPosition.y = to!int(_endPosition.y + (_startPosition.y - event.y));
 			//check x boundaries
