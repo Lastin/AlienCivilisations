@@ -221,9 +221,9 @@ class JSONParser {
 			int index = to!int(jorder["index"].integer);
 			orders ~= tuple(branch, index);
 		}
-		sort!q{a[1] > b[1]}(orders);
+		sort!q{a[1] < b[1]}(orders);
 		KnowledgeTree kt = new KnowledgeTree(points);
-		foreach_reverse(order; orders) {
+		foreach(order; orders) {
 			kt.addOrder(order[0]);
 		}
 		return kt;
