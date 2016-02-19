@@ -131,6 +131,9 @@ class JSONParser {
 			}
 			Map map = jsonToMap(json["gameState"]["map"], players);
 			int queuePosition = to!int(json["gameState"]["queuePosition"].integer);
+			foreach(planet; map.planets){
+				writefln("Planet name %s orders: %s", planet.name, planet.shipOrders.length);
+			}
 			return new GameState(map, players, queuePosition);
 		} catch(JSONException e) {
 			writeln(e.toString);
@@ -174,7 +177,6 @@ class JSONParser {
 		foreach(shipOrder; shipOrdersIndexed) {
 			shipOrders ~= shipOrder[0];
 		}
-		debug writefln("Added %s orders to planet %s", shipOrders.length, name);
 		Planet planet = new Planet(uniqueId, name, pos, radius, ba, pop, food, mu, shipOrders);
 		int ownerIndex = to!int(jplanet["ownerId"].integer);
 		if(ownerIndex > -1) {

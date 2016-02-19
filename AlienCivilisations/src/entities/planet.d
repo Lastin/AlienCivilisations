@@ -89,7 +89,8 @@ class Planet {
 	}
 	Planet setOwner(Player player) {
 		_owner = player;
-		_shipOrders = null;
+		if(!_owner)
+			_shipOrders = null;
 		return this;
 	}
 	/**Sets new owner of the planet and sets units from inhabitation ship**/
