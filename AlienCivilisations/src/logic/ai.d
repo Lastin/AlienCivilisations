@@ -34,15 +34,44 @@ class AI : Player {
 		//#3: enemy planets > attack with military ships
 		//#4: order inhabitation ship
 		//#5: order miliaty ships
+
+		//#1: inhabit free planets
+		Planet[] freePlanets = _realState.map.freePlanets;
+		sort!"a.capacity > b.capacity"(freePlanets);
+		foreach(planet; freePlanets) {
+			if(inhabitationShips.length == 0)
+				break;
+			inhabitPlanet(planet);
+		}
+		if(freePlanets.length > 0) {
+			int totalOrders = 0;
+			foreach(planet; planets(_realState.map.planets)) {
+				foreach(int index, order; planet.shipOrders) {
+					if(cast(InhabitationShip)order) {
+						totalOrders++;
+						if(totalOrders > freePlanets.length){
+							planet.cancelOrder(index);
+						}
+					} 
+				}
+			}
+			if(totalOrders < freePlanets.length) {
+				int pid = leastAffectedPlanet(*_realState, ShipType.Inhabitation, _uniqueId);
+				_realState.map.planets[pid].addShipOrder(ShipType.Inhabitation);
+			}
+		}
+
 		GameState[] possibleMoves;
 		long[20] scores;
 		scores[] = long.min;
 		//Make order for each undeveloped branch
-		Branch[] ub = knowledgeTree.undevelopedBranches;
-		if(ub.length > 0) {
+		knowledgeTree.clearOrders();
+		Branch[] ubs = knowledgeTree.undevelopedBranches;
+		/*if(ub.length > 0) {
 			foreach(possibleDev; ub) {
 				GameState hyp = _realState.dup;
 				addKTOrder(hyp, possibleDev.name);
+
 			}
 		} else {
 			//If all branches are developed
@@ -51,6 +80,7 @@ class AI : Player {
 				if(inhabitationShips.length == 0) {
 					for(int i=0; i<fp.length; i++) {
 						//try to produce different numbers of ships
+
 					}
 				} else {
 					//Utilise all ships
@@ -60,7 +90,8 @@ class AI : Player {
 					}
 				}
 			}
-		}
+
+		}*/
 	}
 
 	long negaMax(GameState gs, int depth, real beta, real alpha, PlayerEnum currentPlayer){
@@ -82,9 +113,9 @@ class AI : Player {
 		return bestScore;
 	}
 	/** returns index of planet least affected by construction of ship of given type **/
-	private int leastAffectedPlanet(GameState gs, ShipType st) {
+	private int leastAffectedPlanet(GameState gs, ShipType st, int playerId) {
 		immutable int moves = 5;
-		Planet[] playerPlanets = gs.currentPlayer.planets(gs.map.planets);
+		Planet[] playerPlanets = gs.map.playerPlanets(playerId);//gs.currentPlayer.planets(gs.map.planets);
 		int index = -1;
 		//The smaller the effect the better
 		double effect = double.infinity;

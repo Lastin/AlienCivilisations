@@ -74,7 +74,15 @@ abstract class Ship {
 		}
 		return workforce;
 	}
-	Ship dup();
+	Ship dup() const;
+	/** Handy function for duplicating list of ships **/
+	static Ship[] duplicateShips(const Ship[] originShips) {
+		Ship[] duplicates;
+		foreach(const Ship origin; originShips){
+			duplicates ~= origin.dup();
+		}
+		return duplicates;
+	}
 }
 
 class MilitaryShip : Ship {

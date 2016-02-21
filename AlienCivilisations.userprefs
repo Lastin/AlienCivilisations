@@ -1,11 +1,37 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/lib/dlangui/src/dlangui/core/types.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/entities/planet.d">
     <Files>
-      <File FileName="AlienCivilisations/src/handlers/jsonParser.d" Line="4" Column="4" />
-      <File FileName="AlienCivilisations/src/entities/planet.d" Line="22" Column="22" />
-      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/core/types.d" Line="1" Column="1" />
+      <File FileName="AlienCivilisations/src/containers/gameState.d" Line="67" Column="26" />
+      <File FileName="AlienCivilisations/src/entities/player.d" Line="99" Column="13" />
+      <File FileName="AlienCivilisations/src/entities/ship.d" Line="81" Column="17" />
+      <File FileName="AlienCivilisations/src/entities/map.d" Line="102" Column="76" />
+      <File FileName="AlienCivilisations/src/entities/planet.d" Line="136" Column="7" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="AlienCivilisations" expanded="True">
+            <Node name="AlienCivilisations" expanded="True">
+              <Node name="src" expanded="True">
+                <Node name="containers" expanded="True" />
+                <Node name="entities" expanded="True">
+                  <Node name="planet.d" selected="True" />
+                </Node>
+                <Node name="screens" expanded="True" />
+              </Node>
+            </Node>
+            <Node name="dlangui-monod-linux" expanded="True">
+              <Node name="src" expanded="True">
+                <Node name="dlangui" expanded="True">
+                  <Node name="core" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

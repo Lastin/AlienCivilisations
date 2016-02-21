@@ -10,10 +10,10 @@ import std.algorithm.mutation;
 
 class Player {
 	private {
-		immutable string _name;
+		protected string _name;
 		KnowledgeTree _knowledgeTree;
 		Ship[] _ships;
-		immutable int _uniqueId;
+		protected int _uniqueId;
 	}
 
 	this(int uniqueId, string name, KnowledgeTree knowledgeTree, Ship[] ships = null) {
@@ -26,6 +26,9 @@ class Player {
 	@property KnowledgeTree knowledgeTree() {
 		return _knowledgeTree;
 	}
+	@property KnowledgeTree knowledgeTree() const {
+		return _knowledgeTree.dup;
+	}
 	/** Player's written name **/
 	@property string name() const {
 		return _name;
@@ -34,7 +37,7 @@ class Player {
 	@property Planet[] planets(Planet[] list){
 		Planet[] owned;
 		foreach(Planet p; list) {
-			if(p.owner == this)
+			if(p.owner && p.owner.uniqueId == _uniqueId)
 				owned ~= p;
 		}
 		return owned;
@@ -42,6 +45,13 @@ class Player {
 	/** Returns all ships **/
 	@property Ship[] ships(){
 		return _ships;
+	}
+	@property Ship[] ships() const {
+		Ship[] duplicates;
+		foreach(const Ship origin; _ships){
+			duplicates ~= origin.dup();
+		}
+		return duplicates;
 	}
 	@property uint populationSum(Planet[] planets) {
 		uint sum = 0;
@@ -73,7 +83,7 @@ class Player {
 		}
 		return inhShips;
 	}
-	@property int uniqueId() {
+	@property int uniqueId() const {
 		return _uniqueId;
 	}
 	/** Adds a ship to list of player'savailable ships **/
@@ -111,11 +121,17 @@ class Player {
 		}
 	}
 	/** Returns player with given unique id, or null if none found **/
-	static Player findPlayerWithId(int id, Player[] players) {
-		foreach(player; players) {
-			if(id == player.uniqueId)
-				return player;
+	static Player findPlayerWithId(int ownerId, Player[] players) {
+		if(ownerId == -1){
+			return null;
+		} else {
+			foreach(p; players){
+				if(p.uniqueId == ownerId)
+					return p;
+			}
+			debug {
+				throw new Exception("Cannot find planet owner");
+			}
 		}
-		return null;
 	}
 }

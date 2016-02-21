@@ -150,6 +150,9 @@ public class KnowledgeTree {
 		_orders ~= toAdd;
 		return true;
 	}
+	void clearOrders() {
+		_orders = null;
+	}
 	//Returns duplicate of the current object, without references to original
 	KnowledgeTree dup() const {
 		uint[4] points = 

@@ -74,8 +74,13 @@ class Play : AppFrame {
 		_shipOrdersList.ownAdapter = _solAdapter;
 		//set camera positions
 		if(initCam) {
-			float tempX = _gameState.human.planets(_gameState.map.planets)[0].position.x;
-			float tempY = _gameState.human.planets(_gameState.map.planets)[0].position.y;
+			float tempX = 0;
+			float tempY = 0;
+			Planet[] playerPlanets = _gameState.map.playerPlanets(_gameState.human.uniqueId);
+			if(playerPlanets.length > 0) {
+				tempX = playerPlanets[0].position.x;
+				tempY = playerPlanets[0].position.y;
+			}
 			_cameraPosition = Vector2d(tempX - _mainContainer.width / 2, tempY - _mainContainer.height / 2);
 			_endPosition = _cameraPosition.dup;
 			debug {
@@ -901,7 +906,8 @@ class Play : AppFrame {
 	void updatePlayerStats() {
 		uint populationTotal = 0;
 		uint militaryUnitTotal = 0;
-		foreach(Planet p; _gameState.human.planets(_gameState.map.planets)) {
+		int playerId = _gameState.human.uniqueId;
+		foreach(Planet p; _gameState.map.playerPlanets(playerId)) {
 			populationTotal += p.populationSum;
 			militaryUnitTotal += p.militaryUnits;
 		}

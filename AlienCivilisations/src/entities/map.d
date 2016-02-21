@@ -6,6 +6,7 @@ import std.conv;
 import std.random;
 import std.stdio;
 import src.containers.vector2d;
+import src.entities.ship;
 
 class Map {
 	private immutable float _size;
@@ -85,6 +86,26 @@ class Map {
 	@property Planet[] planets() {
 		return _planets;
 	}
+	/** Returns duplicates of the planets**/
+	@property Planet[] duplicatePlanets(Player[] players) const {
+		Planet[] duplicates;
+		foreach(const Planet origin; _planets){
+			string name = origin.name;
+			int uniqueId = origin.uniqueId;
+			Vector2d pos = origin.position;
+			float r = origin.radius;
+			bool ba = origin.breathableAtmosphere;
+			uint[8] pop = origin.population.dup;
+			double food = origin.food;
+			uint mu = origin.militaryUnits;
+			Ship[] so = origin.shipOrders;//origin.shipOrders.dup;
+			Planet pDup = new Planet(uniqueId, name, pos, r, ba, pop, food, mu, so);
+			Player newOwner = Player.findPlayerWithId(origin.ownerId, players);
+			pDup.setOwner(newOwner);
+			duplicates ~= pDup;
+		}
+		return duplicates;
+	}
 	/** Returns size of the map **/
 	@property float size() const {
 		return _size;
@@ -97,6 +118,15 @@ class Map {
 				free ~= planet;
 		}
 		return free;
+	}
+	Planet[] playerPlanets(int puid) {
+		Planet[] pp;
+		foreach(planet; planets) {
+			if(planet.owner && planet.owner.uniqueId == puid) {
+				pp ~= planet;
+			}
+		}
+		return pp;
 	}
 	Planet planetWithId(int uniqueId) {
 		foreach(planet; _planets) {

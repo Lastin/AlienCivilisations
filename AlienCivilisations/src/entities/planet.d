@@ -49,7 +49,10 @@ class Planet {
 	@property Vector2d position() {
 		return _position;
 	}
-	@property bool breathableAtmosphere() {
+	@property Vector2d position() const {
+		return _position.dup;
+	}
+	@property bool breathableAtmosphere() const {
 		return _breathableAtmosphere;
 	}
 	@property int capacity() {
@@ -76,11 +79,25 @@ class Planet {
 	@property uint[8] population() {
 		return _population;
 	}
-
+	@property uint[8] population() const {
+		uint[8] na;
+		foreach(i, number; _population) {
+			na[i] = number;
+		}
+		return na;
+	}
+	@property int ownerId() const {
+		if(!_owner)
+			return -1;
+		return _owner.uniqueId;
+	}
 	@property Ship[] shipOrders() {
 		return _shipOrders;
 	}
-	@property int uniqueId() {
+	@property Ship[] shipOrders() const {
+		return Ship.duplicateShips(_shipOrders);
+	}
+	@property int uniqueId() const {
 		return _uniqueId;
 	}
 

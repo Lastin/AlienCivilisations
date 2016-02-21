@@ -61,67 +61,25 @@ class GameState {
 		}
 	}
 	
-	GameState dup() {
+	GameState dup() const {
 		GameState duplicateState;
-		Player[] playersDup = duplicatePlayers();
-		Planet[] planetsDup = duplicatePlanets(playersDup);
+		Player[] playersDup = duplicatePlayers(duplicateState);
+		Planet[] planetsDup = _map.duplicatePlanets(playersDup);//duplicatePlanets(playersDup);
 		//duplicate map
 		Map mapDup = new Map(_map.size, planetsDup);
 		duplicateState = new GameState(mapDup, playersDup, _queuePosition);
 		return duplicateState;
 	}
 	
-	/** Function used by duplicatePlayers function **/
-	private Ship[] duplicateShips(Ship[] originShips) {
-		Ship[] duplicates;
-		foreach(Ship origin; originShips){
-			duplicates ~= origin.dup();
-		}
-		return duplicates;
-	}
-	
-	private Player[] duplicatePlayers() {
+	private Player[] duplicatePlayers(GameState duplicateState) const {
 		Player[] duplicates;
-		foreach(Player origin; _players) {
+		foreach(const Player origin; _players) {
 			if(AI ai = cast(AI)origin){
-				duplicates ~= new AI(origin.uniqueId, &this, origin.knowledgeTree.dup, duplicateShips(origin.ships));
+				duplicates ~= new AI(origin.uniqueId, &duplicateState, origin.knowledgeTree.dup, origin.ships);
 			} else {
-				duplicates ~= new Player(origin.uniqueId, origin.name, origin.knowledgeTree.dup, duplicateShips(origin.ships));
+				duplicates ~= new Player(origin.uniqueId, origin.name, origin.knowledgeTree.dup, origin.ships);
 			}
 		}
 		return duplicates;
-	}
-	
-	private Planet[] duplicatePlanets(Player[] playersDup) {
-		Planet[] duplicates;
-		foreach(Planet origin; _map.planets){
-			string name = origin.name;
-			int uniqueId = origin.uniqueId;
-			Vector2d pos = origin.position;
-			float r = origin.radius;
-			bool ba = origin.breathableAtmosphere;
-			uint[8] pop = origin.population.dup;
-			double food = origin.food;
-			uint mu = origin.militaryUnits;
-			Ship[] so = origin.shipOrders.dup;
-			Planet pDup = new Planet(uniqueId, name, pos, r, ba, pop, food, mu, so);
-			int originOwnerId = origin.owner ? origin.owner.uniqueId : -1;
-			Player newOwner = findOwner(playersDup, originOwnerId);
-			pDup.setOwner(newOwner);
-			duplicates ~= pDup;
-		}
-		return duplicates;
-	}
-	
-	private Player findOwner(Player[] playersDups, int ownerId) {
-		if(ownerId == -1){
-			return null;
-		} else {
-			foreach(p; playersDups){
-				if(p.uniqueId == ownerId)
-					return p;
-			}
-			throw new Exception("Cannot find planet owner");
-		}
 	}
 }
