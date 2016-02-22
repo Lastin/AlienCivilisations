@@ -5,6 +5,7 @@ import src.logic.ai;
 import src.entities.ship;
 import src.entities.planet;
 import src.containers.vector2d;
+import std.stdio;
 
 enum PlayerEnum : ubyte {
 	None,
@@ -67,6 +68,7 @@ class GameState {
 	/** Moves queue position to next available position **/
 	void moveQPosition() {
 		_queuePosition = ++_queuePosition % _players.length;
+		debug writefln("Queue position: %s", _queuePosition);
 	}
 	/** Returns duplicate of the state **/
 	GameState dup() const {

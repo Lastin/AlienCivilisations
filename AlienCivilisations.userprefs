@@ -1,11 +1,11 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/screens/menu.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/screens/play.d">
     <Files>
-      <File FileName="AlienCivilisations/src/screens/play.d" Line="95" Column="9" />
-      <File FileName="AlienCivilisations/src/handlers/gameManager.d" Line="40" Column="4" />
-      <File FileName="AlienCivilisations/src/containers/gameState.d" Line="16" Column="7" />
-      <File FileName="AlienCivilisations/src/screens/menu.d" Line="53" Column="10" />
+      <File FileName="AlienCivilisations/src/screens/play.d" Line="37" Column="37" />
+      <File FileName="AlienCivilisations/src/handlers/jsonParser.d" Line="18" Column="18" />
+      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/core/types.d" Line="1" Column="1" />
+      <File FileName="AlienCivilisations/src/containers/gameState.d" Line="7" Column="7" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

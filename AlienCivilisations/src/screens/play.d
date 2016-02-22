@@ -92,6 +92,7 @@ class Play : AppFrame {
 		_drawableRef = _animatedBackground;
 		//check if AI starts and makes it's turn if true
 		if(cast(AI)_gm.state.currentPlayer) {
+			debug writeln("Starting player AI");
 			_gm.endTurn();
 		}
 	}
