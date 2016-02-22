@@ -94,7 +94,7 @@ class Planet {
 	@property Ship[] shipOrders() {
 		return _shipOrders;
 	}
-	@property Ship[] shipOrders() const {
+	@property Ship[] shipOrdersDups() const {
 		return Ship.duplicateShips(_shipOrders);
 	}
 	@property int uniqueId() const {
@@ -102,7 +102,7 @@ class Planet {
 	}
 
 	override public string toString() {
-		return format("Position: %s \n Y:%s", _position.x, _position.y);
+		return format("Planet: %s Position X:%s Y:%s", _name, _position.x, _position.y);
 	}
 	Planet setOwner(Player player) {
 		_owner = player;
@@ -133,7 +133,7 @@ class Planet {
 		return result;
 	}
 	/** Function affects planet's attributes. Should be called after player finishes move **/
-	void step(bool limited = false) {
+	void step(bool testStep) {
 		double workforce = calculateWorkforce();
 		debug {
 			writeln("-----------------------------------------");
@@ -142,7 +142,7 @@ class Planet {
 			writefln("Workforce: %s", workforce);
 		}
 		//Consume at most half of the workforce on production
-		workforce = workforce/2 + produceShips(workforce/2, limited);
+		workforce = workforce/2 + produceShips(workforce/2, testStep);
 		debug writefln("Workforce after ships production: %s", workforce);
 		affectFood(workforce);
 		growPopulation();
@@ -326,6 +326,7 @@ class Planet {
 		}
 		_shipOrders = null;
 	}
+	/** Sets object fields to given parameters **/
 	void restore(uint[8] pop, double food, uint mu, Ship[] so) {
 		_population = pop;
 		_food = food;

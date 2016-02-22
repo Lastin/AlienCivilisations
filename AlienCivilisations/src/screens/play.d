@@ -695,6 +695,19 @@ class Play : AppFrame {
 								textColor: white
 								padding: Rect {5 10 30 10}
 							}
+							TextWidget {
+								fontWeight: 800
+								fontSize: 120%
+								textColor: white
+								text: "Inhabitation ships:"
+							}
+							TextWidget {
+								id: inhabitationShipCount
+								text: ""
+								fontSize: 120%
+								textColor: white
+								padding: Rect {5 10 30 10}
+							}
 						}
 					}
 					HSpacer {}
@@ -913,6 +926,7 @@ class Play : AppFrame {
 		}
 		_playerStatsContainer.childById("totalPopulation").text = to!dstring(populationTotal);
 		_playerStatsContainer.childById("totalMilitaryUnits").text = to!dstring(militaryUnitTotal);
+		_playerStatsContainer.childById("inhabitationShipCount").text = to!dstring(_gameState.human.inhabitationShips.length);
 	}
 	override void animate(long interval) {
 		//_animation.animate(interval);

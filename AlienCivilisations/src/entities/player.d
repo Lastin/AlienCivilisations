@@ -46,6 +46,7 @@ class Player {
 	@property Ship[] ships(){
 		return _ships;
 	}
+	/** Returns duplicates of ships **/
 	@property Ship[] ships() const {
 		Ship[] duplicates;
 		foreach(const Ship origin; _ships){
@@ -53,6 +54,7 @@ class Player {
 		}
 		return duplicates;
 	}
+	/** Returns sum of all player's planet's populations **/
 	@property uint populationSum(Planet[] planets) {
 		uint sum = 0;
 		foreach(planet; planets) {
@@ -61,10 +63,11 @@ class Player {
 		}
 		return sum;
 	}
+	/** Returns true if player has no units and inhabitation ships left **/
 	@property bool dead(Planet[] planets) {
 		return populationSum(planets) == 0 && inhabitationShips.length == 0;
 	}
-
+	/** Returns all ships of type military **/
 	@property MilitaryShip[] militaryShips(){
 		MilitaryShip[] milShips;
 		foreach(Ship ship; _ships){
@@ -74,6 +77,7 @@ class Player {
 		}
 		return milShips;
 	}
+	/** Returns all ships of type inhabitation **/
 	@property InhabitationShip[] inhabitationShips(){
 		InhabitationShip[] inhShips;
 		foreach(Ship ship; _ships){
@@ -83,6 +87,7 @@ class Player {
 		}
 		return inhShips;
 	}
+	/** Returns player's unique identifier**/
 	@property int uniqueId() const {
 		return _uniqueId;
 	}
@@ -96,7 +101,7 @@ class Player {
 		int totalPopulation = 0;
 		foreach(Planet planet; myPlanets) {
 			totalPopulation += planet.populationSum;
-			planet.step();
+			planet.step(false);
 		}
 		knowledgeTree.develop(totalPopulation);
 	}

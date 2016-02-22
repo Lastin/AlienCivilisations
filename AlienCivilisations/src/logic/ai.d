@@ -36,7 +36,9 @@ class AI : Player {
 		//#5: order miliaty ships
 
 		//#1: inhabit free planets
+
 		Planet[] freePlanets = _realState.map.freePlanets;
+		Planet[] playersPlanets = _realState.map.playerPlanets(_uniqueId);
 		sort!"a.capacity > b.capacity"(freePlanets);
 		foreach(planet; freePlanets) {
 			if(inhabitationShips.length == 0)
@@ -45,7 +47,7 @@ class AI : Player {
 		}
 		if(freePlanets.length > 0) {
 			int totalOrders = 0;
-			foreach(planet; planets(_realState.map.planets)) {
+			foreach(planet; playersPlanets) {
 				foreach(int index, order; planet.shipOrders) {
 					if(cast(InhabitationShip)order) {
 						totalOrders++;
@@ -56,42 +58,10 @@ class AI : Player {
 				}
 			}
 			if(totalOrders < freePlanets.length) {
-				int pid = leastAffectedPlanet(*_realState, ShipType.Inhabitation, _uniqueId);
-				_realState.map.planets[pid].addShipOrder(ShipType.Inhabitation);
+				int planetIndex = leastAffectedPlanet(*_realState, ShipType.Inhabitation, _uniqueId);
+				_realState.map.planets[planetIndex].addShipOrder(ShipType.Inhabitation);
 			}
 		}
-
-		GameState[] possibleMoves;
-		long[20] scores;
-		scores[] = long.min;
-		//Make order for each undeveloped branch
-		knowledgeTree.clearOrders();
-		Branch[] ubs = knowledgeTree.undevelopedBranches;
-		/*if(ub.length > 0) {
-			foreach(possibleDev; ub) {
-				GameState hyp = _realState.dup;
-				addKTOrder(hyp, possibleDev.name);
-
-			}
-		} else {
-			//If all branches are developed
-			Planet[] fp = _realState.map.freePlanets;
-			if(fp.length > 0) {
-				if(inhabitationShips.length == 0) {
-					for(int i=0; i<fp.length; i++) {
-						//try to produce different numbers of ships
-
-					}
-				} else {
-					//Utilise all ships
-					sort!q{a.capacity > b.capacity}(fp);
-					foreach(ship; inhabitationShips) {
-						
-					}
-				}
-			}
-
-		}*/
 	}
 
 	long negaMax(GameState gs, int depth, real beta, real alpha, PlayerEnum currentPlayer){
@@ -115,38 +85,42 @@ class AI : Player {
 	/** returns index of planet least affected by construction of ship of given type **/
 	private int leastAffectedPlanet(GameState gs, ShipType st, int playerId) {
 		immutable int moves = 5;
-		Planet[] playerPlanets = gs.map.playerPlanets(playerId);//gs.currentPlayer.planets(gs.map.planets);
+		//Planet[] playerPlanets = gs.map.playerPlanets(playerId);//gs.currentPlayer.planets(gs.map.planets);
 		int index = -1;
 		//The smaller the effect the better
-		double effect = double.infinity;
-		foreach(int i, planet; playerPlanets) {
-			//Backup essential values
-			uint[8] pop = planet.population.dup;
-			double food = planet.food;
-			uint mu = planet.militaryUnits;
-			Ship[] so = planet.shipOrders.dup;
-			//Population before x moves
-			double sumBefore = to!double(planet.populationSum);
-			for(int j=0; j<moves; j++) {
-				planet.step();
+		double smallestEffect = double.infinity;
+		foreach(int i, Planet planet; gs.map.planets) {
+			if(planet.ownerId == playerId) {
+				//Backup essential values
+				const uint[8] pop = planet.population;
+				const double food = planet.food;
+				const uint mu = planet.militaryUnits;
+				Ship[] so1 = planet.shipOrdersDups;
+				debug writefln("");
+				//Population before x moves
+				double sumBefore = to!double(planet.populationSum);
+				for(int j=0; j<moves; j++) {
+					planet.step(true);
+				}
+				//Population after x moves
+				double sumUnaffected = to!double(planet.populationSum);
+				//Restore values and place order
+				planet.restore(pop, food, mu, so1);
+				Ship[] so2 = planet.shipOrdersDups;
+				planet.addShipOrder(st, 0);
+				//Make same number of moves with order
+				for(int j=0; j<moves; j++) {
+					planet.step(true);
+				}
+				double sumAffected = to!double(planet.populationSum);
+				double ratio = sumBefore / sumAffected - sumBefore / sumUnaffected;
+				if(ratio < smallestEffect) {
+					smallestEffect = ratio;
+					index = i;
+				}
+				//important to restore values of planet again to one before
+				planet.restore(pop, food, mu, so2);
 			}
-			//Population after x moves
-			double sumUnaffected = to!double(planet.populationSum);
-			//Restore values and place order
-			planet.restore(pop, food, mu, so);
-			planet.addShipOrder(st, 0);
-			//Make same number of moves with order
-			for(int j=0; j<moves; j++) {
-				planet.step();
-			}
-			double sumAffected = to!double(planet.populationSum);
-			double ratio = sumBefore / sumAffected - sumBefore / sumUnaffected;
-			if(ratio < effect) {
-				effect = ratio;
-				index = i;
-			}
-			//important to restore values of planet again to one before
-			planet.restore(pop, food, mu, so);
 		}
 		return index;
 	}

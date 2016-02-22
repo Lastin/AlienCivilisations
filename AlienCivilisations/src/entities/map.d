@@ -98,7 +98,7 @@ class Map {
 			uint[8] pop = origin.population.dup;
 			double food = origin.food;
 			uint mu = origin.militaryUnits;
-			Ship[] so = origin.shipOrders;//origin.shipOrders.dup;
+			Ship[] so = origin.shipOrdersDups;//origin.shipOrders.dup;
 			Planet pDup = new Planet(uniqueId, name, pos, r, ba, pop, food, mu, so);
 			Player newOwner = Player.findPlayerWithId(origin.ownerId, players);
 			pDup.setOwner(newOwner);

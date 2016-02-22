@@ -56,11 +56,9 @@ class GameState {
 	}
 	/** Moves queue position to next available position **/
 	void moveQPosition() {
-		if(++_queuePosition == _players.length){
-			_queuePosition = 0;
-		}
+		_queuePosition = ++_queuePosition % _players.length;
 	}
-	
+	/** Returns duplicate of the state **/
 	GameState dup() const {
 		GameState duplicateState;
 		Player[] playersDup = duplicatePlayers(duplicateState);
