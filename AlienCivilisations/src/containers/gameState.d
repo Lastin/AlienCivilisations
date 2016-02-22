@@ -28,11 +28,21 @@ class GameState {
 	@property Map map() {
 		return _map;
 	}
+	/** Returns all players objects **/
 	@property Player[] players() {
 		return _players;
 	}
+	/** Returns current player object **/
 	@property Player currentPlayer() {
 		return _players[_queuePosition];
+	}
+	@property int currentPlayerId() {
+		return currentPlayer.uniqueId;
+	}
+	@property int currentPlayerEnum() {
+		if(cast(AI)currentPlayer)
+			return PlayerEnum.AI;
+		return PlayerEnum.Human;
 	}
 	@property Player human(){
 		return _players[0];
@@ -48,9 +58,9 @@ class GameState {
 		bool aiDead = ai.dead(_map.planets);
 		if(!aiDead && !humanDead)
 			return PlayerEnum.None;
-		if(!aiDead && humanDead)
+		if(humanDead && !aiDead)
 			return PlayerEnum.Human;
-		if(!humanDead && aiDead)
+		if(aiDead && !humanDead)
 			return PlayerEnum.AI;
 		return PlayerEnum.Both;
 	}

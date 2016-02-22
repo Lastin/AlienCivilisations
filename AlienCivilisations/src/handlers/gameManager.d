@@ -38,8 +38,6 @@ class GameManager {
 			writeln("=======================================================");
 			writefln("Ending turn of player: %s", _gs.currentPlayer.name);
 		}
-		_gs.currentPlayer.completeTurn(_gs.map.planets);
-		_gs.moveQPosition();
 		debug writeln("=======================================================");
 		if(AI ai = cast(AI)_gs.currentPlayer){
 			debug {
@@ -50,6 +48,9 @@ class GameManager {
 			_gs.currentPlayer.completeTurn(_gs.map.planets);
 			_gs.moveQPosition();
 			debug writeln("=======================================================");
+		} else {
+			_gs.currentPlayer.completeTurn(_gs.map.planets);
+			_gs.moveQPosition();
 		}
 		debug writefln("Current player: %s", _gs.currentPlayer.name);
 	}

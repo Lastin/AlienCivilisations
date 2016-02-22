@@ -62,24 +62,37 @@ class AI : Player {
 				_realState.map.planets[planetIndex].addShipOrder(ShipType.Inhabitation);
 			}
 		}
-	}
-
-	long negaMax(GameState gs, int depth, real beta, real alpha, PlayerEnum currentPlayer){
-		PlayerEnum dead = gs.deadPlayer;
-		long bestScore = 0;
-		//Non-terminal node
-		if(depth > 0 && dead == PlayerEnum.None) {
+		void* action;
+		long[] scores;
+		foreach(branch; knowledgeTree.undevelopedBranches()){
+			GameState dup = _realState.dup;
 
 		}
-		//Terminal node
+	}
+
+	long negaMax(GameState gs, int depth, real beta, real alpha){
+		//Check if terminal node
 		if(depth == 0)
 			return evaluateState(gs);
-		if(dead == PlayerEnum.Both)
+		PlayerEnum dead = gs.deadPlayer;
+		if(dead == PlayerEnum.Both) {
+			//Both players dead, neither good nor bad
 			return 0;
-		if(dead == currentPlayer)
-			return long.max;
-		if(dead == currentPlayer)
+		}
+		else if(dead == gs.currentPlayerEnum) {
+			//Current player is dead, worst output
 			return long.min;
+		}
+		else if(dead != PlayerEnum.None){
+			//Oponent is dead, best output
+			return long.max;
+		}
+		//Non-terminal node
+		long bestScore = 0;
+		if(depth > 0 && dead == PlayerEnum.None) {
+
+
+		}
 		return bestScore;
 	}
 	/** returns index of planet least affected by construction of ship of given type **/
@@ -96,6 +109,7 @@ class AI : Player {
 				const double food = planet.food;
 				const uint mu = planet.militaryUnits;
 				Ship[] so1 = planet.shipOrdersDups;
+				Ship[] so2 = planet.shipOrdersDups;
 				debug writefln("");
 				//Population before x moves
 				double sumBefore = to!double(planet.populationSum);
@@ -106,7 +120,6 @@ class AI : Player {
 				double sumUnaffected = to!double(planet.populationSum);
 				//Restore values and place order
 				planet.restore(pop, food, mu, so1);
-				Ship[] so2 = planet.shipOrdersDups;
 				planet.addShipOrder(st, 0);
 				//Make same number of moves with order
 				for(int j=0; j<moves; j++) {
@@ -118,7 +131,7 @@ class AI : Player {
 					smallestEffect = ratio;
 					index = i;
 				}
-				//important to restore values of planet again to one before
+				//Restore values
 				planet.restore(pop, food, mu, so2);
 			}
 		}
