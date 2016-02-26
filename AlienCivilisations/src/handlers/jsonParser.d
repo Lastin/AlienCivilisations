@@ -16,6 +16,7 @@ import std.algorithm : sort;
 import std.format;
 import src.containers.gameState;
 import src.containers.vector2d;
+import src.logic.ai;
 
 class JSONParser {
 	/** Parses object Play into json structure preserving camera position and game state **/
@@ -73,6 +74,7 @@ class JSONParser {
 		JSONValue[] jPlayers;
 		foreach(player; players) {
 			JSONValue p = ["name" : player.name];
+			p.object["type"] = cast(AI)player ? "AI" : "HUMAN"; 
 			p.object["uniqueId"] = player.uniqueId;
 			p.object["knowledgeTree"] = ktToJSON(player.knowledgeTree);
 			p.object["ships"] = shipsToJSON(player.ships);
@@ -182,6 +184,7 @@ class JSONParser {
 		if(ownerIndex > -1) {
 			planet.setOwner(Player.findPlayerWithId(ownerIndex, players));
 		}
+		debug writefln("New planet %s owner: %s", name, planet.ownerId);
 		return planet;
 	}
 	/** Parses valid json structure to Vector2d struct **/
@@ -199,6 +202,9 @@ class JSONParser {
 		JSONValue[] jships = jplayer["ships"].array;
 		foreach(JSONValue jship; jships) {
 			ships ~= jsonToShip(jship);
+		}
+		if(jplayer["type"].str == "AI") {
+			return new AI(uniqueId, kt, ships);
 		}
 		return new Player(uniqueId, name, kt, ships);
 	}

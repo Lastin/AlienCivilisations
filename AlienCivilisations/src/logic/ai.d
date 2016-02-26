@@ -16,15 +16,12 @@ import std.conv;
 
 class AI : Player {
 	/**THIS STATE IS ALWAYS REFERING TO REAL STATE OF THE GAME**/
-	private GameState* _realState;
-	private GameState[] duplicates;
-	this(int uniqueId, GameState* realState, KnowledgeTree knowledgeTree, Ship[] ships = null) {
+	this(int uniqueId, KnowledgeTree knowledgeTree, Ship[] ships = null) {
 		super(uniqueId, "AI", knowledgeTree, ships);
-		_realState = realState;
 	}
 	/** Function called when it's AI's move. AI makes decisions and moves here.
 	Moves that are finialised on the end of turn are executed in completeTurn() from parent class **/
-	void makeMove() {
+	void makeMove(GameState realState) {
 		debug {
 			writeln("AI making decisions");
 			writefln("CPUs: %s", totalCPUs);
@@ -34,11 +31,9 @@ class AI : Player {
 		//#3: enemy planets > attack with military ships
 		//#4: order inhabitation ship
 		//#5: order miliaty ships
-
 		//#1: inhabit free planets
-
-		Planet[] freePlanets = _realState.map.freePlanets;
-		Planet[] playersPlanets = _realState.map.playerPlanets(_uniqueId);
+		Planet[] freePlanets = realState.map.freePlanets;
+		Planet[] playersPlanets = realState.map.playerPlanets(_uniqueId);
 		sort!"a.capacity > b.capacity"(freePlanets);
 		foreach(planet; freePlanets) {
 			if(inhabitationShips.length == 0)
@@ -58,14 +53,14 @@ class AI : Player {
 				}
 			}
 			if(totalOrders < freePlanets.length) {
-				int planetIndex = leastAffectedPlanet(*_realState, ShipType.Inhabitation, _uniqueId);
-				_realState.map.planets[planetIndex].addShipOrder(ShipType.Inhabitation);
+				int planetIndex = leastAffectedPlanet(realState, ShipType.Inhabitation, _uniqueId);
+				realState.map.planets[planetIndex].addShipOrder(ShipType.Inhabitation);
 			}
 		}
 		void* action;
 		long[] scores;
 		foreach(branch; knowledgeTree.undevelopedBranches()){
-			GameState dup = _realState.dup;
+			GameState dup = realState.dup;
 
 		}
 	}

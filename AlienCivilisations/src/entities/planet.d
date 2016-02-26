@@ -22,7 +22,7 @@ class Planet {
 		immutable float _radius;
 		immutable bool _breathableAtmosphere;
 		immutable int _uniqueId;
-		Player _owner;
+		Player _owner = null;
 		uint[8] _population = [0,0,0,0,0,0,0,0];
 		double _food = 0;
 		uint _militaryUnits = 0;

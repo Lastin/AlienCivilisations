@@ -72,20 +72,18 @@ class GameState {
 	}
 	/** Returns duplicate of the state **/
 	GameState dup() const {
-		GameState duplicateState;
-		Player[] playersDup = duplicatePlayers(duplicateState);
+		Player[] playersDup = duplicatePlayers();
 		Planet[] planetsDup = _map.duplicatePlanets(playersDup);//duplicatePlanets(playersDup);
 		//duplicate map
 		Map mapDup = new Map(_map.size, planetsDup);
-		duplicateState = new GameState(mapDup, playersDup, _queuePosition);
-		return duplicateState;
+		return new GameState(mapDup, playersDup, _queuePosition);
 	}
 	
-	private Player[] duplicatePlayers(GameState duplicateState) const {
+	private Player[] duplicatePlayers() const {
 		Player[] duplicates;
 		foreach(const Player origin; _players) {
 			if(AI ai = cast(AI)origin){
-				duplicates ~= new AI(origin.uniqueId, &duplicateState, origin.knowledgeTree.dup, origin.ships);
+				duplicates ~= new AI(origin.uniqueId, origin.knowledgeTree.dup, origin.ships);
 			} else {
 				duplicates ~= new Player(origin.uniqueId, origin.name, origin.knowledgeTree.dup, origin.ships);
 			}

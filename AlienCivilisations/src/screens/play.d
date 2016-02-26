@@ -902,7 +902,7 @@ class Play : AppFrame {
 			} else {
 				_planetInfoContainer.childById("productivity").text = "unknown"d;
 				_playersPlanetOptions.visibility(Visibility.Gone);
-				if(planet.owner == _gameState.ai){
+				if(planet.owner == _gameState.ai) {
 					_planetInfoContainer.childById("attackButton").visibility(Visibility.Visible);
 					_planetInfoContainer.childById("inhabitButton").visibility(Visibility.Gone);
 				} else {
