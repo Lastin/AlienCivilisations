@@ -15,7 +15,6 @@ import std.algorithm;
 import std.conv;
 
 class AI : Player {
-	/**THIS STATE IS ALWAYS REFERING TO REAL STATE OF THE GAME**/
 	this(int uniqueId, KnowledgeTree knowledgeTree, Ship[] ships = null) {
 		super(uniqueId, "AI", knowledgeTree, ships);
 	}
@@ -27,35 +26,25 @@ class AI : Player {
 			writefln("CPUs: %s", totalCPUs);
 		}
 		//#1: undeveloped branches
-		//#2: free planets > use inhabitation ships
 		//#3: enemy planets > attack with military ships
 		//#4: order inhabitation ship
 		//#5: order miliaty ships
 		//#1: inhabit free planets
+
+		//#2: free planets > use inhabitation ships
 		Planet[] freePlanets = realState.map.freePlanets;
-		Planet[] playersPlanets = realState.map.playerPlanets(_uniqueId);
 		sort!"a.capacity > b.capacity"(freePlanets);
+		size_t ihc = inhabitationShips.length;
 		foreach(planet; freePlanets) {
-			if(inhabitationShips.length == 0)
+			if(ihc == 0)
 				break;
 			inhabitPlanet(planet);
+			ihc--;
 		}
-		if(freePlanets.length > 0) {
-			int totalOrders = 0;
-			foreach(planet; playersPlanets) {
-				foreach(int index, order; planet.shipOrders) {
-					if(cast(InhabitationShip)order) {
-						totalOrders++;
-						if(totalOrders > freePlanets.length){
-							planet.cancelOrder(index);
-						}
-					} 
-				}
-			}
-			if(totalOrders < freePlanets.length) {
-				int planetIndex = leastAffectedPlanet(realState, ShipType.Inhabitation, _uniqueId);
-				realState.map.planets[planetIndex].addShipOrder(ShipType.Inhabitation);
-			}
+		Planet[] pp = realState.map.playerPlanets(_uniqueId);
+		double enemyAggression = 0;
+		foreach(planet; pp) {
+			enemyAggression += planet.attackedCount;
 		}
 		void* action;
 		long[] scores;

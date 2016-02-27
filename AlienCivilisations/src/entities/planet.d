@@ -27,6 +27,7 @@ class Planet {
 		double _food = 0;
 		uint _militaryUnits = 0;
 		Ship[] _shipOrders;
+		int _attackedCount = 0;
 	}
 
 	this(int uniqueId, string name, Vector2d position, float radius, bool breathableAtmosphere) {
@@ -109,6 +110,22 @@ class Planet {
 		if(!_owner)
 			_shipOrders = null;
 		return this;
+	}
+	/** Increases attacks on the planet counter or sets to value **/
+	void setAttacked(int attackedCount = 0) {
+		if(attackedCount > 0) {
+			_attackedCount = attackedCount;
+		} else {
+			_attackedCount++;
+		}
+	}
+	/** Sets count of attacks on planet to 0 **/
+	void clearAttacked() {
+		_attackedCount = 0;
+	}
+	/** Returns the count of attacks on the planet **/
+	@property int attackedCount() {
+		return _attackedCount;
 	}
 	/**Sets new owner of the planet and sets units from inhabitation ship**/
 	void inhabit(Player owner, InhabitationShip ship){

@@ -58,6 +58,7 @@ class JSONParser {
 		jsonPlanet.object["population"] = planet.population.idup;
 		jsonPlanet.object["food"] = planet.food;
 		jsonPlanet.object["militaryUnits"] = planet.militaryUnits;
+		jsonPlanet.object["attackedCount"] = planet.attackedCount;
 		JSONValue[] jShipOrders = shipsToJSON(planet.shipOrders);
 		foreach(i, jorder; jShipOrders) {
 			jorder.object["index"] = i;
@@ -180,6 +181,7 @@ class JSONParser {
 			shipOrders ~= shipOrder[0];
 		}
 		Planet planet = new Planet(uniqueId, name, pos, radius, ba, pop, food, mu, shipOrders);
+		planet.setAttacked(to!int(jplanet["attackedCount"].integer));
 		int ownerIndex = to!int(jplanet["ownerId"].integer);
 		if(ownerIndex > -1) {
 			planet.setOwner(Player.findPlayerWithId(ownerIndex, players));

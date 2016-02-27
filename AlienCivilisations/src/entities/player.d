@@ -102,6 +102,7 @@ class Player {
 		foreach(Planet planet; myPlanets) {
 			totalPopulation += planet.populationSum;
 			planet.step(false);
+			planet.clearAttacked();
 		}
 		knowledgeTree.develop(totalPopulation);
 	}

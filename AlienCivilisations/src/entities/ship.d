@@ -101,6 +101,7 @@ class MilitaryShip : Ship {
 		debug writefln("Onboard before: %s", _onboard);
 		double force = _onboard * milEff * lambda;
 		double rest = planet.destroyPopulation(force);
+		planet.setAttacked();
 		_onboard = to!int(rest / milEff);
 		debug writefln("Onboard after: %s", _onboard);
 	}
