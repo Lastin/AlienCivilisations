@@ -13,6 +13,7 @@ import std.parallelism;
 import src.containers.gameState;
 import std.algorithm;
 import std.conv;
+import std.math;
 
 class AI : Player {
 	this(int uniqueId, KnowledgeTree knowledgeTree, Ship[] ships = null) {
@@ -41,11 +42,13 @@ class AI : Player {
 			inhabitPlanet(planet);
 			ihc--;
 		}
+
 		Planet[] pp = realState.map.playerPlanets(_uniqueId);
 		double enemyAggression = 0;
 		foreach(planet; pp) {
 			enemyAggression += planet.attackedCount;
 		}
+
 		void* action;
 		long[] scores;
 		foreach(branch; knowledgeTree.undevelopedBranches()){
@@ -74,19 +77,18 @@ class AI : Player {
 		//Non-terminal node
 		long bestScore = 0;
 		if(depth > 0 && dead == PlayerEnum.None) {
-
-
+			
 		}
 		return bestScore;
 	}
-	/** returns index of planet least affected by construction of ship of given type **/
+	/** Returns uniqueId of planet least affected by construction of ship of given type **/
 	private int leastAffectedPlanet(GameState gs, ShipType st, int playerId) {
 		immutable int moves = 5;
 		//Planet[] playerPlanets = gs.map.playerPlanets(playerId);//gs.currentPlayer.planets(gs.map.planets);
-		int index = -1;
+		int id = -1;
 		//The smaller the effect the better
 		double smallestEffect = double.infinity;
-		foreach(int i, Planet planet; gs.map.planets) {
+		foreach(Planet planet; gs.map.planets) {
 			if(planet.ownerId == playerId) {
 				//Backup essential values
 				const uint[8] pop = planet.population;
@@ -98,7 +100,7 @@ class AI : Player {
 				//Population before x moves
 				double sumBefore = to!double(planet.populationSum);
 				for(int j=0; j<moves; j++) {
-					planet.step(true);
+					planet.step(false);
 				}
 				//Population after x moves
 				double sumUnaffected = to!double(planet.populationSum);
@@ -107,23 +109,62 @@ class AI : Player {
 				planet.addShipOrder(st, 0);
 				//Make same number of moves with order
 				for(int j=0; j<moves; j++) {
-					planet.step(true);
+					planet.step(false);
 				}
 				double sumAffected = to!double(planet.populationSum);
 				double ratio = sumBefore / sumAffected - sumBefore / sumUnaffected;
 				if(ratio < smallestEffect) {
 					smallestEffect = ratio;
-					index = i;
+					id = planet.uniqueId;
 				}
 				//Restore values
 				planet.restore(pop, food, mu, so2);
 			}
 		}
-		return index;
+		return id;
 	}
 	/** Adds kt development order for current player **/
 	private void addKTOrder(GameState gs, BranchName bn) {
 		gs.currentPlayer.knowledgeTree.addOrder(bn);
+	}
+	/** Return uniqueId of planet most affected by attacks **/
+	private int mostAffectedPlanet(GameState gs) {
+		Planet[] aps;
+		Player attacker;
+		if(gs.currentPlayerEnum == PlayerEnum.AI) {
+			//attack human
+			aps = gs.human.planets(gs.map.planets);
+			attacker = gs.ai;
+		} else {
+			//attack ai
+			aps = gs.ai.planets(gs.map.planets);
+			attacker = gs.human;
+		}
+		double greatestEffect = double.min_normal;
+		int id = -1;
+		foreach(ap; aps) {
+			size_t planetBH = ap.toHash;
+			size_t playerBH = attacker.toHash;
+			Planet testField = ap.dup(ap.owner);
+			foreach(ms; attacker.militaryShips) {
+				attacker.attackPlanet(ms, testField, false);
+				testField.step(false);
+			}
+			double effect = to!double(ap.populationSum);
+			double divisor = to!double(testField.populationSum);
+			if(divisor == 0) {
+				divisor = 0.5;
+			}
+			effect /= divisor;
+			if(effect > greatestEffect) {
+				greatestEffect = effect;
+				id = ap.uniqueId;
+			}
+			debug writefln("testfield hash: %s", testField.toHash);
+			assert(ap.toHash == planetBH && attacker.toHash == playerBH);
+		}
+		debug writefln("Most affected planet id: %s with value: %s", id, greatestEffect);
+		return id;
 	}
 	private long evaluateState(GameState gs) {
 		return 0;

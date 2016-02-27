@@ -45,7 +45,7 @@ class Branch {
 		return effness;
 	}
 	/** Returns points within current branch **/
-	@property uint points() const {
+	@trusted @property uint points() const nothrow {
 		return _points;
 	}
 	/** Returns true if branch reached max level **/

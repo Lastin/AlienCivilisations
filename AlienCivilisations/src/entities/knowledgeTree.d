@@ -164,4 +164,13 @@ public class KnowledgeTree {
 		];
 		return new KnowledgeTree(points);
 	}
+	override size_t toHash() nothrow {
+		double sum = 0;
+		sum += _energy.points;
+		sum += _food.points;
+		sum += _military.points;
+		sum += _science.points;
+		sum += _orders.length;
+		return super.toHash;
+	}
 }

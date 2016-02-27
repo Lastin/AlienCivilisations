@@ -101,15 +101,15 @@ class Player {
 		int totalPopulation = 0;
 		foreach(Planet planet; myPlanets) {
 			totalPopulation += planet.populationSum;
-			planet.step(false);
+			planet.step(true);
 			planet.clearAttacked();
 		}
 		knowledgeTree.develop(totalPopulation);
 	}
 	/** Attacks given planet using given military ship with force based on player knowledge tree and ship units **/
-	void attackPlanet(MilitaryShip ship, Planet planet){
+	void attackPlanet(MilitaryShip ship, Planet planet, bool affectShip = true){
 		double milEff = _knowledgeTree.branch(BranchName.Military).effectiveness;
-		ship.attackPlanet(planet, milEff);
+		ship.attackPlanet(planet, milEff, affectShip);
 		//TODO: remove ship after attacking if empty
 	}
 	/** Inhabits given planet using first available inhabitation ship **/
@@ -139,5 +139,14 @@ class Player {
 				throw new Exception("Cannot find planet owner");
 			}
 		}
+	}
+	override size_t toHash() nothrow {
+		double sum = 0;
+		foreach(s; _ships) {
+			sum += s.toHash;
+		}
+		sum += _uniqueId;
+		sum += _knowledgeTree.toHash;
+		return cast(size_t)sum;
 	}
 }

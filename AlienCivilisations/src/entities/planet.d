@@ -9,6 +9,7 @@ import src.entities.knowledgeTree;
 import std.stdio;
 import std.math;
 import src.containers.vector2d;
+import std.digest.md;
 
 public enum int POPULATION_CONSTANT = 10000;
 enum double FOOD_CONSUMPTION_RATE = 1;
@@ -46,6 +47,21 @@ class Planet {
 		_militaryUnits = militaryUnits;
 		_shipOrders = shipOrders;
 	}
+	/** Returns duplicate of the planet. Takes object to not pass wrong owner reference **/
+	Planet dup(Player newOwner) const {
+		string name = name();
+		int uniqueId = uniqueId();
+		Vector2d pos = position();
+		float r = radius();
+		bool ba = breathableAtmosphere();
+		uint[8] pop = population();
+		double food = food();
+		uint mu = militaryUnits();
+		Ship[] so = shipOrdersDups();
+		Planet pDup = new Planet(uniqueId, name, pos, r, ba, pop, food, mu, so);
+		pDup.setOwner(newOwner);
+		return pDup;
+	}
 
 	@property Vector2d position() {
 		return _position;
@@ -59,7 +75,7 @@ class Planet {
 	@property int capacity() {
 		return to!int(_radius / 10 * POPULATION_CONSTANT);
 	}
-	@property uint populationSum() const {
+	@trusted @property uint populationSum() const nothrow {
 		return _population[].sum;
 	}
 	@property float radius() const {
@@ -150,7 +166,7 @@ class Planet {
 		return result;
 	}
 	/** Function affects planet's attributes. Should be called after player finishes move **/
-	void step(bool testStep) {
+	void step(bool affectOwner) {
 		double workforce = calculateWorkforce();
 		debug {
 			writeln("-----------------------------------------");
@@ -159,7 +175,7 @@ class Planet {
 			writefln("Workforce: %s", workforce);
 		}
 		//Consume at most half of the workforce on production
-		workforce = workforce/2 + produceShips(workforce/2, testStep);
+		workforce = workforce/2 + produceShips(workforce/2, affectOwner);
 		debug writefln("Workforce after ships production: %s", workforce);
 		affectFood(workforce);
 		growPopulation();
@@ -276,6 +292,9 @@ class Planet {
 				}
 			}
 		}
+		if(populationSum == 0) {
+			_owner = null;
+		}
 		debug { 
 			writefln("New population: %s",_population);
 			writeln("-----------------------------------------");
@@ -283,11 +302,11 @@ class Planet {
 		return force;
 	}
 	/** Produces ships from the queue **/
-	private double produceShips(double workforce, bool limited) {
+	private double produceShips(double workforce, bool addToOwner) {
 		foreach(Ship s; _shipOrders) {
 			workforce = s.build(workforce);
 			if(s.completed){
-				if(!limited) {
+				if(addToOwner) {
 					_owner.addShip(s);
 				}
 				_shipOrders = _shipOrders[1 .. $];
@@ -349,5 +368,17 @@ class Planet {
 		_food = food;
 		_militaryUnits = mu;
 		_shipOrders = so;
+	}
+	override size_t toHash() nothrow {
+		double sum = 0;
+		sum += populationSum;
+		sum += _food;
+		sum += _militaryUnits;
+		sum += _owner.toHash;
+		foreach(so; _shipOrders) {
+			sum += so.toHash;
+		}
+		sum += _attackedCount;
+		return cast(size_t)(sum);//super.toHash;
 	}
 }

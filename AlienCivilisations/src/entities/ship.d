@@ -62,6 +62,9 @@ abstract class Ship {
 	@property double onboard() const {
 		return _onboard;
 	}
+	override size_t toHash() nothrow {
+		return cast(size_t)(_onboard + _completion);
+	}
 	/**Adds workforce to completion, eventually completing the construction**/
 	double build(double workforce){
 		debug writefln("MS: cost: %s | force: %s", buildCost, workforce);
@@ -97,12 +100,13 @@ class MilitaryShip : Ship {
 		_onboard += units;
 	}
 	/** Perform attack on a given planet **/
-	void attackPlanet(Planet planet, double milEff){
+	void attackPlanet(Planet planet, double milEff, bool affectShip){
 		debug writefln("Onboard before: %s", _onboard);
 		double force = _onboard * milEff * lambda;
 		double rest = planet.destroyPopulation(force);
 		planet.setAttacked();
-		_onboard = to!int(rest / milEff);
+		if(affectShip)
+			_onboard = to!int(rest / milEff);
 		debug writefln("Onboard after: %s", _onboard);
 	}
 	override @property double buildCost() {
