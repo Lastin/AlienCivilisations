@@ -50,12 +50,13 @@ class AI : Player {
 			GameState dup = realState.dup;
 
 		}
+		//negamax(dup, 4, -inifinity, +infinity, false);
 		//#3: enemy planets > attack with military ships
 		//#4: order inhabitation ship
 		//#5: order miliaty ships
 	}
 
-	long negaMax(GameState gs, int depth, real beta, real alpha) const {
+	long negaMax(GameState gs, int depth,real alpha, real beta, bool maximising) const {
 		//Check if terminal node
 		if(depth == 0)
 			return evaluateState(gs);
@@ -73,18 +74,15 @@ class AI : Player {
 			return long.max;
 		}
 		//Non-terminal node
-		long bestScore = 0;
+		long bestScore = long.min;
 		if(depth > 0 && dead == PlayerEnum.None) {
-			Branch[] ub = gs.currentPlayer().knowledgeTree().undevelopedBranches();
-			if(ub.length > 0) {
-				foreach(branch; ub) {
-					GameState dup = gs.dup();
-					gs.currentPlayer.knowledgeTree.addOrder(branch.name);
-					gs.moveQPosition();
-					long score = negaMax(dup, ++depth, -alpha, -beta);
-				}
-			} else {
-
+			GameState[] combinations = possibleCombinations(gs);
+			foreach(combination; combinations) {
+				long score = -negaMax(combination, ++depth, -beta, -alpha, !maximising);
+				bestScore = max(bestScore, score);
+				alpha = max(alpha, score);
+				if(alpha >= beta)
+					break;
 			}
 		}
 		return bestScore;
@@ -176,5 +174,22 @@ class AI : Player {
 	}
 	private long evaluateState(GameState gs) const {
 		return 0;
+	}
+	private GameState[] possibleCombinations(GameState original) const {
+		GameState[] combinations;
+		Branch[] ub = original.currentPlayer().knowledgeTree().undevelopedBranches();
+		if(ub.length > 0) {
+			foreach(branch; ub) {
+				GameState testGS = original.dup();
+				testGS.currentPlayer.knowledgeTree.clearOrders();
+				testGS.currentPlayer.knowledgeTree.addOrder(branch.name);
+				//end turn once decisions are made
+				testGS.currentPlayer.completeTurn(testGS.map.planets);
+				testGS.moveQPosition();
+			}
+		} else {
+
+		}
+		return combinations;
 	}
 }
