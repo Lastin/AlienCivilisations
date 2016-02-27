@@ -1,15 +1,8 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/entities/player.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/logic/ai.d">
     <Files>
-      <File FileName="AlienCivilisations/src/logic/ai.d" Line="163" Column="41" />
-      <File FileName="AlienCivilisations/src/entities/player.d" Line="148" Column="11" />
-      <File FileName="AlienCivilisations/src/entities/ship.d" Line="106" Column="29" />
-      <File FileName="AlienCivilisations/src/containers/gameState.d" Line="88" Column="90" />
-      <File FileName="AlienCivilisations/src/entities/map.d" Line="94" Column="39" />
-      <File FileName="AlienCivilisations/src/entities/planet.d" Line="377" Column="23" />
-      <File FileName="AlienCivilisations/src/entities/knowledgeTree.d" Line="169" Column="19" />
-      <File FileName="AlienCivilisations/src/entities/branch.d" Line="48" Column="48" />
+      <File FileName="AlienCivilisations/src/logic/ai.d" Line="82" Column="57" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

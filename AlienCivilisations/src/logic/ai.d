@@ -26,13 +26,7 @@ class AI : Player {
 			writeln("AI making decisions");
 			writefln("CPUs: %s", totalCPUs);
 		}
-		//#1: undeveloped branches
-		//#3: enemy planets > attack with military ships
-		//#4: order inhabitation ship
-		//#5: order miliaty ships
-		//#1: inhabit free planets
-
-		//#2: free planets > use inhabitation ships
+		//#1: free planets > use inhabitation ships
 		Planet[] freePlanets = realState.map.freePlanets;
 		sort!"a.capacity > b.capacity"(freePlanets);
 		size_t ihc = inhabitationShips.length;
@@ -49,15 +43,19 @@ class AI : Player {
 			enemyAggression += planet.attackedCount;
 		}
 
+		//#2: undeveloped branches
 		void* action;
 		long[] scores;
 		foreach(branch; knowledgeTree.undevelopedBranches()){
 			GameState dup = realState.dup;
 
 		}
+		//#3: enemy planets > attack with military ships
+		//#4: order inhabitation ship
+		//#5: order miliaty ships
 	}
 
-	long negaMax(GameState gs, int depth, real beta, real alpha){
+	long negaMax(GameState gs, int depth, real beta, real alpha) const {
 		//Check if terminal node
 		if(depth == 0)
 			return evaluateState(gs);
@@ -77,7 +75,17 @@ class AI : Player {
 		//Non-terminal node
 		long bestScore = 0;
 		if(depth > 0 && dead == PlayerEnum.None) {
-			
+			Branch[] ub = gs.currentPlayer().knowledgeTree().undevelopedBranches();
+			if(ub.length > 0) {
+				foreach(branch; ub) {
+					GameState dup = gs.dup();
+					gs.currentPlayer.knowledgeTree.addOrder(branch.name);
+					gs.moveQPosition();
+					long score = negaMax(dup, ++depth, -alpha, -beta);
+				}
+			} else {
+
+			}
 		}
 		return bestScore;
 	}
@@ -166,7 +174,7 @@ class AI : Player {
 		debug writefln("Most affected planet id: %s with value: %s", id, greatestEffect);
 		return id;
 	}
-	private long evaluateState(GameState gs) {
+	private long evaluateState(GameState gs) const {
 		return 0;
 	}
 }
