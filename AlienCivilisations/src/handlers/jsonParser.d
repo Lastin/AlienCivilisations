@@ -15,17 +15,17 @@ import std.typecons;
 import std.algorithm : sort;
 import std.format;
 import src.containers.gameState;
-import src.containers.vector2d;
+import src.containers.point2d;
 import src.logic.ai;
 
 class JSONParser {
 	/** Parses object Play into json structure preserving camera position and game state **/
 	static JSONValue playToJSON(Play play) {
 		GameState state = play.gameState;
-		Vector2d camPos = play.cameraPosition;
+		Point2D camPos = play.cameraPosition;
 		JSONValue save = ["game" : "AlienCivilisations"];
 		save.object["date"] = __TIME__ ~ " " ~ __DATE__;
-		save.object["cameraPosition"] = vecToJSON(camPos);
+		save.object["cameraPosition"] = pointToJSON(camPos);
 		save.object["gameState"] = stateToJSON(state);
 		writeln(save.toPrettyString());
 		return save;
@@ -51,7 +51,7 @@ class JSONParser {
 	private static JSONValue planetToJSON(Planet planet, ) {
 		JSONValue jsonPlanet = ["name" : planet.name];
 		jsonPlanet.object["uniqueId"] = planet.uniqueId;
-		jsonPlanet.object["position"] = vecToJSON(planet.position);
+		jsonPlanet.object["position"] = pointToJSON(planet.position);
 		jsonPlanet.object["radius"] = planet.radius;
 		jsonPlanet.object["breathableAtmosphere"] = planet.breathableAtmosphere;
 		jsonPlanet.object["ownerId"] = planet.owner ? planet.owner.uniqueId : -1;
@@ -67,7 +67,7 @@ class JSONParser {
 		return jsonPlanet;
 	}
 	/** Converts Vector2d object into JSONValue **/
-	private static JSONValue vecToJSON(Vector2d vec) {
+	private static JSONValue pointToJSON(Point2D vec) {
 		return JSONValue(["x": vec.x, "y": vec.y]);
 	}
 	/** Converts Player object and its knowledge tree and ships into JSONValue **/
@@ -157,7 +157,7 @@ class JSONParser {
 	static Planet jsonToPlanet(JSONValue jplanet, Player[] players) {
 		string name = jplanet["name"].str;
 		int uniqueId = to!int(jplanet["uniqueId"].integer);
-		Vector2d pos = jsonToVec(jplanet["position"]);
+		Point2D pos = jsonToPoint(jplanet["position"]);
 		float radius = safeFloat(jplanet["radius"]);
 		bool ba = jplanet["breathableAtmosphere"].type == JSON_TYPE.TRUE;
 		JSONValue[] jpop = jplanet["population"].array;
@@ -190,10 +190,10 @@ class JSONParser {
 		return planet;
 	}
 	/** Parses valid json structure to Vector2d struct **/
-	static Vector2d jsonToVec(JSONValue jvec) {
+	static Point2D jsonToPoint(JSONValue jvec) {
 		float x = safeFloat(jvec["x"]);
 		float y = safeFloat(jvec["y"]);
-		return Vector2d(x, y);
+		return Point2D(x, y);
 	}
 	/** Parses valid json structure to Player **/
 	static Player jsonToPlayer(JSONValue jplayer) {

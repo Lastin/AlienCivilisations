@@ -1,7 +1,7 @@
-﻿module src.containers.vector2d;
+﻿module src.containers.point2d;
 import std.math;
 
-struct Vector2d {
+struct Point2D {
 	float x;
 	float y;
 	this(float x_param, float y_param) {
@@ -9,13 +9,13 @@ struct Vector2d {
 		y = y_param;
 	}
 	
-	float getEuclideanDistance(Vector2d vecA) {
+	float getEuclideanDistance(Point2D vecA) {
 		auto xdiff = vecA.x - x;
 		auto ydiff = vecA.y - y;
 		return sqrt(xdiff^^2 + ydiff^^2);
 	}
 	
-	Vector2d dup() const {
-		return Vector2d(x, y);
+	Point2D dup() const {
+		return Point2D(x, y);
 	}
 }

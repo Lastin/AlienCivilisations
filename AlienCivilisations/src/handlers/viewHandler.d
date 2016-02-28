@@ -8,7 +8,7 @@ import std.json;
 import src.handlers.gameManager;
 import src.handlers.jsonParser;
 import src.containers.gameState;
-import src.containers.vector2d;
+import src.containers.point2d;
 
 class ViewHandler {
 	private {
@@ -53,7 +53,7 @@ class ViewHandler {
 		JSONValue jsave = JSONParser.fileToJSON(saveFile);
 		GameState gs = JSONParser.jsonToState(jsave);
 		GameManager gm = new GameManager(gs);
-		Vector2d camPos = JSONParser.jsonToVec(jsave["cameraPosition"]);
+		Point2D camPos = JSONParser.jsonToPoint(jsave["cameraPosition"]);
 		_play = new Play(this, gm, camPos);
 		resumePlay();
 	}

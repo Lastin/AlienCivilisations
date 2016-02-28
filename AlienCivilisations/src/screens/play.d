@@ -14,7 +14,7 @@ import src.logic.ai;
 import std.math;
 import src.handlers.jsonParser;
 import src.handlers.viewHanlder;
-import src.containers.vector2d;
+import src.containers.point2d;
 import src.containers.gameState;
 import std.datetime;
 
@@ -23,9 +23,9 @@ class Play : AppFrame {
 		ViewHandler _vh;
 		//Vectors used for camera
 		bool _rightDown = false;
-		Vector2d _startPosition;
-		Vector2d _endPosition;
-		Vector2d _cameraPosition;
+		Point2D _startPosition;
+		Point2D _endPosition;
+		Point2D _cameraPosition;
 		//other
 		GameManager _gm;
 		GameState _gameState;
@@ -56,7 +56,7 @@ class Play : AppFrame {
 		updatePlayerStats();
 	}
 
-	this(ViewHandler vh, GameManager gm, Vector2d camPos) {
+	this(ViewHandler vh, GameManager gm, Point2D camPos) {
 		this(vh, gm);
 		_cameraPosition = camPos;
 		_endPosition = _cameraPosition.dup;
@@ -81,7 +81,7 @@ class Play : AppFrame {
 				tempX = playerPlanets[0].position.x;
 				tempY = playerPlanets[0].position.y;
 			}
-			_cameraPosition = Vector2d(tempX - _mainContainer.width / 2, tempY - _mainContainer.height / 2);
+			_cameraPosition = Point2D(tempX - _mainContainer.width / 2, tempY - _mainContainer.height / 2);
 			_endPosition = _cameraPosition.dup;
 			debug {
 				writefln("camera initial position: %s %s", tempX, tempY);
@@ -179,7 +179,7 @@ class Play : AppFrame {
 	bool handleMouseEvent(Widget source, MouseEvent event) {
 		if(event.action == MouseAction.ButtonDown) {
 			if(event.button == MouseButton.Left) {
-				auto relativeMousePosition = Vector2d(
+				auto relativeMousePosition = Point2D(
 					_cameraPosition.x + event.x,
 					_cameraPosition.y + event.y);
 				debug writefln("Mouse Pos X: %s Y: %s", relativeMousePosition.x, relativeMousePosition.y);
@@ -942,7 +942,7 @@ class Play : AppFrame {
 	@property AnimatedBackground animatedBackground() {
 		return _animatedBackground;
 	}
-	@property Vector2d cameraPosition() {
+	@property Point2D cameraPosition() {
 		return _cameraPosition;
 	}
 	@property GameState gameState() {
@@ -952,11 +952,11 @@ class Play : AppFrame {
 
 class AnimatedBackground : Drawable {
 	private DrawableRef[] _background;
-	private Vector2d* _cameraPosition;
+	private Point2D* _cameraPosition;
 	private Planet[] _planets;
 	private Planet _selected;
 	private GameState _state;
-	this(Vector2d* cameraPosition, GameState state) {
+	this(Point2D* cameraPosition, GameState state) {
 		_cameraPosition = cameraPosition;
 		_state = state;
 		_planets = _state.map.planets;

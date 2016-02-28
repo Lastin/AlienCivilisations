@@ -4,7 +4,7 @@ import src.entities.player;
 import src.logic.ai;
 import src.entities.ship;
 import src.entities.planet;
-import src.containers.vector2d;
+import src.containers.point2d;
 import std.stdio;
 
 enum PlayerEnum : ubyte {

@@ -88,7 +88,7 @@ class AI : Player {
 		}
 		return bestScore;
 	}
-	/** Returns least affected by production planet belonging to player **/
+	/** Returns least affected by production planet belonging to current player **/
 	private Planet leastAffectedPlanet(GameState testGS, ShipType type) const {
 		Planet[] pp = testGS.currentPlayer.planets(testGS.map.planets);
 		Planet best;

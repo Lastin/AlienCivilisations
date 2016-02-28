@@ -8,7 +8,7 @@ import std.format;
 import src.entities.knowledgeTree;
 import std.stdio;
 import std.math;
-import src.containers.vector2d;
+import src.containers.point2d;
 import std.digest.md;
 
 public enum int POPULATION_CONSTANT = 10000;
@@ -19,7 +19,7 @@ enum double CHILD_PER_PAID = 2.5;
 class Planet {
 	private {
 		immutable string _name;
-		immutable Vector2d _position;
+		immutable Point2D _position;
 		immutable float _radius;
 		immutable bool _breathableAtmosphere;
 		immutable int _uniqueId;
@@ -31,7 +31,7 @@ class Planet {
 		int _attackedCount = 0;
 	}
 
-	this(int uniqueId, string name, Vector2d position, float radius, bool breathableAtmosphere) {
+	this(int uniqueId, string name, Point2D position, float radius, bool breathableAtmosphere) {
 		_uniqueId = uniqueId;
 		_breathableAtmosphere = breathableAtmosphere;
 		_name = name;
@@ -39,7 +39,7 @@ class Planet {
 		_radius = radius;
 	}
 	/** (Cloning) Constructor for creating planet from existing values **/
-	this(int uniqueId, string name, Vector2d position, float radius, bool breathableAtmosphere,
+	this(int uniqueId, string name, Point2D position, float radius, bool breathableAtmosphere,
 		uint[8] population, double food, uint militaryUnits, Ship[] shipOrders) {
 		this(uniqueId, name, position, radius, breathableAtmosphere);
 		_population = population;
@@ -51,7 +51,7 @@ class Planet {
 	Planet dup(Player newOwner) const {
 		string name = name();
 		int uniqueId = uniqueId();
-		Vector2d pos = position();
+		Point2D pos = position();
 		float r = radius();
 		bool ba = breathableAtmosphere();
 		uint[8] pop = population();
@@ -63,10 +63,10 @@ class Planet {
 		return pDup;
 	}
 
-	@property Vector2d position() {
+	@property Point2D position() {
 		return _position;
 	}
-	@property Vector2d position() const {
+	@property Point2D position() const {
 		return _position.dup;
 	}
 	@property bool breathableAtmosphere() const {

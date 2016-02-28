@@ -5,7 +5,7 @@ import src.entities.player;
 import std.conv;
 import std.random;
 import std.stdio;
-import src.containers.vector2d;
+import src.containers.point2d;
 import src.entities.ship;
 
 class Map {
@@ -54,7 +54,7 @@ class Map {
 		return false;
 	}
 	/** Returns planet which border is closer than minimum distance minus radius of vector **/
-	Planet collides(Vector2d vector, float radius, float minDistance = 700) {
+	Planet collides(Point2D vector, float radius, float minDistance = 700) {
 		foreach(Planet planet; _planets){
 			auto distance = vector.getEuclideanDistance(planet.position) - radius - planet.radius;
 			if(distance < minDistance){
@@ -64,17 +64,17 @@ class Map {
 		return null;
 	}
 	/** Returns location on the map which is not closer than minimum distance minus radius from other planets. **/
-	Vector2d getFreeLocation(float radius) {
-		Vector2d vector;
+	Point2D getFreeLocation(float radius) {
+		Point2D vector;
 		do {
 			float x = uniform(0.0, _size-radius);
 			float y = uniform(0.0, _size-radius);
-			vector = Vector2d(x, y);
+			vector = Point2D(x, y);
 		} while(collides(vector, radius));
 		return vector;
 	}
 	/** Returns planet which is located on given vector **/
-	Planet planetAt(Vector2d vector) {
+	Planet planetAt(Point2D vector) {
 		foreach(Planet planet; _planets){
 			if(vector.getEuclideanDistance(planet.position) <= planet.radius){
 				return planet;
