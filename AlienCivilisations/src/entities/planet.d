@@ -317,7 +317,7 @@ class Planet {
 		return workforce;
 	}
 	/** Adds order for ship to queue **/
-	void addShipOrder(ShipType type, int units = 0) {
+	Ship addShipOrder(ShipType type, int units = 0) {
 		double eneEff = _owner.knowledgeTree.branch(BranchName.Energy).effectiveness;
 		double sciEff = _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
 		if(type == ShipType.Military) {
@@ -336,9 +336,12 @@ class Planet {
 				_militaryUnits -= units;
 			}
 			_shipOrders ~= ns;
+			return _shipOrders[$-1];
 		} else {
 			_shipOrders ~= new InhabitationShip(eneEff, sciEff, 0);
 			debug writefln("Planet %s. Ordered inhabitation ship", _name);
+			return _shipOrders[$-1];
+
 		}
 	}
 	/** Returns number of steps needed to complete the ship **/
