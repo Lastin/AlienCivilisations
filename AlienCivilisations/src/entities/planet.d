@@ -262,6 +262,24 @@ class Planet {
 		uint g2 = to!int(_population[3] * p/100);
 		return g1 + g2;
 	}
+	int numberToPercent(int amount) const {
+		int min = 0;
+		int max = 100;
+		int pos = 0;
+		int tries = 0;
+		while(min < max && tries <5) {
+			pos = (max - min) / 2;
+			uint result = percentToNumber(pos);
+			if(amount == result)
+				return pos;
+			if(result < amount)
+				min = pos;
+			else if(result > amount)
+				max = pos;
+			tries++;
+		}
+		return pos;
+	}
 	/** Subtract value, evenly distributing across all ages where possible **/
 	double destroyPopulation(double force) {
 		debug {

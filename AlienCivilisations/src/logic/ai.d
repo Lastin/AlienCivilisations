@@ -16,6 +16,13 @@ import std.conv;
 import std.math;
 import std.typecons;
 
+struct Behaviour {
+	bool attack = false;
+	bool inhabit = false;
+	bool orderMS = false;
+	bool orderIS = false;
+}
+
 class AI : Player {
 	this(int uniqueId, KnowledgeTree knowledgeTree, Ship[] ships = null) {
 		super(uniqueId, "AI", knowledgeTree, ships);
@@ -45,6 +52,7 @@ class AI : Player {
 		}
 
 		//#2: undeveloped branches
+		long[] scores;
 		Branch[] ub = knowledgeTree.undevelopedBranches();
 		if(ub.length > 0) {
 			GameState[] combinations;
@@ -53,13 +61,24 @@ class AI : Player {
 				gsWithOrder.currentPlayer.knowledgeTree.clearOrders();
 				gsWithOrder.currentPlayer.knowledgeTree.addOrder(branch.name);
 				combinations ~= behaviourCombinations(gsWithOrder);
+				foreach(combination; combinations) {
+					scores ~= negaMax(combination, 1, -real.infinity, real.infinity, false);
+				}
+				long largestScore = long.min;
+				long index = -1;
+				foreach(int i, score; scores) {
+					if(score >= largestScore) {
+						largestScore = score;
+						index = i;
+					}
+				}
 			}
 		} else {
 			GameState[] combinations;
 			combinations.reserve(20);
 			combinations ~= behaviourCombinations(realState);
 			foreach(combination; combinations) {
-				negaMax(combination, 3, -real.infinity, real.infinity, false);
+				negaMax(combination, 1, -real.infinity, real.infinity, false);
 			}
 		}
 	}
@@ -67,7 +86,7 @@ class AI : Player {
 	/* Similar to Minimax but inverting alpha and beta and recursive result. */
 	long negaMax(GameState gs, int depth,real alpha, real beta, bool maximising) const {
 		//Check if terminal node
-		if(depth == 0)
+		if(depth <= 0)
 			return evaluateState(gs);
 		PlayerEnum dead = gs.deadPlayer;
 		if(dead == PlayerEnum.Both) {
@@ -86,9 +105,8 @@ class AI : Player {
 		long bestScore = long.min;
 		if(depth > 0 && dead == PlayerEnum.None) {
 			GameState[] combinations = possibleCombinations(gs);
-			debug writefln("Depth: %s Combinations: %s", depth, combinations.length);
 			foreach(combination; combinations) {
-				long score = -negaMax(combination, ++depth, -beta, -alpha, !maximising);
+				long score = -negaMax(combination, --depth, -beta, -alpha, !maximising);
 				bestScore = max(bestScore, score);
 				alpha = max(alpha, score);
 				if(alpha >= beta)
@@ -275,6 +293,20 @@ class AI : Player {
 		combinations ~= n1111;
 		return combinations;
 	}
+	void makeActions(Behaviour behaviour, GameState gs) {
+		if(behaviour.attack) {
+			performAttack(gs);
+		}
+		if(behaviour.inhabit) {
+			useInhabitShips(gs);
+		}
+		if(behaviour.orderMS) {
+			addShipOrders(gs, ShipType.Military);
+		}
+		if(behaviour.orderIS) {
+			addShipOrders(gs, ShipType.Inhabitation);
+		}
+	}
 	/** Uses inhabitation ships of the current player **/
 	private void useInhabitShips(GameState testGS) const {
 		Planet[] freePlanets = testGS.map.freePlanets;
@@ -294,12 +326,13 @@ class AI : Player {
 		Planet[] playerPlanets = testGS.currentPlayer.planets(testGS.map.planets);
 		int ordersLeft = to!int(freePlanets.length - testGS.currentPlayer.inhabitationShips.length);
 		//sort!"a.calculateWorkforce() > b.calculateWorkforce()"(playersPlanets);
-		playerPlanets = sortByEff(playerPlanets, ShipType.Inhabitation);
+		playerPlanets = sortByEff(playerPlanets, type);
 		int[] excluded;
 		foreach(planet; playerPlanets) {
 			if(ordersLeft <= 0)
 				break;
 			Ship order = planet.addShipOrder(type);
+			planet.convertUnits(planet.numberToPercent(order.capacity));
 			--ordersLeft;
 			totalAdded++;
 			if(planet.stepsToCompleteOrder(order) > 1) {
