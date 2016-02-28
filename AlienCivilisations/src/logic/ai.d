@@ -24,7 +24,7 @@ class AI : Player {
 	void makeMove(GameState realState) {
 		debug {
 			writeln("AI making decisions");
-			writefln("CPUs: %s", totalCPUs);
+			//writefln("CPUs: %s", totalCPUs);
 		}
 		//#1: free planets > use inhabitation ships
 		Planet[] freePlanets = realState.map.freePlanets;
@@ -150,7 +150,7 @@ class AI : Player {
 			double effect = to!double(ap.populationSum);
 			double divisor = to!double(testField.populationSum);
 			if(divisor == 0) {
-				divisor = 0.5;
+				divisor = 0.2;
 			}
 			effect /= divisor;
 			if(effect > greatestEffect) {
@@ -163,55 +163,84 @@ class AI : Player {
 		debug writefln("Most affected planet id: %s with value: %s", id, greatestEffect);
 		return id;
 	}
+	/** Returns long representing the value of the gamestate for current player **/
 	private long evaluateState(GameState gs) const {
 		return 0;
 	}
+	/** Returns possible game states which are effect of certain behaviours **/
 	private GameState[] possibleCombinations(GameState original) const {
 		GameState[] combinations;
 		Branch[] ub = original.currentPlayer().knowledgeTree().undevelopedBranches();
 		if(ub.length > 0) {
 			foreach(branch; ub) {
-				GameState testGS = original.dup();
-				testGS.currentPlayer.knowledgeTree.clearOrders();
-				testGS.currentPlayer.knowledgeTree.addOrder(branch.name);
-				//Attack most valuable enemy planet/s
-				while(testGS.currentPlayer.militaryShips().length > 0 && testGS.notCurrentPlayer.planets(testGS.map.planets).length > 0) {
-					Planet mvp = testGS.map.planetWithId(mostAffectedPlanet(testGS));
-					MilitaryShip[] ms = testGS.currentPlayer.militaryShips();
-					foreach(ship; ms) {
-						testGS.currentPlayer.attackPlanet(ship, mvp, true);
-						if(mvp.populationSum == 0)
-							break;
-					}
-				}
-				//end turn once decisions are made
-				testGS.currentPlayer.completeTurn(testGS.map.planets);
-				testGS.moveQPosition();
+				GameState gsWithOrder = original.dup();
+				gsWithOrder.currentPlayer.knowledgeTree.clearOrders();
+				gsWithOrder.currentPlayer.knowledgeTree.addOrder(branch.name);
+				GameState noAttack = gsWithOrder.dup();
+				GameState doAttack = gsWithOrder.dup();
+				performAttack(doAttack);
+				GameState noAttackInhabit = noAttack.dup();
+				GameState doAttackInhabit = doAttack.dup();
+				useInhabitShips(noAttackInhabit);
+				useInhabitShips(doAttackInhabit);
+				combinations ~= noAttack;
+				combinations ~= doAttack;
+				combinations ~= noAttackInhabit;
+				combinations ~= doAttackInhabit;
 			}
 		} else {
 
 		}
+		foreach(combination; combinations) {
+			//end turn once decisions are made
+			combination.currentPlayer.completeTurn(combination.map.planets);
+			combination.moveQPosition();
+		}
 		return combinations;
 	}
-	private void test(GameState gs) {
-
-
+	/** Uses inhabitation ships of the current player **/
+	private void useInhabitShips(GameState testGS) const {
+		Planet[] freePlanets = testGS.map.freePlanets;
+		sort!"a.capacity > b.capacity"(freePlanets);
+		size_t ihc = testGS.currentPlayer.inhabitationShips.length;
+		foreach(planet; freePlanets) {
+			if(ihc == 0)
+				break;
+			testGS.currentPlayer.inhabitPlanet(planet);
+			ihc--;
+		}
 	}
+	/** Performs attack with all military ships on enemy planets **/
+	private void performAttack(GameState testGS) const {
+		//Attack most valuable enemy planet/s
+		while(testGS.currentPlayer.militaryShips().length > 0 && testGS.notCurrentPlayer.planets(testGS.map.planets).length > 0) {
+			Planet mvp = testGS.map.planetWithId(mostAffectedPlanet(testGS));
+			MilitaryShip[] ms = testGS.currentPlayer.militaryShips();
+			foreach(ship; ms) {
+				testGS.currentPlayer.attackPlanet(ship, mvp, true);
+				if(mvp.populationSum == 0)
+					break;
+			}
+		}
+	}
+	/** Returns uniqueId of the planet with potentially best value for player **/
 	private int mostValuablePlanetId(Planet[] planets) const {
-		int bestGrowth = int.min;
-		Planet best;
+		double bestGain = double.min_normal;
+		Planet bestPlanet;
 		foreach(planet; planets) {
 			Planet testField = planet.dup(planet.owner);
 			for(int i=0; i<5; i++) {
 				testField.step(false);
 			}
-			int diff = testField.populationSum - planet.populationSum;
-			if(diff > bestGrowth) {
-				best = planet;
-				bestGrowth = diff;
+			int popDiff = testField.populationSum - planet.populationSum;
+			double prodDiff = testField.calculateWorkforce() - planet.calculateWorkforce();
+			double gain = 0.4 * prodDiff + 0.6 * popDiff;
+			if(gain > bestGain) {
+				bestGain = gain;
+				bestPlanet = planet;
 			}
 		}
-		return best.uniqueId;
+		return bestPlanet.uniqueId;
 	}
 	/** Returns number of ships required to destroy population on a planet **/
 	private int shipsRequired(Player player, Planet planet) const {

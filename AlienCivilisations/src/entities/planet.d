@@ -159,6 +159,8 @@ class Planet {
 	}
 	/** Returns workforce points based on number of units within certain age groups and knowledge boost **/
 	double calculateWorkforce() {
+		if(!owner)
+			return 0.0;
 		KnowledgeTree kt = _owner.knowledgeTree;
 		double boost = kt.branch(BranchName.Energy).effectiveness * _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
 		double result = to!double(_population[2 .. 7].sum) * boost;
