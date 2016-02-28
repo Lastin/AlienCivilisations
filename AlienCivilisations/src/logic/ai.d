@@ -55,7 +55,8 @@ class AI : Player {
 		//#4: order inhabitation ship
 		//#5: order miliaty ships
 	}
-
+	/** Negamax algorithm **/
+	/* Similar to Minimax but inverting alpha and beta and recursive result. */
 	long negaMax(GameState gs, int depth,real alpha, real beta, bool maximising) const {
 		//Check if terminal node
 		if(depth == 0)
@@ -87,47 +88,28 @@ class AI : Player {
 		}
 		return bestScore;
 	}
-	/** Returns uniqueId of planet least affected by construction of ship of given type **/
-	private int leastAffectedPlanet(GameState gs, ShipType st, int playerId) {
-		immutable int moves = 5;
-		//Planet[] playerPlanets = gs.map.playerPlanets(playerId);//gs.currentPlayer.planets(gs.map.planets);
-		int id = -1;
-		//The smaller the effect the better
+	/** Returns least affected by production planet belonging to player **/
+	private Planet leastAffectedPlanet(GameState testGS, ShipType type) const {
+		Planet[] pp = testGS.currentPlayer.planets(testGS.map.planets);
+		Planet best;
 		double smallestEffect = double.infinity;
-		foreach(Planet planet; gs.map.planets) {
-			if(planet.ownerId == playerId) {
-				//Backup essential values
-				const uint[8] pop = planet.population;
-				const double food = planet.food;
-				const uint mu = planet.militaryUnits;
-				Ship[] so1 = planet.shipOrdersDups;
-				Ship[] so2 = planet.shipOrdersDups;
-				debug writefln("");
-				//Population before x moves
-				double sumBefore = to!double(planet.populationSum);
-				for(int j=0; j<moves; j++) {
-					planet.step(false);
-				}
-				//Population after x moves
-				double sumUnaffected = to!double(planet.populationSum);
-				//Restore values and place order
-				planet.restore(pop, food, mu, so1);
-				planet.addShipOrder(st, 0);
-				//Make same number of moves with order
-				for(int j=0; j<moves; j++) {
-					planet.step(false);
-				}
-				double sumAffected = to!double(planet.populationSum);
-				double ratio = sumBefore / sumAffected - sumBefore / sumUnaffected;
-				if(ratio < smallestEffect) {
-					smallestEffect = ratio;
-					id = planet.uniqueId;
-				}
-				//Restore values
-				planet.restore(pop, food, mu, so2);
+		foreach(planet; pp){
+			Planet unaffected = planet.dup(planet.owner);
+			Planet affected = planet.dup(planet.owner);
+			affected.addShipOrder(type);
+			for(int i=0; i<6; i++) {
+				unaffected.step(false);
+				affected.step(false);
+			}
+			double before = to!double(planet.populationSum());
+			double affPop = to!double(affected.populationSum());
+			double ratio =  (before / affPop) - (before / unaffected.populationSum());
+			if(ratio < smallestEffect) {
+				smallestEffect = ratio;
+				best = planet;
 			}
 		}
-		return id;
+		return best;
 	}
 	/** Adds kt development order for current player **/
 	private void addKTOrder(GameState gs, BranchName bn) {
@@ -174,15 +156,34 @@ class AI : Player {
 		if(ub.length > 0) {
 			foreach(branch; ub) {
 				GameState gsWithOrder = original.dup();
+				//add kt order
 				gsWithOrder.currentPlayer.knowledgeTree.clearOrders();
 				gsWithOrder.currentPlayer.knowledgeTree.addOrder(branch.name);
+				//attck or don't
 				GameState noAttack = gsWithOrder.dup();
 				GameState doAttack = gsWithOrder.dup();
 				performAttack(doAttack);
+				//inhabit
 				GameState noAttackInhabit = noAttack.dup();
 				GameState doAttackInhabit = doAttack.dup();
 				useInhabitShips(noAttackInhabit);
 				useInhabitShips(doAttackInhabit);
+				//produce military ships
+				GameState noAttackOrdMil = noAttack.dup();
+				GameState doAttackOrdMil = doAttack.dup();
+				GameState noAttackInhabitOrdMil = noAttackInhabit.dup();
+				GameState doAttackInhabitOrdMil = doAttackInhabit.dup();
+				orderMilitaryShips(noAttackOrdMil);
+				orderMilitaryShips(doAttackOrdMil);
+				orderMilitaryShips(noAttackInhabitOrdMil);
+				orderMilitaryShips(doAttackInhabitOrdMil);
+				//order inhabit ships
+				GameState noAttackOrdInh = noAttack.dup();
+				GameState doAttackProdInh = doAttack.dup();
+				GameState noAttackInhabitProdInh = noAttackInhabit.dup();
+				GameState doAttackInhabitProdInh = doAttackInhabit.dup();
+
+				//add all above to list
 				combinations ~= noAttack;
 				combinations ~= doAttack;
 				combinations ~= noAttackInhabit;
@@ -209,6 +210,20 @@ class AI : Player {
 			testGS.currentPlayer.inhabitPlanet(planet);
 			ihc--;
 		}
+	}
+	/** Adds best number of inhabitation ships orders on least affected planets **/
+	private void orderInhabitShips(GameState testGS) const {
+		Planet[] freePlanets = testGS.map.freePlanets;
+		Planet[] playersPlanets = testGS.currentPlayer.planets(testGS.map.planets);
+		int maxOrders = to!int(playersPlanets.length+1);
+		//sort!"a.calculateWorkforce() > b.calculateWorkforce()"(playersPlanets);
+		for(int i=0; i<maxOrders; i++) {
+			leastAffectedPlanet(testGS, ShipType.Inhabitation);
+		}
+	}
+	/** Adds best number of military ships orders on least affected planets **/
+	private void orderMilitaryShips(GameState testGS) const {
+
 	}
 	/** Performs attack with all military ships on enemy planets **/
 	private void performAttack(GameState testGS) const {
