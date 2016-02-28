@@ -15,6 +15,7 @@ import std.algorithm;
 import std.conv;
 import std.math;
 import std.typecons;
+import std.algorithm.iteration;
 
 struct Behaviour {
 	bool attack = false;
@@ -193,7 +194,33 @@ class AI : Player {
 	}
 	/** Returns long representing the value of the gamestate for current player **/
 	private long evaluateState(GameState gs) const {
-		return 0;
+		return calcPlayerVal(gs.currentPlayer, gs) - calcPlayerVal(gs.notCurrentPlayer, gs);
+	}
+	private long calcPlayerVal(Player player, GameState gs) const {
+		long playerPoints = 0;
+		int[8] playerPop = [0,0,0,0,0,0,0,0];
+		int popSum = playerPop[].sum;
+		Planet[] playerPlanets = gs.currentPlayer.planets(gs.map.planets);
+		foreach(planet; playerPlanets) {
+			foreach(i, each; planet.population) {
+				playerPop[i] += each;
+			}
+		}
+		playerPoints += weightedPop(playerPop);
+		ulong fpc = gs.map.freePlanets.length;
+		playerPoints += min(fpc, player.inhabitationShips.length) * popSum / 20;
+		foreach(ship; player.militaryShips) {
+			playerPoints += to!long(ship.force(player.knowledgeTree.branch(BranchName.Military).effectiveness) *  popSum / 15);
+		}
+		playerPoints += to!long(player.knowledgeTree.totalEff * popSum / 10);
+		return playerPoints;
+	}
+	private long weightedPop(int[8] p) const {
+		int g1 = 5;
+		int g2 = 4;
+		int g3 = 1;
+		int result = (p[0..2].sum * 5 + p[2..7].sum * 4 + p[7..$].sum * 1) / g1+g2+g3;
+		return result;
 	}
 	/** Returns possible game states which are effect of certain behaviours **/
 	private GameState[] possibleCombinations(GameState original) const {
