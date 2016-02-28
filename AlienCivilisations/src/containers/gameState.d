@@ -37,6 +37,9 @@ class GameState {
 	@property Player currentPlayer() {
 		return _players[_queuePosition];
 	}
+	@property Player notCurrentPlayer() {
+		return _players[++_queuePosition % _players.length];
+	}
 	@property int currentPlayerId() {
 		return currentPlayer.uniqueId;
 	}

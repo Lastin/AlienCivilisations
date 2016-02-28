@@ -134,18 +134,9 @@ class AI : Player {
 		gs.currentPlayer.knowledgeTree.addOrder(bn);
 	}
 	/** Return uniqueId of planet most affected by attacks **/
-	private int mostAffectedPlanet(GameState gs) {
-		Planet[] aps;
-		Player attacker;
-		if(gs.currentPlayerEnum == PlayerEnum.AI) {
-			//attack human
-			aps = gs.human.planets(gs.map.planets);
-			attacker = gs.ai;
-		} else {
-			//attack ai
-			aps = gs.ai.planets(gs.map.planets);
-			attacker = gs.human;
-		}
+	private int mostAffectedPlanet(GameState gs) const {
+		Planet[] aps = gs.notCurrentPlayer.planets(gs.map.planets);
+		Player attacker = gs.currentPlayer();
 		double greatestEffect = double.min_normal;
 		int id = -1;
 		foreach(ap; aps) {
@@ -183,6 +174,16 @@ class AI : Player {
 				GameState testGS = original.dup();
 				testGS.currentPlayer.knowledgeTree.clearOrders();
 				testGS.currentPlayer.knowledgeTree.addOrder(branch.name);
+				//Attack most valuable enemy planet/s
+				while(testGS.currentPlayer.militaryShips().length > 0 && testGS.notCurrentPlayer.planets(testGS.map.planets).length > 0) {
+					Planet mvp = testGS.map.planetWithId(mostAffectedPlanet(testGS));
+					MilitaryShip[] ms = testGS.currentPlayer.militaryShips();
+					foreach(ship; ms) {
+						testGS.currentPlayer.attackPlanet(ship, mvp, true);
+						if(mvp.populationSum == 0)
+							break;
+					}
+				}
 				//end turn once decisions are made
 				testGS.currentPlayer.completeTurn(testGS.map.planets);
 				testGS.moveQPosition();
@@ -191,5 +192,34 @@ class AI : Player {
 
 		}
 		return combinations;
+	}
+	private void test(GameState gs) {
+
+
+	}
+	private int mostValuablePlanetId(Planet[] planets) const {
+		int bestGrowth = int.min;
+		Planet best;
+		foreach(planet; planets) {
+			Planet testField = planet.dup(planet.owner);
+			for(int i=0; i<5; i++) {
+				testField.step(false);
+			}
+			int diff = testField.populationSum - planet.populationSum;
+			if(diff > bestGrowth) {
+				best = planet;
+				bestGrowth = diff;
+			}
+		}
+		return best.uniqueId;
+	}
+	/** Returns number of ships required to destroy population on a planet **/
+	private int shipsRequired(Player player, Planet planet) const {
+		int toDestroy = planet.populationSum;
+		double eneEff = player.knowledgeTree.branch(BranchName.Energy).effectiveness;
+		double sciEff = player.knowledgeTree.branch(BranchName.Science).effectiveness;
+		double milEff = player.knowledgeTree.branch(BranchName.Military).effectiveness;
+		double unitsReq = planet.populationSum / (MilitaryShip.lambda * milEff);
+		return to!int(ceil(unitsReq / Ship.capacity(eneEff, sciEff)));
 	}
 }

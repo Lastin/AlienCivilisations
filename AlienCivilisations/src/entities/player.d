@@ -68,7 +68,7 @@ class Player {
 		return populationSum(planets) == 0 && inhabitationShips.length == 0;
 	}
 	/** Returns all ships of type military **/
-	@property MilitaryShip[] militaryShips(){
+	@property MilitaryShip[] militaryShips() {
 		MilitaryShip[] milShips;
 		foreach(Ship ship; _ships){
 			if(auto casted = cast(MilitaryShip)ship){
@@ -76,6 +76,16 @@ class Player {
 			}
 		}
 		return milShips;
+	}
+	/** Returns the sum of forces on all military ships **/
+	@property totalMilitaryForce() {
+		double sum = 0;
+		MilitaryShip[] ms = militaryShips();
+		double milEff = _knowledgeTree.branch(BranchName.Military).effectiveness;
+		foreach(ship; ms) {
+			sum += ship.force(milEff);
+		}
+		return sum;
 	}
 	/** Returns all ships of type inhabitation **/
 	@property InhabitationShip[] inhabitationShips(){
@@ -107,10 +117,17 @@ class Player {
 		knowledgeTree.develop(totalPopulation);
 	}
 	/** Attacks given planet using given military ship with force based on player knowledge tree and ship units **/
-	void attackPlanet(MilitaryShip ship, Planet planet, bool affectShip = true){
+	void attackPlanet(MilitaryShip attackingShip, Planet planet, bool affectShip = true){
 		double milEff = _knowledgeTree.branch(BranchName.Military).effectiveness;
-		ship.attackPlanet(planet, milEff, affectShip);
-		//TODO: remove ship after attacking if empty
+		attackingShip.attackPlanet(planet, milEff, affectShip);
+		//TODO: check if removing works properly
+		if(attackingShip.empty) {
+			foreach(i, Ship ship; _ships){
+				if(ship == attackingShip){
+					_ships = _ships.remove(i);
+				}
+			}
+		}
 	}
 	/** Inhabits given planet using first available inhabitation ship **/
 	void inhabitPlanet(Planet planet) {

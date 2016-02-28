@@ -28,7 +28,10 @@ abstract class Ship {
 	}
 	/**Return number of units that can fit onboard**/
 	@property int capacity() const {
-		return to!int(MULTIPLIER * _eneEff * _sciEff);
+		return capacity(_eneEff, _sciEff);//to!int(MULTIPLIER * _eneEff * _sciEff);
+	}
+	static @property int capacity(double eneEff, double sciEff) {
+		return to!int(MULTIPLIER * eneEff * sciEff);
 	}
 	/** Returns ship capacity for player with given knowledge tree levels**/
 	static @property int capacity(Player player){
@@ -89,7 +92,7 @@ abstract class Ship {
 }
 
 class MilitaryShip : Ship {
-	private double lambda = 10.0;
+	static double lambda = 10.0;
 	this(double eneEff, double sciEff, double completion) {
 		super(eneEff, sciEff, completion);
 	}
@@ -102,12 +105,15 @@ class MilitaryShip : Ship {
 	/** Perform attack on a given planet **/
 	void attackPlanet(Planet planet, double milEff, bool affectShip){
 		debug writefln("Onboard before: %s", _onboard);
-		double force = _onboard * milEff * lambda;
+		double force = force(milEff);//_onboard * milEff * lambda;
 		double rest = planet.destroyPopulation(force);
 		planet.setAttacked();
 		if(affectShip)
 			_onboard = to!int(rest / milEff);
 		debug writefln("Onboard after: %s", _onboard);
+	}
+	@property double force(double milEff) {
+		return _onboard * milEff * lambda;
 	}
 	override @property double buildCost() {
 		return capacity * 3.5;
