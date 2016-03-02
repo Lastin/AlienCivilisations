@@ -348,6 +348,7 @@ class AI : Player {
 	}
 	/** Adds best number of inhabitation ships orders on least affected planets **/
 	private void addShipOrders(GameState testGS, ShipType type) const {
+		//TODO: remove breaking when ordering the production of the military ship
 		int totalAdded = 0;
 		Planet[] freePlanets = testGS.map.freePlanets;
 		Planet[] playerPlanets = testGS.currentPlayer.planets(testGS.map.planets);

@@ -208,15 +208,6 @@ class Planet {
 	 * 1 > 2 > 4 > 8 > 16
 	**/
 	private void growPopulation() {
-		//Age the population
-		for(size_t i = _population.length - 1; i>0; i--){
-			_population[i] = _population[i-1];
-		}
-		if(populationSum == 0){
-			debug writeln("Population empty!");
-			_owner = null;
-			return;
-		}
 		double opf = 1;
 		if(populationSum > capacity){
 			debug writeln("[ Overpopulation takes effect! ]");
@@ -226,6 +217,15 @@ class Planet {
 			if(opf <= 0){
 				opf = 0.1;
 			}
+		}
+		//Age the population
+		for(size_t i = _population.length - 1; i>0; i--){
+			_population[i] = _population[i-1];
+		}
+		if(populationSum == 0){
+			debug writeln("Population empty!");
+			_owner = null;
+			return;
 		}
 
 		double fpu = _food / (populationSum * FOOD_CONSUMPTION_RATE);

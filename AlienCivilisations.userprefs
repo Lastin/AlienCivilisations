@@ -2,8 +2,8 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/logic/ai.d">
     <Files>
-      <File FileName="AlienCivilisations/src/logic/ai.d" Line="199" Column="28" />
-      <File FileName="AlienCivilisations/src/entities/planet.d" Line="78" Column="26" />
+      <File FileName="AlienCivilisations/src/entities/player.d" Line="31" Column="31" />
+      <File FileName="AlienCivilisations/src/logic/ai.d" Line="68" Column="68" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
