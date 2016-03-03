@@ -63,7 +63,7 @@ class AI : Player {
 				gsWithOrder.currentPlayer.knowledgeTree.addOrder(branch.name);
 				combinations ~= behaviourCombinations(gsWithOrder);
 				foreach(combination; combinations) {
-					scores ~= negaMax(combination, 1, -real.infinity, real.infinity, false);
+					//scores ~= negaMax(combination, 1, -real.infinity, real.infinity, false);
 				}
 				long largestScore = long.min;
 				long index = -1;
@@ -79,13 +79,13 @@ class AI : Player {
 			combinations.reserve(20);
 			combinations ~= behaviourCombinations(realState);
 			foreach(combination; combinations) {
-				negaMax(combination, 1, -real.infinity, real.infinity, false);
+				//negaMax(combination, 1, -real.infinity, real.infinity, false);
 			}
 		}
 	}
 	/** Negamax algorithm **/
 	/* Similar to Minimax but inverting alpha and beta and recursive result. */
-	long negaMax(GameState gs, int depth,real alpha, real beta, bool maximising) const {
+	long negaMax(GameState gs, int depth, real alpha, real beta, bool maximising) const {
 		//Check if terminal node
 		if(depth <= 0)
 			return evaluateState(gs);

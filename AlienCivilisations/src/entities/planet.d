@@ -218,19 +218,18 @@ class Planet {
 				opf = 0.1;
 			}
 		}
-		//Age the population
-		for(size_t i = _population.length - 1; i>0; i--){
-			_population[i] = _population[i-1];
-		}
 		if(populationSum == 0){
 			debug writeln("Population empty!");
 			_owner = null;
 			return;
 		}
-
 		double fpu = _food / (populationSum * FOOD_CONSUMPTION_RATE);
 		double foodFactor = (fpu / (fpu + 1)) * 2;
-		int reproductivePairs = _population[2 .. 4].sum / 2;
+		//Age the population
+		for(size_t i = _population.length - 1; i>0; i--){
+			_population[i] = _population[i-1];
+		}
+		int reproductivePairs = _population[2 .. 5].sum / 2;
 		debug {
 			writefln("Reproductive pairs: %s", reproductivePairs);
 			writefln("Food factor: %s", foodFactor);
