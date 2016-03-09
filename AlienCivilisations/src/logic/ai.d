@@ -22,6 +22,7 @@ struct Behaviour {
 	bool inhabit = false;
 	bool orderMS = false;
 	bool orderIS = false;
+	GameState state;
 }
 
 class AI : Player {
@@ -85,7 +86,7 @@ class AI : Player {
 	}
 	/** Negamax algorithm **/
 	/* Similar to Minimax but inverting alpha and beta and recursive result. */
-	long negaMax(GameState gs, int depth, real alpha, real beta, bool maximising) const {
+	long negaMax(GameState gs, int depth, real alpha, real beta) const {
 		//Check if terminal node
 		if(depth <= 0)
 			return evaluateState(gs);
