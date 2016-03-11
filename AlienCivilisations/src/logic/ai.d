@@ -23,6 +23,25 @@ struct Behaviour {
 	bool orderMS = false;
 	bool orderIS = false;
 	GameState state;
+	this(bool a, bool, i, bool om, bool oi, GameState gs) {
+		state = gs;
+		if(a) {
+			performAttack(state);
+			attack = true;
+		}
+		if(i) {
+			useInhabitShips(state);
+			inhabit = true;
+		}
+		if(om) {
+			addShipOrders(state, ShipType.Military);
+			orderMS = true;
+		}
+		if(oi) {
+			addShipOrders(state, ShipType.Inhabitation);
+			orderIS = true;
+		}
+	}
 }
 
 class AI : Player {
@@ -334,6 +353,22 @@ class AI : Player {
 		if(behaviour.orderIS) {
 			addShipOrders(gs, ShipType.Inhabitation);
 		}
+	}
+	private Behaviour[] behaviourCombinations(GameState baseState) const {
+		Behaviour[] behaviours;
+		behaviours.reserve(16);
+		/*
+		 * naming code position (0 = false, 1 = true):
+		 * n - just name beginning
+		 * 1 - attack
+		 * 2 - inhabit
+		 * 3 - order military ship
+		 * 4 - order inhabitation ship
+		*/
+		for(byte i=0; i<16; i++) {
+			behaviours ~= Behaviour(false, false, false, false, baseState.dup());
+		}
+		return behaviours;
 	}
 	/** Uses inhabitation ships of the current player **/
 	private void useInhabitShips(GameState testGS) const {
