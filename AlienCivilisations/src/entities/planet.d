@@ -209,14 +209,12 @@ class Planet {
 	**/
 	private void growPopulation() {
 		double opf = 1;
+		//POWER(1 + (SUM(A2:H2) - N3) / N3,2)
 		if(populationSum > capacity){
 			debug writeln("[ Overpopulation takes effect! ]");
 			double overflow = populationSum - capacity;
-			double lambda = 9.5;
-			opf -= (overflow / capacity) * lambda;
-			if(opf <= 0){
-				opf = 0.1;
-			}
+			opf -= (overflow / capacity);
+			opf = max(opf, 0.01);
 		}
 		if(populationSum == 0){
 			debug writeln("Population empty!");
@@ -225,18 +223,22 @@ class Planet {
 		}
 		double fpu = _food / (populationSum * FOOD_CONSUMPTION_RATE);
 		double foodFactor = (fpu / (fpu + 1)) * 2;
+		foodFactor = max(foodFactor, 0.01);
 		//Age the population
 		for(size_t i = _population.length - 1; i>0; i--){
 			_population[i] = _population[i-1];
 		}
 		int reproductivePairs = _population[2 .. 5].sum / 2;
+		double birthFactor = CHILD_PER_PAID * foodFactor * opf;
+		birthFactor = min(7, max(birthFactor, 0.01));
+		double newBorns = reproductivePairs * birthFactor;
 		debug {
 			writefln("Reproductive pairs: %s", reproductivePairs);
 			writefln("Food factor: %s", foodFactor);
 			writefln("OPF = %s", opf);
+			writefln("Birth factor = %s", birthFactor);
 		}
-		double newBorns = reproductivePairs * CHILD_PER_PAID;
-		_population[0] = to!int(newBorns * foodFactor * opf);
+		_population[0] = to!int(newBorns);
 		assert(_population[0] >= 0);
 	}
 	/** Converts civil units into military units **/
