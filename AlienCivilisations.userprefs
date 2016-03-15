@@ -1,9 +1,9 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/logic/ai.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/containers/gameState.d">
     <Files>
-      <File FileName="AlienCivilisations/src/entities/player.d" Line="1" Column="1" />
-      <File FileName="AlienCivilisations/src/logic/ai.d" Line="11" Column="11" />
+      <File FileName="AlienCivilisations/src/logic/ai.d" Line="228" Column="37" />
+      <File FileName="AlienCivilisations/src/containers/gameState.d" Line="41" Column="35" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

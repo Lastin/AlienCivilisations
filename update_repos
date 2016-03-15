@@ -1,0 +1,11 @@
+#!/bin/bash
+# Handy script for cloning repositories
+cd AlienCivilisations/lib/dlangui
+git pull
+cd deps
+for dir in ./*
+do
+  git pull
+done
+cd ../../DMagick
+git pull

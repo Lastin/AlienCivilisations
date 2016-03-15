@@ -38,7 +38,7 @@ class GameState {
 		return _players[_queuePosition];
 	}
 	@property Player notCurrentPlayer() {
-		return _players[++_queuePosition % _players.length];
+		return _players[_queuePosition+1 % _players.length];
 	}
 	@property int currentPlayerId() {
 		return currentPlayer.uniqueId;
@@ -91,6 +91,7 @@ class GameState {
 				duplicates ~= new Player(origin.uniqueId, origin.name, origin.knowledgeTree.dup, origin.ships);
 			}
 		}
+		debug writefln("Duplicated %d players", duplicates.length);
 		return duplicates;
 	}
 }

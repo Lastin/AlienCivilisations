@@ -20,30 +20,47 @@ import std.algorithm.iteration;
 struct Behaviour {
 	bool attack = false;
 	bool inhabit = false;
-	bool orderMS = false;
-	bool orderIS = false;
+	bool orderMil = false;
+	bool orderInh = false;
+	BranchName developed;
 	GameState state;
-	this(bool a, bool, i, bool om, bool oi, GameState gs) {
-		state = gs;
-		if(a) {
-			performAttack(state);
-			attack = true;
+	this(bool att, bool inh, bool ordMil, bool ordInh, Behaviour bhvr) {
+		state = bhvr.state.dup();
+		developed = bhvr.developed;
+		attack = att;
+		inhabit = inh;
+		orderMil = ordMil;
+		orderInh = ordInh;
+		if(attack && !bhvr.attack)
+			AI.performAttack(state);
+		if(inhabit && !bhvr.inhabit)
+			AI.useInhabitShips(state);
+		if(orderMil && !bhvr.orderMil)
+			AI.addShipOrders(state, ShipType.Military);
+		if(orderInh && !bhvr.orderInh)
+			AI.addShipOrders(state, ShipType.Inhabitation);
+	}
+	this(bool att, bool inh, bool ordMil, bool ordInh, BranchName dev, GameState gs) {
+		state = gs.dup();
+		developed = dev;
+		attack = att;
+		inhabit = inh;
+		orderMil = ordMil;
+		orderInh = ordInh;
+		if(dev) {
+			gs.currentPlayer.knowledgeTree.clearOrders();
+			gs.currentPlayer.knowledgeTree.addOrder(dev);
 		}
-		if(i) {
-			useInhabitShips(state);
-			inhabit = true;
-		}
-		if(om) {
-			addShipOrders(state, ShipType.Military);
-			orderMS = true;
-		}
-		if(oi) {
-			addShipOrders(state, ShipType.Inhabitation);
-			orderIS = true;
-		}
+		if(attack)
+			AI.performAttack(state);
+		if(inhabit)
+			AI.useInhabitShips(state);
+		if(orderMil)
+			AI.addShipOrders(state, ShipType.Military);
+		if(orderInh)
+			AI.addShipOrders(state, ShipType.Inhabitation);
 	}
 }
-
 class AI : Player {
 	this(int uniqueId, KnowledgeTree knowledgeTree, Ship[] ships = null) {
 		super(uniqueId, "AI", knowledgeTree, ships);
@@ -55,57 +72,38 @@ class AI : Player {
 			writeln("AI making decisions");
 			//writefln("CPUs: %s", totalCPUs);
 		}
-		//#1: free planets > use inhabitation ships
-		Planet[] freePlanets = realState.map.freePlanets;
-		sort!"a.capacity > b.capacity"(freePlanets);
-		size_t ihc = inhabitationShips.length;
-		foreach(planet; freePlanets) {
-			if(ihc == 0)
-				break;
-			inhabitPlanet(planet);
-			ihc--;
-		}
-
-		Planet[] pp = realState.map.playerPlanets(_uniqueId);
+		/*Planet[] pp = realState.map.playerPlanets(_uniqueId);
 		double enemyAggression = 0;
 		foreach(planet; pp) {
 			enemyAggression += planet.attackedCount;
+		}*/
+		Behaviour[] combinations = allCombinations(realState);
+		Tuple!(Behaviour, long) best;// = tuple(null, long.min);
+		foreach(combination; combinations) {
+			long score = negaMax(combination.state, 0, long.min, long.max);
+			if(best[1] < score)
+				best = tuple(combination, score);
 		}
+		executeMoves(best[0], realState);
+	}
 
-		//#2: undeveloped branches
-		long[] scores;
-		Branch[] ub = knowledgeTree.undevelopedBranches();
-		if(ub.length > 0) {
-			GameState[] combinations;
-			foreach(branch; knowledgeTree.undevelopedBranches()){
-				GameState gsWithOrder = realState.dup;
-				gsWithOrder.currentPlayer.knowledgeTree.clearOrders();
-				gsWithOrder.currentPlayer.knowledgeTree.addOrder(branch.name);
-				combinations ~= behaviourCombinations(gsWithOrder);
-				foreach(combination; combinations) {
-					//scores ~= negaMax(combination, 1, -real.infinity, real.infinity, false);
-				}
-				long largestScore = long.min;
-				long index = -1;
-				foreach(int i, score; scores) {
-					if(score >= largestScore) {
-						largestScore = score;
-						index = i;
-					}
-				}
-			}
-		} else {
-			GameState[] combinations;
-			combinations.reserve(20);
-			combinations ~= behaviourCombinations(realState);
-			foreach(combination; combinations) {
-				//negaMax(combination, 1, -real.infinity, real.infinity, false);
-			}
+	/** Performs the moves on the given state, as in the given behaviour **/
+	static void executeMoves(Behaviour behaviour, GameState realState) {
+		if(behaviour.developed) {
+			realState.currentPlayer.knowledgeTree.clearOrders();
+			realState.currentPlayer.knowledgeTree.addOrder(behaviour.developed);
 		}
+		if(behaviour.attack)
+			performAttack(realState);
+		if(behaviour.inhabit)
+			useInhabitShips(realState);
+		if(behaviour.orderMil)
+			addShipOrders(realState, ShipType.Military);
+		if(behaviour.orderInh)
+			addShipOrders(realState, ShipType.Inhabitation);
 	}
 	/** Negamax algorithm **/
-	/* Similar to Minimax but inverting alpha and beta and recursive result. */
-	long negaMax(GameState gs, int depth, real alpha, real beta) const {
+	static long negaMax(GameState gs, int depth, long alpha, long beta) {
 		//Check if terminal node
 		if(depth <= 0)
 			return evaluateState(gs);
@@ -124,10 +122,10 @@ class AI : Player {
 		}
 		//Non-terminal node
 		long bestScore = long.min;
-		if(depth > 0 && dead == PlayerEnum.None) {
-			GameState[] combinations = possibleCombinations(gs);
+		if(dead == PlayerEnum.None) {
+			Behaviour[] combinations = allCombinations(gs);
 			foreach(combination; combinations) {
-				long score = -negaMax(combination, --depth, -beta, -alpha, !maximising);
+				long score = -negaMax(combination.state, --depth, -beta, -alpha);
 				bestScore = max(bestScore, score);
 				alpha = max(alpha, score);
 				if(alpha >= beta)
@@ -136,8 +134,51 @@ class AI : Player {
 		}
 		return bestScore;
 	}
+
+	/** Returns possible moves **/
+	static Behaviour[] allCombinations(GameState original) {
+		Behaviour[] combinations;
+		combinations.reserve(21);
+		Behaviour bhvr0 = Behaviour(false, false, false, false, null, original);
+		combinations ~= behaviourCombinations(bhvr0);
+		foreach(possDev; original.currentPlayer().knowledgeTree().undevelopedBranches()) {
+			Behaviour bhvr1 = Behaviour(false, false, false, false, possDev.name, original);
+			combinations ~= behaviourCombinations(bhvr1);
+		}
+		foreach(combination; combinations) {
+			//End turn for each combination
+			combination.state.currentPlayer.completeTurn(combination.state.map.planets);
+			combination.state.moveQPosition();
+		}
+		return combinations;
+	}
+	/** Returns the combinations of possible actions **/
+	static Behaviour[] behaviourCombinations(Behaviour bhvr) {
+		Behaviour[] behaviours;
+		behaviours.reserve(16);
+		//Create all combinations of moves
+		behaviours ~= Behaviour(false, false, false, false, bhvr);
+		behaviours ~= Behaviour(true,  false, false, false, bhvr);
+		behaviours ~= Behaviour(false, true,  false, false, behaviours[0]);
+		behaviours ~= Behaviour(true,  true,  false, false, behaviours[1]);
+		behaviours ~= Behaviour(false, false, true,  false, bhvr);
+		behaviours ~= Behaviour(true,  false, true,  false, behaviours[1]);
+		behaviours ~= Behaviour(false, true,  true,  false, behaviours[2]);
+		behaviours ~= Behaviour(true,  true,  true,  false, behaviours[3]);
+		//
+		behaviours ~= Behaviour(false, false, false, true, bhvr);
+		behaviours ~= Behaviour(true,  false, false, true, behaviours[1]);
+		behaviours ~= Behaviour(false, true,  false, true, behaviours[2]);
+		behaviours ~= Behaviour(true,  true,  false, true, behaviours[3]);
+		behaviours ~= Behaviour(false, false, true,  true, behaviours[4]);
+		behaviours ~= Behaviour(true,  false, true,  true, behaviours[5]);
+		behaviours ~= Behaviour(false, true,  true,  true, behaviours[6]);
+		behaviours ~= Behaviour(true,  true,  true,  true, behaviours[7]);
+		return behaviours;
+	}
+
 	/** Returns least affected by production planet belonging to current player **/
-	private Planet leastAffectedPlanet(GameState testGS, ShipType type, int[] excluded) const {
+	static Planet leastAffectedPlanet(GameState testGS, ShipType type, int[] excluded) {
 		Planet[] pp = testGS.currentPlayer.planets(testGS.map.planets);
 		Planet best;
 		double smallestEffect = double.infinity;
@@ -153,7 +194,7 @@ class AI : Player {
 		return best;
 	}
 	/**  Returns the double representing the effect of construction on planet **/
-	private double consEff(Planet planet, ShipType type) const {
+	static double consEff(Planet planet, ShipType type) {
 		Planet unaffected = planet.dup(planet.owner);
 		Planet affected = planet.dup(planet.owner);
 		affected.addShipOrder(type);
@@ -166,7 +207,7 @@ class AI : Player {
 		return (before / affPop) - (before / unaffected.populationSum());
 	}
 	/** Sort by effect of construction, least affected first **/
-	private Planet[] sortByEff(Planet[] planets, ShipType type) const {
+	static Planet[] sortByEff(Planet[] planets, ShipType type) {
 		Tuple!(Planet, double)[] scores;
 		foreach(planet; planets) {
 			scores ~= tuple(planet, consEff(planet, type));
@@ -179,11 +220,11 @@ class AI : Player {
 		return result;
 	}
 	/** Adds kt development order for current player **/
-	private void addKTOrder(GameState gs, BranchName bn) {
+	static void addKTOrder(GameState gs, BranchName bn) {
 		gs.currentPlayer.knowledgeTree.addOrder(bn);
 	}
 	/** Return uniqueId of planet most affected by attacks **/
-	private int mostAffectedPlanet(GameState gs) const {
+	static int mostAffectedPlanet(GameState gs) {
 		Planet[] aps = gs.notCurrentPlayer.planets(gs.map.planets);
 		Player attacker = gs.currentPlayer();
 		double greatestEffect = double.min_normal;
@@ -212,11 +253,12 @@ class AI : Player {
 		debug writefln("Most affected planet id: %s with value: %s", id, greatestEffect);
 		return id;
 	}
-	/** Returns long representing the value of the gamestate for current player **/
-	private long evaluateState(GameState gs) const {
+	/** Returns the value of the gamestate for the current player **/
+	static long evaluateState(GameState gs) {
 		return calcPlayerVal(gs.currentPlayer, gs) - calcPlayerVal(gs.notCurrentPlayer, gs);
 	}
-	private long calcPlayerVal(Player player, GameState gs) const {
+	/** Returns the value of the player **/
+	static long calcPlayerVal(Player player, GameState gs) {
 		long playerPoints = 0;
 		int[8] playerPop = [0,0,0,0,0,0,0,0];
 		int popSum = playerPop[].sum;
@@ -235,143 +277,16 @@ class AI : Player {
 		playerPoints += to!long(player.knowledgeTree.totalEff * popSum / 10);
 		return playerPoints;
 	}
-	private long weightedPop(int[8] p) const {
+	/** Returns the value of the given population **/
+	static long weightedPop(int[8] p) {
 		int g1 = 5;
 		int g2 = 4;
 		int g3 = 1;
-		int result = (p[0..2].sum * 5 + p[2..7].sum * 4 + p[7..$].sum * 1) / g1+g2+g3;
+		int result = (p[0..2].sum * g1 + p[2..7].sum * g2 + p[7..$].sum * g3) / g1+g2+g3;
 		return result;
 	}
-	/** Returns possible game states which are effect of certain behaviours **/
-	private GameState[] possibleCombinations(GameState original) const {
-		GameState[] combinations;
-		combinations.reserve(18);
-		Branch[] ub = original.currentPlayer().knowledgeTree().undevelopedBranches();
-		if(ub.length > 0) {
-			foreach(branch; ub) {
-				GameState gsWithOrder = original.dup();
-				//add kt order
-				gsWithOrder.currentPlayer.knowledgeTree.clearOrders();
-				gsWithOrder.currentPlayer.knowledgeTree.addOrder(branch.name);
-				combinations ~= gsWithOrder;
-				combinations ~= behaviourCombinations(gsWithOrder);
-			}
-		} else {
-			combinations ~= behaviourCombinations(original);
-		}
-		foreach(combination; combinations) {
-			//end turn once decisions are made
-			combination.currentPlayer.completeTurn(combination.map.planets);
-			combination.moveQPosition();
-		}
-		return combinations;
-	}
-	/** Returns the combinations of possible behaviours such as attack and ship orders **/
-	private GameState[] behaviourCombinations(GameState baseState) const {
-		GameState[] combinations;
-		combinations.reserve(16);
-		/*
-		 * naming code position (0 = false, 1 = true):
-		 * n - just name beginning
-		 * 1 - attack
-		 * 2 - inhabit
-		 * 3 - order military ship
-		 * 4 - order inhabitation ship
-		*/
-		//Attack?
-		//Bit: n1---
-		GameState n0000 = baseState.dup();
-		GameState n1000 = baseState.dup();
-		performAttack(n1000);
-		//Inhabit?
-		//Bit: n-1--
-		GameState n0100 = n0000.dup();
-		GameState n1100 = n1000.dup();
-		useInhabitShips(n0100);
-		useInhabitShips(n1100);
-		//Produce military ships?
-		//Bit: n--1-
-		GameState n0010 = n0000.dup();
-		GameState n1010 = n1000.dup();
-		GameState n0110 = n0100.dup();
-		GameState n1110 = n1100.dup();
-		addShipOrders(n0010, ShipType.Military);
-		addShipOrders(n1010, ShipType.Military);
-		addShipOrders(n0110, ShipType.Military);
-		addShipOrders(n1110, ShipType.Military);
-		//Order inhabit ships?
-		//Bit: n---1
-		GameState n0001 = n0000.dup();
-		GameState n1001 = n1000.dup();
-		GameState n0101 = n0100.dup();
-		GameState n1101 = n1000.dup();
-		GameState n0011 = n0010.dup();
-		GameState n1011 = n1010.dup();
-		GameState n0111 = n0110.dup();
-		GameState n1111 = n1110.dup();
-		addShipOrders(n0001, ShipType.Inhabitation);
-		addShipOrders(n1001, ShipType.Inhabitation);
-		addShipOrders(n0101, ShipType.Inhabitation);
-		addShipOrders(n1101, ShipType.Inhabitation);
-		addShipOrders(n0011, ShipType.Inhabitation);
-		addShipOrders(n1011, ShipType.Inhabitation);
-		addShipOrders(n0111, ShipType.Inhabitation);
-		addShipOrders(n1111, ShipType.Inhabitation);
-		//Add all hypothetical states to list
-		//
-		combinations ~= n0000;
-		combinations ~= n1000;
-		//
-		combinations ~= n0100;
-		combinations ~= n1100;
-		//
-		combinations ~= n0010;
-		combinations ~= n1010;
-		combinations ~= n0110;
-		combinations ~= n1110;
-		//
-		combinations ~= n0001;
-		combinations ~= n1001;
-		combinations ~= n0101;
-		combinations ~= n1101;
-		combinations ~= n0011;
-		combinations ~= n1011;
-		combinations ~= n0111;
-		combinations ~= n1111;
-		return combinations;
-	}
-	void makeActions(Behaviour behaviour, GameState gs) {
-		if(behaviour.attack) {
-			performAttack(gs);
-		}
-		if(behaviour.inhabit) {
-			useInhabitShips(gs);
-		}
-		if(behaviour.orderMS) {
-			addShipOrders(gs, ShipType.Military);
-		}
-		if(behaviour.orderIS) {
-			addShipOrders(gs, ShipType.Inhabitation);
-		}
-	}
-	private Behaviour[] behaviourCombinations(GameState baseState) const {
-		Behaviour[] behaviours;
-		behaviours.reserve(16);
-		/*
-		 * naming code position (0 = false, 1 = true):
-		 * n - just name beginning
-		 * 1 - attack
-		 * 2 - inhabit
-		 * 3 - order military ship
-		 * 4 - order inhabitation ship
-		*/
-		for(byte i=0; i<16; i++) {
-			behaviours ~= Behaviour(false, false, false, false, baseState.dup());
-		}
-		return behaviours;
-	}
 	/** Uses inhabitation ships of the current player **/
-	private void useInhabitShips(GameState testGS) const {
+	static void useInhabitShips(GameState testGS) {
 		Planet[] freePlanets = testGS.map.freePlanets;
 		sort!"a.capacity > b.capacity"(freePlanets);
 		size_t ihc = testGS.currentPlayer.inhabitationShips.length;
@@ -383,7 +298,7 @@ class AI : Player {
 		}
 	}
 	/** Adds best number of inhabitation ships orders on least affected planets **/
-	private void addShipOrders(GameState testGS, ShipType type) const {
+	static void addShipOrders(GameState testGS, ShipType type) {
 		//TODO: remove breaking when ordering the production of the military ship
 		int totalAdded = 0;
 		Planet[] freePlanets = testGS.map.freePlanets;
@@ -406,7 +321,7 @@ class AI : Player {
 		debug writefln("Total added ship orders: %s", totalAdded);
 	}
 	/** Performs attack with all military ships on enemy planets **/
-	private void performAttack(GameState testGS) const {
+	static void performAttack(GameState testGS) {
 		//Attack most valuable enemy planet/s
 		while(testGS.currentPlayer.militaryShips().length > 0 && testGS.notCurrentPlayer.planets(testGS.map.planets).length > 0) {
 			Planet mvp = testGS.map.planetWithId(mostAffectedPlanet(testGS));
@@ -419,7 +334,7 @@ class AI : Player {
 		}
 	}
 	/** Returns uniqueId of the planet with potentially best value for player **/
-	private int mostValuablePlanetId(Planet[] planets) const {
+	static int mostValuablePlanetId(Planet[] planets) {
 		double bestGain = double.min_normal;
 		Planet bestPlanet;
 		foreach(planet; planets) {
@@ -438,7 +353,7 @@ class AI : Player {
 		return bestPlanet.uniqueId;
 	}
 	/** Returns number of ships required to destroy population on a planet **/
-	private int shipsRequired(Player player, Planet planet) const {
+	static int shipsRequired(Player player, Planet planet) {
 		int toDestroy = planet.populationSum;
 		double eneEff = player.knowledgeTree.branch(BranchName.Energy).effectiveness;
 		double sciEff = player.knowledgeTree.branch(BranchName.Science).effectiveness;
@@ -446,4 +361,5 @@ class AI : Player {
 		double unitsReq = planet.populationSum / (MilitaryShip.lambda * milEff);
 		return to!int(ceil(unitsReq / Ship.capacity(eneEff, sciEff)));
 	}
+
 }

@@ -76,7 +76,6 @@ Global
 		{DAFA1963-D306-464A-B4DE-8F051FFE9644}.UnittestX11|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = AlienCivilisations\AlienCivilisations.dproj
 		Policies = $0
 		$0.StandardHeader = $1
 		$1.Text = 
@@ -205,5 +204,6 @@ Global
 		$23.NamingStyle = PascalCase
 		$23.IncludeInstanceMembers = True
 		$23.IncludeStaticEntities = True
+		StartupItem = AlienCivilisations\AlienCivilisations.dproj
 	EndGlobalSection
 EndGlobal

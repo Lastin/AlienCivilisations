@@ -16,13 +16,11 @@
     <Includes>
       <Includes>
         <Path>lib/dlangui/src</Path>
-        <Path>lib/dlangui/deps/gl3n</Path>
         <Path>lib/dlangui/deps/DerelictSDL2/source</Path>
         <Path>lib/dlangui/deps/DerelictFT/source</Path>
         <Path>lib/dlangui/deps/DerelictGL3/source</Path>
         <Path>lib/dlangui/deps/DerelictUtil/source</Path>
         <Path>lib/dlangui/3rdparty</Path>
-        <Path>lib/dlangui/3rdparty-extra</Path>
         <Path>lib/DMagick</Path>
       </Includes>
     </Includes>
