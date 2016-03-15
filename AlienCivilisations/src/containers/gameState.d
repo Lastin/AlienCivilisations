@@ -91,7 +91,6 @@ class GameState {
 				duplicates ~= new Player(origin.uniqueId, origin.name, origin.knowledgeTree.dup, origin.ships);
 			}
 		}
-		debug writefln("Duplicated %d players", duplicates.length);
 		return duplicates;
 	}
 }

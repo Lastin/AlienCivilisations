@@ -25,11 +25,7 @@ struct Behaviour {
 	BranchName developed;
 	GameState state;
 	this(bool att, bool inh, bool ordMil, bool ordInh, Behaviour bhvr) {
-<<<<<<< HEAD
 		state = bhvr.state.dup();
-=======
-		state = bhvr.state.dup;
->>>>>>> 30aa4ad865f1f0c350a659df9147deae53a3df73
 		developed = bhvr.developed;
 		attack = att;
 		inhabit = inh;
@@ -45,11 +41,7 @@ struct Behaviour {
 			AI.addShipOrders(state, ShipType.Inhabitation);
 	}
 	this(bool att, bool inh, bool ordMil, bool ordInh, BranchName dev, GameState gs) {
-<<<<<<< HEAD
 		state = gs.dup();
-=======
-		state = gs.dup;
->>>>>>> 30aa4ad865f1f0c350a659df9147deae53a3df73
 		developed = dev;
 		attack = att;
 		inhabit = inh;
@@ -88,11 +80,8 @@ class AI : Player {
 		Behaviour[] combinations = allCombinations(realState);
 		Tuple!(Behaviour, long) best;// = tuple(null, long.min);
 		foreach(combination; combinations) {
-<<<<<<< HEAD
 			long score = negaMax(combination.state, 0, long.min, long.max);
-=======
-			long score = negaMax(combination.state, 2, long.min, long.max);
->>>>>>> 30aa4ad865f1f0c350a659df9147deae53a3df73
+			writefln("Score: %s", score);
 			if(best[1] < score)
 				best = tuple(combination, score);
 		}
@@ -150,7 +139,7 @@ class AI : Player {
 	/** Returns possible moves **/
 	static Behaviour[] allCombinations(GameState original) {
 		Behaviour[] combinations;
-		combinations.reserve(21);
+		combinations.reserve(90);
 		Behaviour bhvr0 = Behaviour(false, false, false, false, null, original);
 		combinations ~= behaviourCombinations(bhvr0);
 		foreach(possDev; original.currentPlayer().knowledgeTree().undevelopedBranches()) {
@@ -274,7 +263,7 @@ class AI : Player {
 		long playerPoints = 0;
 		int[8] playerPop = [0,0,0,0,0,0,0,0];
 		int popSum = playerPop[].sum;
-		Planet[] playerPlanets = gs.currentPlayer.planets(gs.map.planets);
+		Planet[] playerPlanets = player.planets(gs.map.planets);
 		foreach(planet; playerPlanets) {
 			foreach(i, each; planet.population) {
 				playerPop[i] += each;
@@ -287,6 +276,7 @@ class AI : Player {
 			playerPoints += to!long(ship.force(player.knowledgeTree.branch(BranchName.Military).effectiveness) *  popSum / 15);
 		}
 		playerPoints += to!long(player.knowledgeTree.totalEff * popSum / 10);
+		writefln("Player points: %s", playerPoints);
 		return playerPoints;
 	}
 	/** Returns the value of the given population **/
