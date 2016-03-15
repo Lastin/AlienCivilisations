@@ -1,6 +1,6 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/containers/gameState.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/logic/ai.d">
     <Files>
       <File FileName="AlienCivilisations/src/logic/ai.d" Line="228" Column="37" />
       <File FileName="AlienCivilisations/src/containers/gameState.d" Line="41" Column="35" />

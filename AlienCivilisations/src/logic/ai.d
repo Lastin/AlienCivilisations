@@ -25,7 +25,11 @@ struct Behaviour {
 	BranchName developed;
 	GameState state;
 	this(bool att, bool inh, bool ordMil, bool ordInh, Behaviour bhvr) {
+<<<<<<< HEAD
 		state = bhvr.state.dup();
+=======
+		state = bhvr.state.dup;
+>>>>>>> 30aa4ad865f1f0c350a659df9147deae53a3df73
 		developed = bhvr.developed;
 		attack = att;
 		inhabit = inh;
@@ -41,7 +45,11 @@ struct Behaviour {
 			AI.addShipOrders(state, ShipType.Inhabitation);
 	}
 	this(bool att, bool inh, bool ordMil, bool ordInh, BranchName dev, GameState gs) {
+<<<<<<< HEAD
 		state = gs.dup();
+=======
+		state = gs.dup;
+>>>>>>> 30aa4ad865f1f0c350a659df9147deae53a3df73
 		developed = dev;
 		attack = att;
 		inhabit = inh;
@@ -80,7 +88,11 @@ class AI : Player {
 		Behaviour[] combinations = allCombinations(realState);
 		Tuple!(Behaviour, long) best;// = tuple(null, long.min);
 		foreach(combination; combinations) {
+<<<<<<< HEAD
 			long score = negaMax(combination.state, 0, long.min, long.max);
+=======
+			long score = negaMax(combination.state, 2, long.min, long.max);
+>>>>>>> 30aa4ad865f1f0c350a659df9147deae53a3df73
 			if(best[1] < score)
 				best = tuple(combination, score);
 		}
