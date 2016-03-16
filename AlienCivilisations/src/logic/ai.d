@@ -16,6 +16,7 @@ import std.conv;
 import std.math;
 import std.typecons;
 import std.algorithm.iteration;
+import std.format;
 
 struct Behaviour {
 	bool attack = false;
@@ -60,6 +61,9 @@ struct Behaviour {
 		if(orderInh)
 			AI.addShipOrders(state, ShipType.Inhabitation);
 	}
+	string toString() {
+		return format("%s %s %s %s %s", attack, inhabit, orderMil, orderInh, developed);
+	}
 }
 class AI : Player {
 	this(int uniqueId, KnowledgeTree knowledgeTree, Ship[] ships = null) {
@@ -79,12 +83,13 @@ class AI : Player {
 		}*/
 		Behaviour[] combinations = allCombinations(realState);
 		Tuple!(Behaviour, long) best;// = tuple(null, long.min);
-		foreach(combination; combinations) {
+		foreach(combination; parallel(combinations)) {
 			long score = negaMax(combination.state, 0, long.min, long.max);
-			writefln("Score: %s", score);
 			if(best[1] < score)
 				best = tuple(combination, score);
 		}
+		writefln("Best score: %s", best[1]);
+		writefln("Move: %s", best[0].toString());
 		executeMoves(best[0], realState);
 	}
 
@@ -248,8 +253,7 @@ class AI : Player {
 				greatestEffect = effect;
 				id = ap.uniqueId;
 			}
-			debug writefln("testfield hash: %s", testField.toHash);
-			assert(ap.toHash == planetBH && attacker.toHash == playerBH);
+			//assert(ap.toHash == planetBH && attacker.toHash == playerBH);
 		}
 		debug writefln("Most affected planet id: %s with value: %s", id, greatestEffect);
 		return id;
