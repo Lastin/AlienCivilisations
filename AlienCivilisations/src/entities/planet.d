@@ -223,7 +223,7 @@ class Planet {
 		}
 		double fpu = _food / (populationSum * FOOD_CONSUMPTION_RATE);
 		double foodFactor = (fpu / (fpu + 1)) * 2;
-		foodFactor = max(foodFactor, 0.01);
+		foodFactor = min(1.5, max(foodFactor, 0.01));
 		//Age the population
 		for(size_t i = _population.length - 1; i>0; i--){
 			_population[i] = _population[i-1];
