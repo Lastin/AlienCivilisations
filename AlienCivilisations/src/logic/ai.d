@@ -17,6 +17,7 @@ import std.math;
 import std.typecons;
 import std.algorithm.iteration;
 import std.format;
+import std.algorithm;
 
 struct Behaviour {
 	bool attack = false;
@@ -83,10 +84,11 @@ class AI : Player {
 		}*/
 		Behaviour[] combinations = allCombinations(realState);
 		Tuple!(Behaviour, long) best;// = tuple(null, long.min);
-		foreach(combination; parallel(combinations)) {
+		foreach(i, combination; combinations) {
 			long score = negaMax(combination.state, 0, long.min, long.max);
 			if(best[1] < score)
 				best = tuple(combination, score);
+			writefln("Thread %s completed", i);
 		}
 		writefln("Best score: %s", best[1]);
 		writefln("Move: %s", best[0].toString());
@@ -305,6 +307,9 @@ class AI : Player {
 	}
 	/** Adds best number of inhabitation ships orders on least affected planets **/
 	static void addShipOrders(GameState testGS, ShipType type) {
+
+
+
 		//TODO: remove breaking when ordering the production of the military ship
 		int totalAdded = 0;
 		Planet[] freePlanets = testGS.map.freePlanets;
@@ -368,4 +373,25 @@ class AI : Player {
 		return to!int(ceil(unitsReq / Ship.capacity(eneEff, sciEff)));
 	}
 
+	//NEW SECTION
+	static void addMilitaryOrders(GameState gs){
+
+	}
+	static void addInhabitationOrders(GameState gs) {
+
+	}
+	static void convertUnits(GameState gs) {
+		Planet[] allPlanets = gs.map.planets;
+		Planet[] owned = gs.currentPlayer.planets(allPlanets);
+		foreach(planet; owned) {
+			if(planet.populationSum > planet.capacity) {
+				int overflow = planet.populationSum - planet.capacity;
+				int reduction = planet.population[2..4].sum;
+				reduction = min(reduction, overflow);
+				int perc = planet.numberToPercent(reduction);
+				perc = min(90, perc);
+				planet.convertUnits(perc);
+			}
+		}
+	}
 }

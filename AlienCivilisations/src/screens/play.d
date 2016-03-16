@@ -844,6 +844,7 @@ class Play : AppFrame {
 	/** Switches popup shown in window, to see only one **/
 	private void switchPopup(Widget popup){
 		window.removePopup(_currentPopup);
+		_currentPopup.destroy();
 		if(!popup){
 			_currentPopup = null;
 		} else {
