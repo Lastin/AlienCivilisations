@@ -92,7 +92,7 @@ abstract class Ship {
 }
 
 class MilitaryShip : Ship {
-	static double lambda = 10.0;
+	static double LAMBDA = 10.0;
 	this(double eneEff, double sciEff, double completion) {
 		super(eneEff, sciEff, completion);
 	}
@@ -113,7 +113,7 @@ class MilitaryShip : Ship {
 		debug writefln("Onboard after: %s", _onboard);
 	}
 	@property double force(double milEff) {
-		return _onboard * milEff * lambda;
+		return _onboard * milEff * LAMBDA;
 	}
 	override @property double buildCost() {
 		return capacity * 3.5;

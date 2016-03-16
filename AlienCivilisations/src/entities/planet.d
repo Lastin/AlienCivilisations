@@ -353,7 +353,7 @@ class Planet {
 	int stepsToCompleteOrder(Ship ship) {
 		int steps = 0;
 		foreach(Ship s; _shipOrders) {
-			steps += to!int(ceil(s.buildCost / (calculateWorkforce / 2)));
+			steps += to!int(ceil(s.buildCost / (calculateWorkforce() / 2)));
 			if(ship == s)
 				return steps;
 		}

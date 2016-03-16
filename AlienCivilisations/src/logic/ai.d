@@ -369,16 +369,47 @@ class AI : Player {
 		double eneEff = player.knowledgeTree.branch(BranchName.Energy).effectiveness;
 		double sciEff = player.knowledgeTree.branch(BranchName.Science).effectiveness;
 		double milEff = player.knowledgeTree.branch(BranchName.Military).effectiveness;
-		double unitsReq = planet.populationSum / (MilitaryShip.lambda * milEff);
+		double unitsReq = planet.populationSum / (MilitaryShip.LAMBDA * milEff);
 		return to!int(ceil(unitsReq / Ship.capacity(eneEff, sciEff)));
 	}
 
 	//NEW SECTION
-	static void addMilitaryOrders(GameState gs){
-
+	/** Adds number of military ship orders needed to destroy planet's population **/
+	static void addMSOrders(GameState gs, Planet planet) {
+		int utd = planet.populationSum;
+		double totalForce = 0;
+		double mEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
+		foreach(ms; gs.currentPlayer.militaryShips) {
+			totalForce += ms.force(mEff);
+		}
+		double needForce = utd - totalForce;
+		if(needForce > 0) {
+			int nmu = to!int(needForce / (MilitaryShip.LAMBDA * mEff));
+			double sciEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Science).effectiveness;
+			double eneEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Energy).effectiveness;
+			int cap = MilitaryShip.capacity(eneEff, sciEff);
+			int shipsNeeded = nmu / cap;
+			for(int i=0; i<shipsNeeded; i++) {
+				Planet fp = fastestProduction(gs);
+				int units = min(cap, fp.militaryUnits);
+				fp.addShipOrder(ShipType.Military, units);
+			}
+		}
 	}
-	static void addInhabitationOrders(GameState gs) {
-
+	/** Returns a planet which can produce the ship the fastest. Does not foresee changes to the entire world **/
+	static Planet fastestProduction(GameState gs) {
+		Planet[] allPlanets = gs.map.planets;
+		Planet[] owned = gs.currentPlayer.planets(allPlanets);
+		sort!"a.calculateWorkforce() > b.calculateWorkforce()"(owned);
+		Planet best;
+		size_t leastOrders = int.max;
+		foreach(planet; owned) {
+			if(leastOrders > planet.shipOrders.length) {
+				leastOrders = planet.shipOrders.length;
+				best = planet;
+			}
+		}
+		return best;
 	}
 	static void convertUnits(GameState gs) {
 		Planet[] allPlanets = gs.map.planets;
