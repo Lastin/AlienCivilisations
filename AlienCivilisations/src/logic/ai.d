@@ -19,6 +19,8 @@ import std.algorithm.iteration;
 import std.format;
 import std.algorithm;
 
+version = playerDebug;
+
 struct Behaviour {
 	bool attack = false;
 	bool inhabit = false;
@@ -375,6 +377,15 @@ class AI : Player {
 
 
 	//NEW SECTION
+	void makeMoveNew(GameState gs) {
+		version(playerDebug) {
+			writefln("MS: %s", militaryShips.length);
+			writefln("IS: %s", inhabitationShips.length);
+		}
+		inhabit(gs);
+		addISOrders(gs);
+		convertUnits(gs);
+	}
 	/** Adds number of military ship orders needed to destroy planet's population **/
 	static void addMSOrders(GameState gs, Planet planet) {
 		int utd = planet.populationSum;
@@ -411,11 +422,10 @@ class AI : Player {
 			totalIS += count;
 		}
 		int needed = optimal - complete;
-		if(needed < 0) {
+		if(needed > 0) {
 			int limit = 2;
 			int[] excluded;
 			for(int i=0; i<needed; i++) {
-				//TODO: limit number added to one planet
 				Planet bp = fastestProduction(gs);
 				if(!canFind(excluded, bp.uniqueId)) {
 					bp.addShipOrder(ShipType.Inhabitation);
@@ -425,12 +435,25 @@ class AI : Player {
 				}
 			}
 		}
-		else if(needed > 0) {
+		else if(needed < 0) {
 			//cancel unneeded orders
+			//TODO: add cancelation
 			int canCancel = totalIS - complete;
-
 			for(int i=0; i<canCancel; i++) {
 				
+			}
+		}
+	}
+	static void inhabit(GameState gs) {
+		Planet[] free = gs.map.freePlanets();
+		InhabitationShip[] ships = gs.currentPlayer.inhabitationShips();
+		sort!"a.capacity() > b.capacity()"(ships);
+		sort!"a.capacity() > b.capacity()"(free);
+		int i=0;
+		foreach(ship; ships) {
+			if(i<free.length) {
+				gs.currentPlayer.inhabitPlanet(free[i]);
+				i++;
 			}
 		}
 	}

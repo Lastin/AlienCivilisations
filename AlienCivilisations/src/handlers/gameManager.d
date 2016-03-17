@@ -41,7 +41,8 @@ class GameManager {
 			writefln("Moving player %s", _gs.currentPlayer.name);
 		}
 		if(AI ai = cast(AI)_gs.currentPlayer){
-			ai.makeMove(_gs);
+			//ai.makeMove(_gs);
+			ai.makeMoveNew(_gs);
 			_gs.currentPlayer.completeTurn(_gs.map.planets);
 			_gs.moveQPosition();
 		}

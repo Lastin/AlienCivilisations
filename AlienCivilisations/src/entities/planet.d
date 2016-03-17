@@ -164,13 +164,13 @@ class Planet {
 		KnowledgeTree kt = _owner.knowledgeTree;
 		double boost = kt.branch(BranchName.Energy).effectiveness * _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
 		double result = to!double(_population[2 .. 7].sum) * boost;
-		debug writefln("Calulated workforce: %s", result);
+		version(planetDebug) writefln("Calulated workforce: %s", result);
 		return result;
 	}
 	/** Function affects planet's attributes. Should be called after player finishes move **/
 	void step(bool affectOwner) {
 		double workforce = calculateWorkforce();
-		debug {
+		version(planetDebug) {
 			writeln("-----------------------------------------");
 			writefln("Finishing step on planet %s", _name);
 			writefln("Population: %s", _population);
@@ -178,10 +178,10 @@ class Planet {
 		}
 		//Consume at most half of the workforce on production
 		workforce = workforce/2 + produceShips(workforce/2, affectOwner);
-		debug writefln("Workforce after ships production: %s", workforce);
+		version(planetDebug) writefln("Workforce after ships production: %s", workforce);
 		affectFood(workforce);
 		growPopulation();
-		debug {
+		version(planetDebug) {
 			writefln("New population: %s", _population);
 			writeln("-----------------------------------------");
 		}
@@ -193,14 +193,14 @@ class Planet {
 	private void affectFood(double workforce) {
 		//Consume food
 		double fpe = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
-		debug {
+		version(planetDebug) {
 			writefln("Food: %s", _food);
 			writefln("Consumed: %s", populationSum * FOOD_CONSUMPTION_RATE);
 			writefln("Produced: %s", workforce * FOOD_PRODUCTION_RATE * fpe);
 		}
 		_food -= populationSum * FOOD_CONSUMPTION_RATE;
 		_food += workforce * FOOD_PRODUCTION_RATE * fpe;
-		debug writefln("New food = %s", _food);
+		version(planetDebug) writefln("New food = %s", _food);
 		_food = max(_food, 0);
 	}
 	/**
@@ -211,13 +211,13 @@ class Planet {
 		double opf = 1;
 		//POWER(1 + (SUM(A2:H2) - N3) / N3,2)
 		if(populationSum > capacity){
-			debug writeln("[ Overpopulation takes effect! ]");
+			version (planetDebug) writeln("[ Overpopulation takes effect! ]");
 			double overflow = populationSum - capacity;
 			opf -= (overflow / capacity);
 			opf = max(opf, 0.01);
 		}
 		if(populationSum == 0){
-			debug writeln("Population empty!");
+			version(planetDebug) writeln("Population empty!");
 			_owner = null;
 			return;
 		}
@@ -232,7 +232,7 @@ class Planet {
 		double birthFactor = CHILD_PER_PAID * foodFactor * opf;
 		birthFactor = min(7, max(birthFactor, 0.01));
 		double newBorns = reproductivePairs * birthFactor;
-		debug {
+		version(planetDebug) {
 			writefln("Reproductive pairs: %s", reproductivePairs);
 			writefln("Food factor: %s", foodFactor);
 			writefln("OPF = %s", opf);
@@ -249,7 +249,7 @@ class Planet {
 		_population[2] -= g1;
 		_population[3] -= g2;
 		_militaryUnits += g1 + g2;
-		debug {
+		version(planetDebug) {
 			writefln("Subtructed age group 2: %s", g1);
 			writefln("Subtructed age group 3: %s", g2);
 			writefln("New military units: %s", _militaryUnits);
@@ -269,7 +269,7 @@ class Planet {
 	}
 	/** Subtract value, evenly distributing across all ages where possible **/
 	double destroyPopulation(double force) {
-		debug {
+		version(planetDebug) {
 			writeln("-----------------------------------------");
 			writefln("Destroying population using force: %s", force);
 			writefln("Population: %s",_population);
@@ -302,7 +302,7 @@ class Planet {
 		if(populationSum == 0) {
 			_owner = null;
 		}
-		debug { 
+		version(planetDebug) { 
 			writefln("New population: %s",_population);
 			writeln("-----------------------------------------");
 		}
@@ -326,12 +326,14 @@ class Planet {
 		double eneEff = _owner.knowledgeTree.branch(BranchName.Energy).effectiveness;
 		double sciEff = _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
 		if(type == ShipType.Military) {
-			debug {
+			version(planetDebug) {
 				writefln("Planet %s. Ordered military ship: %s units", _name, units);
 				if(units > _militaryUnits){
 					throw new Exception("Number of requested units is larget than available on a planet");
 				}
 			}
+			if(units > _militaryUnits)
+				units = _militaryUnits;
 			MilitaryShip ns = new MilitaryShip(eneEff, sciEff, 0);
 			if(ns.capacity < units){
 				ns.addUnits(ns.capacity);
@@ -344,7 +346,7 @@ class Planet {
 			return _shipOrders[$-1];
 		} else {
 			_shipOrders ~= new InhabitationShip(eneEff, sciEff, 0);
-			debug writefln("Planet %s. Ordered inhabitation ship", _name);
+			version(planetDebug) writefln("Planet %s. Ordered inhabitation ship", _name);
 			return _shipOrders[$-1];
 
 		}
@@ -361,7 +363,7 @@ class Planet {
 	}
 	/** Removes order at index from queue **/
 	void cancelOrder(int index){
-		debug writefln("Removing order #%s", index);
+		version(planetDebug) writefln("Removing order #%s", index);
 		_shipOrders = _shipOrders.remove(index);
 	}
 	/** Cancels all orders and destroys objects **/
