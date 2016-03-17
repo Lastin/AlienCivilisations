@@ -127,4 +127,7 @@
     <Folder Include="src\screens\" />
     <Folder Include="src\containers\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\logic\oldAI.d" />
+  </ItemGroup>
 </Project>
