@@ -373,6 +373,7 @@ class AI : Player {
 		return to!int(ceil(unitsReq / Ship.capacity(eneEff, sciEff)));
 	}
 
+
 	//NEW SECTION
 	/** Adds number of military ship orders needed to destroy planet's population **/
 	static void addMSOrders(GameState gs, Planet planet) {
@@ -393,6 +394,43 @@ class AI : Player {
 				Planet fp = fastestProduction(gs);
 				int units = min(cap, fp.militaryUnits);
 				fp.addShipOrder(ShipType.Military, units);
+			}
+		}
+	}
+	static void addISOrders(GameState gs) {
+		int optimal = to!int(gs.map.freePlanets.length) + 1;
+		int complete = to!int(gs.currentPlayer.inhabitationShips.length);
+		int totalIS = complete;
+		Planet[] ownedP = gs.currentPlayer.planets(gs.map.planets);
+		foreach(planet; ownedP) {
+			int count = 0;
+			foreach(order; planet.shipOrders) {
+				if(cast(InhabitationShip)order)
+					count++;
+			}
+			totalIS += count;
+		}
+		int needed = optimal - complete;
+		if(needed < 0) {
+			int limit = 2;
+			int[] excluded;
+			for(int i=0; i<needed; i++) {
+				//TODO: limit number added to one planet
+				Planet bp = fastestProduction(gs);
+				if(!canFind(excluded, bp.uniqueId)) {
+					bp.addShipOrder(ShipType.Inhabitation);
+					if(bp.shipOrders.length >= limit) {
+						excluded ~= bp.uniqueId;
+					}
+				}
+			}
+		}
+		else if(needed > 0) {
+			//cancel unneeded orders
+			int canCancel = totalIS - complete;
+
+			for(int i=0; i<canCancel; i++) {
+				
 			}
 		}
 	}
