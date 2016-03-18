@@ -118,14 +118,14 @@ public class KnowledgeTree {
 	/** Develops branches in queue using given points **/
 	int develop(int population){
 		uint points = to!uint(population * totalEff * lambda);
-		debug {
+		version(debugTree) {
 			writeln("--------------------------------------");
 			writeln("Developing knowledge tree");
 			writefln("Population total: %s", population);
 			writefln("Points: %s", points);
 		}
 		while(points > 0 && _orders.length > 0) {
-			debug writefln("[Orders Iteration] Points: %s", points);
+			version(debugTree) writefln("[Orders Iteration] Points: %s", points);
 			BranchName head = _orders[0];
 			int previousLevel = branch(head).level;
 			points = branch(head).addPoints(points);
@@ -134,7 +134,7 @@ public class KnowledgeTree {
 				_orders = _orders[1 .. $];
 			}
 		}
-		debug writeln("--------------------------------------");
+		version(debugTree) writeln("--------------------------------------");
 		return points;
 	}
 	bool addOrder(BranchName toAdd){

@@ -42,6 +42,14 @@ class Player {
 		}
 		return owned;
 	}
+	@property uint[8] population(Planet[] list) {
+		Planet[] owned = planets(list);
+		uint[8] total = [0,0,0,0,0,0,0,0];
+		foreach(planet; owned) {
+			total[] += planet.population[];
+		}
+		return total;
+	}
 	/** Returns all ships **/
 	@property Ship[] ships(){
 		return _ships;
@@ -142,6 +150,14 @@ class Player {
 				return;
 			}
 		}
+	}
+	@property uint totalMilitaryUnits (Planet[] allP) {
+		uint total = 0;
+		Planet[] owned = planets(allP);
+		foreach(planet; owned) {
+			total += planet.militaryUnits;
+		}
+		return total;
 	}
 	/** Returns player with given unique id, or null if none found **/
 	static Player findPlayerWithId(int ownerId, Player[] players) {

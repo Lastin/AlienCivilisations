@@ -29,12 +29,14 @@ class AI : Player {
 		version(playerDebug) {
 			writefln("MS: %s", militaryShips.length);
 			writefln("IS: %s", inhabitationShips.length);
+			writefln("Military force: %s", totalMilitaryForce);
+			writefln("Military units: %s", totalMilitaryUnits(gs.map.planets));
 		}
 		inhabit(gs);
-		develop(gs);
 		addISOrders(gs);
 		convertUnits(gs);
 		doAttack(gs);
+		develop(gs);
 	}
 	/** Adds number of military ship orders needed to destroy planet's population **/
 	static void addMSOrders(GameState gs, Planet planet) {
@@ -94,6 +96,7 @@ class AI : Player {
 			}
 		}
 	}
+	/** Uses inhabitation ships on best planets **/
 	static void inhabit(GameState gs) {
 		Planet[] free = gs.map.freePlanets();
 		InhabitationShip[] ships = gs.currentPlayer.inhabitationShips();
@@ -107,7 +110,7 @@ class AI : Player {
 			}
 		}
 	}
-	/** Returns a planet which can produce the ship the fastest. Does not foresee changes to the entire world **/
+	/** Returns a planet which can produce the ship the fastest **/
 	static Planet fastestProduction(GameState gs) {
 		Planet[] allPlanets = gs.map.planets;
 		Planet[] owned = gs.currentPlayer.planets(allPlanets);
@@ -122,6 +125,7 @@ class AI : Player {
 		}
 		return best;
 	}
+	/** Converts civil units to military **/
 	static void convertUnits(GameState gs) {
 		Planet[] allPlanets = gs.map.planets;
 		Planet[] owned = gs.currentPlayer.planets(allPlanets);
@@ -136,20 +140,40 @@ class AI : Player {
 			}
 		}
 	}
+
 	static void doAttack(GameState gs) {
 		int msc = to!int(gs.currentPlayer.militaryShips.length);
 		if(msc == 0) {
 			//TODO: add reasoning for ms production
 			return;
 		}
+		int[] rankedIds = planetAttackRank(gs);
+		int i=0;
+		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
+		MilitaryShip[] ms = gs.currentPlayer.militaryShips;
+		double milEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
+		while(ms.length > 0 && i<rankedIds.length) {
+			Planet attacked = gs.map.planetWithId(rankedIds[i]);
+			foreach(ship; ms) {
+				debug writefln("Attacking planet with id: %s", attacked.uniqueId);
+				ship.attackPlanet(attacked, milEff, true);
+				if(!attacked.owner) {
+					i++;
+				}
+			}
+			//update arrays
+			ms = gs.currentPlayer.militaryShips;
+		}
+	}
+	static int[] planetAttackRank(GameState gs) {
 		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
 		Tuple!(int, long)[] scores;
 		scores.reserve(enemy.length + 1);
 		//Planet attacked
-		foreach(planet; parallel(enemy)) {
+		foreach(planet; enemy) {
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, planet.uniqueId);
-			long score = negaMax(duplicate, 1, long.min, long.max);
+			long score = -negaMaxA(duplicate, 1, long.min, long.max);
 			scores ~= tuple(planet.uniqueId, score);
 			duplicate.destroy();
 		}
@@ -157,11 +181,21 @@ class AI : Player {
 			//No planet attacked
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, -1);
-			long score = negaMax(duplicate, 1, long.min, long.max);
+			long score = -negaMaxA(duplicate, 1, long.min, long.max);
 			scores ~= tuple(-1, score);
 			duplicate.destroy();
 		}
+		sort!"a[1] > b[1]"(scores);
+		//Convert tuple to single array
+		int[] ids;
+		ids.reserve(scores.length);
+		foreach(score; scores) {
+			writefln("Score: %s", score[1]);
+			ids ~= score[0];
+		}
+		return ids;
 	}
+	// Attacks planet with given id, and moves queue
 	static void attackAndShift(GameState gs, int planetId) {
 		if(planetId >= 0){
 			Planet attacked = gs.map.planetWithId(planetId);
@@ -174,7 +208,7 @@ class AI : Player {
 		gs.currentPlayer.completeTurn(gs.map.planets);
 		gs.moveQPosition();
 	}
-	static long negaMax(GameState gs, int depth, long alpha, long beta) {
+	static long negaMaxA(GameState gs, int depth, long alpha, long beta) {
 		//TERMINAL
 		if(depth <= 0 || gs.currentPlayer.militaryShips.length == 0)
 			return evaluate(gs);
@@ -194,10 +228,10 @@ class AI : Player {
 		//NON-TERMINAL
 		long bestScore = long.min;
 		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
-		foreach(planet; parallel(enemy)) {
+		foreach(planet; enemy) {
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, planet.uniqueId);
-			long score = negaMax(duplicate, 1, long.min, long.max);
+			long score = negaMaxA(duplicate, 1, long.min, long.max);
 			duplicate.destroy();
 			bestScore = max(score, bestScore);
 			alpha = max(alpha, score);
@@ -207,14 +241,24 @@ class AI : Player {
 		{
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, -1);
-			long score = negaMax(duplicate, 1, long.min, long.max);
+			long score = negaMaxA(duplicate, 1, long.min, long.max);
 			duplicate.destroy();
 			bestScore = max(score, bestScore);
 		}
 		return bestScore;
 	}
 	static long evaluate(GameState gs) {
-		return 0;
+		Planet[] allP = gs.map.planets;
+		long meP = weightPop(gs.currentPlayer.population(allP));
+		long enP = weightPop(gs.notCurrentPlayer.population(allP));
+		return meP - enP;
+	}
+	static long weightPop(uint[8] p) {
+		int g1 = 5;
+		int g2 = 4;
+		int g3 = 1;
+		int result = (p[0..2].sum * g1 + p[2..7].sum * g2 + p[7..$].sum * g3) / g1+g2+g3;
+		return result;
 	}
 	static void develop(GameState gs) {
 

@@ -70,7 +70,7 @@ abstract class Ship {
 	}
 	/**Adds workforce to completion, eventually completing the construction**/
 	double build(double workforce){
-		debug writefln("MS: cost: %s | force: %s", buildCost, workforce);
+		version(debugShip) writefln("MS: cost: %s | force: %s", buildCost, workforce);
 		if(workforce >= buildCost - _completion){
 			workforce = buildCost - _completion;
 			_completion = buildCost;

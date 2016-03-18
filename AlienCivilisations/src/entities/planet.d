@@ -274,6 +274,8 @@ class Planet {
 			writefln("Destroying population using force: %s", force);
 			writefln("Population: %s",_population);
 		}
+		if(!owner)
+			return force;
 		if(force >= populationSum) {
 			force -= populationSum;
 			_population = [0,0,0,0,0,0,0,0];
