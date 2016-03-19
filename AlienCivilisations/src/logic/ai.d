@@ -47,7 +47,9 @@ class AI : Player {
 		int limit = 2;
 		int added = 0;
 		do {
-			added = addMSOrdersToDestroy(gs, enemy[i]);
+			added += addMSOrdersToDestroy(gs, enemy[i]);
+			i++;
+			enemy = gs.notCurrentPlayer.planets(gs.map.planets);
 		} while(i<enemy.length && i<limit && added == 0);
 	}
 	/** Adds number of military ship orders needed to destroy planet's population **/
@@ -172,6 +174,8 @@ class AI : Player {
 		double milEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
 		while(ms.length > 0 && i<rankedIds.length) {
 			Planet attacked = gs.map.planetWithId(rankedIds[i]);
+			if(!attacked)
+				return;
 			foreach(ship; ms) {
 				gs.currentPlayer.attackPlanet(ship, attacked, true);
 				if(!attacked.owner) {
@@ -191,15 +195,17 @@ class AI : Player {
 		foreach(planet; enemy) {
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, planet.uniqueId);
-			long score = -negaMaxA(duplicate, 1, long.min, long.max);
-			scores ~= tuple(planet.uniqueId, score);
+			long score = negaMaxA(duplicate, 2, long.min, long.max);
+			synchronized {
+				scores ~= tuple(planet.uniqueId, score);
+			}
 			duplicate.destroy();
 		}
 		{
 			//No planet attacked
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, -1);
-			long score = -negaMaxA(duplicate, 2, long.min, long.max);
+			long score = negaMaxA(duplicate, 2, long.min, long.max);
 			scores ~= tuple(-1, score);
 			duplicate.destroy();
 		}
@@ -246,20 +252,22 @@ class AI : Player {
 		//NON-TERMINAL
 		long bestScore = long.min;
 		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
-		foreach(planet; enemy) {
+		foreach(planet; parallel(enemy)) {
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, planet.uniqueId);
-			long score = negaMaxA(duplicate, 1, long.min, long.max);
+			long score = -negaMaxA(duplicate, depth -1, long.min, long.max);
 			duplicate.destroy();
-			bestScore = max(score, bestScore);
-			alpha = max(alpha, score);
-			if(alpha >= beta)
-				break;
+			synchronized {
+				bestScore = max(score, bestScore);
+				alpha = max(alpha, score);
+				if(alpha >= beta)
+					break;
+			}
 		}
 		{
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, -1);
-			long score = negaMaxA(duplicate, 1, long.min, long.max);
+			long score = -negaMaxA(duplicate, depth -1, long.min, long.max);
 			duplicate.destroy();
 			bestScore = max(score, bestScore);
 		}
