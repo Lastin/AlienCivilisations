@@ -425,6 +425,8 @@ class Play : AppFrame {
 					_gameState.human.attackPlanet(ship, _selectedPlanet);
 				}
 			}
+			switchPopup(null);
+			updatePlanetInfo(_selectedPlanet);
 			return true;
 		};
 		HorizontalLayout btnContainer = new HorizontalLayout();

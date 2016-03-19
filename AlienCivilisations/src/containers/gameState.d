@@ -74,14 +74,12 @@ class GameState {
 		//debug writefln("Queue position: %s", _queuePosition);
 	}
 	/** Returns duplicate of the state **/
-	GameState dup() const {
-		synchronized {
-			Player[] playersDup = duplicatePlayers();
-			Planet[] planetsDup = _map.duplicatePlanets(playersDup);//duplicatePlanets(playersDup);
-			//duplicate map
-			Map mapDup = new Map(_map.size, planetsDup);
-			return new GameState(mapDup, playersDup, _queuePosition);
-		}
+	GameState dup() const  {
+		Player[] playersDup = duplicatePlayers();
+		Planet[] planetsDup = _map.duplicatePlanets(playersDup);//duplicatePlanets(playersDup);
+		//duplicate map
+		Map mapDup = new Map(_map.size, planetsDup);
+		return new GameState(mapDup, playersDup, _queuePosition);
 	}
 	
 	private Player[] duplicatePlayers() const {

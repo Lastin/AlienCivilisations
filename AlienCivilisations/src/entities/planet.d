@@ -16,6 +16,8 @@ enum double FOOD_CONSUMPTION_RATE = 1;
 enum double FOOD_PRODUCTION_RATE = 1.7;
 enum double CHILD_PER_PAID = 2.5;
 
+version = planetDebug;
+
 class Planet {
 	private {
 		immutable string _name;
@@ -279,8 +281,6 @@ class Planet {
 		if(force >= populationSum) {
 			force -= populationSum;
 			_population = [0,0,0,0,0,0,0,0];
-			debug writeln(_population);
-			return force;
 		} else {
 			while(force > 0 && force <= populationSum) {
 				int perG = to!int(force / 8);
@@ -302,7 +302,8 @@ class Planet {
 			}
 		}
 		if(populationSum == 0) {
-			_owner = null;
+			//_owner = null;
+			setOwner(null);
 		}
 		version(planetDebug) { 
 			writefln("New population: %s",_population);
