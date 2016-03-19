@@ -7,6 +7,7 @@ import src.handlers.gameManager;
 import src.entities.branch;
 import std.conv;
 import std.algorithm.mutation;
+import std.stdio;
 
 class Player {
 	private {
@@ -132,6 +133,7 @@ class Player {
 		if(attackingShip.empty) {
 			foreach(i, Ship ship; _ships){
 				if(ship == attackingShip){
+					writeln("ship empty removing");
 					_ships = _ships.remove(i);
 				}
 			}

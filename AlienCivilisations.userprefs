@@ -2,9 +2,10 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/src/logic/ai.d">
     <Files>
-      <File FileName="AlienCivilisations/src/logic/ai.d" Line="147" Column="43" NotebookId="1" />
-      <File FileName="AlienCivilisations/src/entities/player.d" Line="37" Column="21" NotebookId="1" />
-      <File FileName="AlienCivilisations/src/containers/gameState.d" Line="40" Column="19" NotebookId="1" />
+      <File FileName="AlienCivilisations/src/logic/ai.d" Line="175" Column="23" NotebookId="1" />
+      <File FileName="AlienCivilisations/src/entities/player.d" Line="129" Column="19" NotebookId="1" />
+      <File FileName="AlienCivilisations/src/containers/gameState.d" Line="74" Column="5" NotebookId="1" />
+      <File FileName="AlienCivilisations/src/entities/planet.d" Line="169" Column="3" NotebookId="1" />
     </Files>
     <FloatingWindows>
       <FloatingWindow WindowId="1" X="1920" Y="24" Width="1920" Height="1056">

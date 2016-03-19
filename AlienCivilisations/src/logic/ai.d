@@ -35,11 +35,24 @@ class AI : Player {
 		inhabit(gs);
 		addISOrders(gs);
 		convertUnits(gs);
-		doAttack(gs);
+		attack(gs);
 		develop(gs);
+		addMSOrders(gs);
+	}
+
+	static void addMSOrders(GameState gs) {
+		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
+		sort!"a.populationSum < b.populationSum"(enemy);
+		int i=0;
+		int limit = 2;
+		int added = 0;
+		do {
+			added = addMSOrdersToDestroy(gs, enemy[i]);
+		} while(i<enemy.length && i<limit && added == 0);
 	}
 	/** Adds number of military ship orders needed to destroy planet's population **/
-	static void addMSOrders(GameState gs, Planet planet) {
+	static int addMSOrdersToDestroy(GameState gs, Planet planet) {
+		int totalAdded = 0;
 		int utd = planet.populationSum;
 		double totalForce = 0;
 		double mEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
@@ -57,9 +70,12 @@ class AI : Player {
 				Planet fp = fastestProduction(gs);
 				int units = min(cap, fp.militaryUnits);
 				fp.addShipOrder(ShipType.Military, units);
+				++totalAdded;
 			}
 		}
+		return totalAdded;
 	}
+
 	static void addISOrders(GameState gs) {
 		int optimal = to!int(gs.map.freePlanets.length) + 1;
 		int complete = to!int(gs.currentPlayer.inhabitationShips.length);
@@ -79,6 +95,8 @@ class AI : Player {
 			int[] excluded;
 			for(int i=0; i<needed; i++) {
 				Planet bp = fastestProduction(gs);
+				if(!bp)
+					return;
 				if(!canFind(excluded, bp.uniqueId)) {
 					bp.addShipOrder(ShipType.Inhabitation);
 					if(bp.shipOrders.length >= limit) {
@@ -141,7 +159,7 @@ class AI : Player {
 		}
 	}
 
-	static void doAttack(GameState gs) {
+	static void attack(GameState gs) {
 		int msc = to!int(gs.currentPlayer.militaryShips.length);
 		if(msc == 0) {
 			//TODO: add reasoning for ms production
@@ -155,10 +173,10 @@ class AI : Player {
 		while(ms.length > 0 && i<rankedIds.length) {
 			Planet attacked = gs.map.planetWithId(rankedIds[i]);
 			foreach(ship; ms) {
-				debug writefln("Attacking planet with id: %s", attacked.uniqueId);
-				ship.attackPlanet(attacked, milEff, true);
+				gs.currentPlayer.attackPlanet(ship, attacked, true);
 				if(!attacked.owner) {
 					i++;
+					break;
 				}
 			}
 			//update arrays
@@ -181,7 +199,7 @@ class AI : Player {
 			//No planet attacked
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, -1);
-			long score = -negaMaxA(duplicate, 1, long.min, long.max);
+			long score = -negaMaxA(duplicate, 2, long.min, long.max);
 			scores ~= tuple(-1, score);
 			duplicate.destroy();
 		}
@@ -190,7 +208,7 @@ class AI : Player {
 		int[] ids;
 		ids.reserve(scores.length);
 		foreach(score; scores) {
-			writefln("Score: %s", score[1]);
+			//writefln("Score: %s", score[1]);
 			ids ~= score[0];
 		}
 		return ids;

@@ -104,13 +104,11 @@ class MilitaryShip : Ship {
 	}
 	/** Perform attack on a given planet **/
 	void attackPlanet(Planet planet, double milEff, bool affectShip){
-		debug writefln("Onboard before: %s", _onboard);
-		double force = force(milEff);//_onboard * milEff * lambda;
+		double force = force(milEff);
 		double rest = planet.destroyPopulation(force);
 		planet.setAttacked();
 		if(affectShip)
-			_onboard = to!int(rest / milEff);
-		debug writefln("Onboard after: %s", _onboard);
+			_onboard = to!int(rest / milEff / LAMBDA);
 	}
 	@property double force(double milEff) {
 		return _onboard * milEff * LAMBDA;

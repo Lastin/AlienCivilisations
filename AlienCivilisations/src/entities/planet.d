@@ -324,33 +324,21 @@ class Planet {
 		return workforce;
 	}
 	/** Adds order for ship to queue **/
-	Ship addShipOrder(ShipType type, int units = 0) {
+	void addShipOrder(ShipType type, int units = 0) {
 		double eneEff = _owner.knowledgeTree.branch(BranchName.Energy).effectiveness;
 		double sciEff = _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
 		if(type == ShipType.Military) {
-			version(planetDebug) {
-				writefln("Planet %s. Ordered military ship: %s units", _name, units);
-				if(units > _militaryUnits){
-					throw new Exception("Number of requested units is larget than available on a planet");
-				}
-			}
-			if(units > _militaryUnits)
-				units = _militaryUnits;
+			units = min(_militaryUnits, units);
+			if(units < 1)
+				return;
 			MilitaryShip ns = new MilitaryShip(eneEff, sciEff, 0);
-			if(ns.capacity < units){
-				ns.addUnits(ns.capacity);
-				_militaryUnits -= ns.capacity;
-			} else {
-				ns.addUnits(units);
-				_militaryUnits -= units;
-			}
+			int toLoad = min(ns.capacity, units);
+			ns.addUnits(toLoad);
+			_militaryUnits -= toLoad;
 			_shipOrders ~= ns;
-			return _shipOrders[$-1];
+			debug writeln(toLoad);
 		} else {
 			_shipOrders ~= new InhabitationShip(eneEff, sciEff, 0);
-			version(planetDebug) writefln("Planet %s. Ordered inhabitation ship", _name);
-			return _shipOrders[$-1];
-
 		}
 	}
 	/** Returns number of steps needed to complete the ship **/
