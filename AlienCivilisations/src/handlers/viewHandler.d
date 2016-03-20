@@ -30,6 +30,12 @@ class ViewHandler {
 		_menu = null;
 	}
 	void setMainMenu() {
+		if(_play) {
+			_play.removeAllChildren();
+			_play.animatedBackground.releaseRef();
+			_play.animatedBackground.destroy();
+			_play = null;
+		}
 		_menu = new Menu(this);
 		_window.mainWidget = _menu;
 	}

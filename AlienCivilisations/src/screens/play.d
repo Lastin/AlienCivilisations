@@ -40,6 +40,7 @@ class Play : AppFrame {
 		ListWidget _shipOrdersList;
 		WidgetListAdapter _solAdapter;
 		PopupWidget _currentPopup;
+		bool _end = false;
 	}
 
 	this(ViewHandler vh, GameManager gm = null){
@@ -108,6 +109,8 @@ class Play : AppFrame {
 		//Assign
 		mouseEvent = &handleMouseEvent;
 		keyEvent = delegate (Widget source, KeyEvent event) {
+			if(_end)
+				return false;
 			if(event.action == KeyAction.KeyDown &&
 				event.keyCode == KeyCode.ESCAPE) {
 				switchPopup(null);
@@ -117,6 +120,8 @@ class Play : AppFrame {
 			return false;
 		};
 		endTurnButton.click = delegate (Widget source) {
+			if(_end)
+				return false;
 			switchPopup(null);
 			_gm.endTurn();
 			updatePlanetInfo(_selectedPlanet);
@@ -171,12 +176,16 @@ class Play : AppFrame {
 			return true;
 		};
 		knowledgeTreeButton.click = delegate (Widget source){
+			if(_end)
+				return false;
 			switchPopup(knowledgeTreePopup());
 			return true;
 		};
 	}
 	/** Handles mouse movements and clicks **/
 	bool handleMouseEvent(Widget source, MouseEvent event) {
+		if(_end)
+			return false;
 		if(event.action == MouseAction.ButtonDown) {
 			if(event.button == MouseButton.Left) {
 				auto relativeMousePosition = Point2D(
@@ -427,6 +436,7 @@ class Play : AppFrame {
 			}
 			switchPopup(null);
 			updatePlanetInfo(_selectedPlanet);
+			checkIfEnd();
 			return true;
 		};
 		HorizontalLayout btnContainer = new HorizontalLayout();
@@ -434,6 +444,47 @@ class Play : AppFrame {
 		btnContainer.addChild(confirmBtn);
 		popupWindow.addChild(btnContainer);
 		return popupWindow;
+	}
+	private void checkIfEnd() {
+		PlayerEnum dead = _gameState.deadPlayer();
+		if(dead == PlayerEnum.None)
+			return;
+		_end = true;
+		_selectedPlanet = null;
+		updatePlanetInfo(_selectedPlanet);
+		uint colour = 0x666633; //draw bg
+		VerticalLayout vl = new VerticalLayout();
+		HorizontalLayout titleBar = new HorizontalLayout();
+		titleBar.layoutWidth(FILL_PARENT);
+		string text = "DRAW";
+		if(dead == PlayerEnum.Human) {
+			colour = 0x990000;
+			text = "DEFEAT";
+		}
+		else if(dead == PlayerEnum.AI) {
+			colour = 0x3399ff;
+			text = "VICTORY";
+		}
+		else {
+			text = "VICTORY";
+		}
+		titleBar.addChild(new HSpacer());
+		TextWidget t1 = new TextWidget(null, to!dstring(text));
+		t1.fontSize(25);
+		titleBar.addChild(t1);
+		titleBar.addChild(new HSpacer());
+		vl.addChild(titleBar);
+		vl.backgroundColor(colour);
+		Button rtrn = new Button(null, "Return"d);
+		rtrn.click = delegate(Widget action){
+			_vh.setMainMenu();
+			return true;
+		};
+		//vl.addChild(showStats());
+		vl.addChild(rtrn);
+	}
+	private void showStats() {
+		//TODO: add showing game statistics
 	}
 	/** Returns widget for putting an order of ship on the planet **/
 	private Widget orderMilitaryShipPopup(){

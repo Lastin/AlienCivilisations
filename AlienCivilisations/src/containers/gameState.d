@@ -19,6 +19,7 @@ class GameState {
 		Map _map;
 		Player[] _players;
 		size_t _queuePosition;
+		int _turnCount = 0;
 	}
 	
 	this(Map map, Player[] players, size_t queuePosition) {
