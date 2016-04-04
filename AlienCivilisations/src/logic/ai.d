@@ -33,8 +33,8 @@ class AI : Player {
 			writefln("Military units: %s", totalMilitaryUnits(gs.map.planets));
 		}
 		inhabit(gs);
+		convertOverpopulation(gs);
 		addISOrders(gs);
-		convertUnits(gs);
 		attack(gs);
 		develop(gs);
 		addMSOrders(gs);
@@ -146,7 +146,7 @@ class AI : Player {
 		return best;
 	}
 	/** Converts civil units to military **/
-	static void convertUnits(GameState gs) {
+	static void convertOverpopulation(GameState gs) {
 		Planet[] allPlanets = gs.map.planets;
 		Planet[] owned = gs.currentPlayer.planets(allPlanets);
 		foreach(planet; owned) {
@@ -160,18 +160,17 @@ class AI : Player {
 			}
 		}
 	}
-
+	/** Finds best planet to be attacked and attacks **/
 	static void attack(GameState gs) {
-		int msc = to!int(gs.currentPlayer.militaryShips.length);
-		if(msc == 0) {
-			//TODO: add reasoning for ms production
+		MilitaryShip[] ms = gs.currentPlayer.militaryShips;
+		if(ms.length == 0) {
 			return;
 		}
+		double milEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
+		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
+		//Rank planets
 		int[] rankedIds = planetAttackRank(gs);
 		int i=0;
-		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
-		MilitaryShip[] ms = gs.currentPlayer.militaryShips;
-		double milEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
 		while(ms.length > 0 && i<rankedIds.length) {
 			Planet attacked = gs.map.planetWithId(rankedIds[i]);
 			if(!attacked)
@@ -183,10 +182,21 @@ class AI : Player {
 					break;
 				}
 			}
-			//update arrays
+			//update array
 			ms = gs.currentPlayer.militaryShips;
 		}
+		//Production of military ship reasoning
+		//TODO: finish reasoning for ms production
+		int ttd = 0;
+		for(int j=0; j<rankedIds.length; j++) {
+			Planet p = gs.map.planetWithId(rankedIds[j]);
+			if(!p.owner)
+				continue;
+			ttd += p.populationSum;
+		}
+
 	}
+	/** Returns ranking of planets to be attacked. Best first **/
 	static int[] planetAttackRank(GameState gs) {
 		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
 		Tuple!(int, long)[] scores;

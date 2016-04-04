@@ -187,6 +187,7 @@ class Planet {
 			writefln("New population: %s", _population);
 			writeln("-----------------------------------------");
 		}
+		_food = 0;
 	}
 	/** 
 	 * Food supply at best increases at arythmetic rate
@@ -285,7 +286,7 @@ class Planet {
 			while(force > 0 && force <= populationSum) {
 				int perG = to!int(force / 8);
 				if(perG == 0){
-					debug writeln(_population);
+					version(planetDebug) writeln(_population);
 					return force;
 				}
 				foreach(i, int ageGroup; _population) {
