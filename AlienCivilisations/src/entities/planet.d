@@ -366,6 +366,17 @@ class Planet {
 		}
 		_shipOrders = null;
 	}
+	/** Returns length of ship queue in steps, using current production rate **/
+	int queueInSteps(){
+		double neededDev = 0;
+		foreach(ship; _shipOrders) {
+			double needed = ship.buildCost - ship.completion;
+			neededDev += needed;
+		}
+		double prodRate = calculateWorkforce() / 2;
+		prodRate = max(prodRate, 1);
+		return to!int(neededDev / prodRate);
+	}
 	/** Sets object fields to given parameters **/
 	void restore(uint[8] pop, double food, uint mu, Ship[] so) {
 		_population = pop;

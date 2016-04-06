@@ -33,11 +33,25 @@ class AI : Player {
 			writefln("Military units: %s", totalMilitaryUnits(gs.map.planets));
 		}
 		inhabit(gs);
-		convertOverpopulation(gs);
-		addISOrders(gs);
 		attack(gs);
+		convertOverpopulation(gs);
+		decideProduction(gs);
 		develop(gs);
-		addMSOrders(gs);
+	}
+
+
+	static void decideProduction(GameState gs) {
+		Planet[] owned = gs.currentPlayer.planets(gs.map.planets);
+		int[] availables;
+		foreach(planet; owned) {
+			if(planet.queueInSteps > 1)
+				continue;
+			availables ~= planet.uniqueId;
+
+		}
+
+		//addISOrders(gs);
+		//addMSOrders(gs);
 	}
 
 	static void addMSOrders(GameState gs) {
@@ -49,7 +63,7 @@ class AI : Player {
 		do {
 			added += addMSOrdersToDestroy(gs, enemy[i]);
 			i++;
-			enemy = gs.notCurrentPlayer.planets(gs.map.planets);
+			//enemy = gs.notCurrentPlayer.planets(gs.map.planets);
 		} while(i<enemy.length && i<limit && added == 0);
 	}
 	/** Adds number of military ship orders needed to destroy planet's population **/
@@ -187,13 +201,13 @@ class AI : Player {
 		}
 		//Production of military ship reasoning
 		//TODO: finish reasoning for ms production
-		int ttd = 0;
+		/*int utd = 0;
 		for(int j=0; j<rankedIds.length; j++) {
 			Planet p = gs.map.planetWithId(rankedIds[j]);
 			if(!p.owner)
 				continue;
-			ttd += p.populationSum;
-		}
+			utd += p.populationSum;
+		}*/
 
 	}
 	/** Returns ranking of planets to be attacked. Best first **/
