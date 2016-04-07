@@ -7,6 +7,7 @@ import std.random;
 import std.stdio;
 import src.containers.point2d;
 import src.entities.ship;
+import std.format;
 
 class Map {
 	private immutable float _size;
@@ -122,7 +123,7 @@ class Map {
 			if(planet.uniqueId == uniqueId)
 				return planet;
 		}
-		debug writefln("Could not find planet with uid: %s", uniqueId);
+		writeln("Could not find planet with uid: %s", uniqueId);
 		return null;
 	}
 }
