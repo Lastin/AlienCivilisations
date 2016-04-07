@@ -74,6 +74,11 @@ class GameState {
 		_queuePosition = ++_queuePosition % _players.length;
 		//debug writefln("Queue position: %s", _queuePosition);
 	}
+	/** Completes turn on a player and moves queue position **/
+	void shift() {
+		currentPlayer.completeTurn(_map.planets);
+		moveQPosition();
+	}
 	/** Returns duplicate of the state **/
 	GameState dup() const  {
 		Player[] playersDup = duplicatePlayers();
@@ -82,7 +87,7 @@ class GameState {
 		Map mapDup = new Map(_map.size, planetsDup);
 		return new GameState(mapDup, playersDup, _queuePosition);
 	}
-	
+	/** Returns duplicates of all players, with respect to their types**/
 	private Player[] duplicatePlayers() const {
 		Player[] duplicates;
 		foreach(const Player origin; _players) {

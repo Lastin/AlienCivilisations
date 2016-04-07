@@ -16,7 +16,7 @@ enum double FOOD_CONSUMPTION_RATE = 1;
 enum double FOOD_PRODUCTION_RATE = 1.7;
 enum double CHILD_PER_PAID = 2.5;
 
-version = planetDebug;
+//version = planetDebug;
 
 class Planet {
 	private {

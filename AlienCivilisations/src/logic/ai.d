@@ -32,29 +32,74 @@ class AI : Player {
 			writefln("Military force: %s", totalMilitaryForce);
 			writefln("Military units: %s", totalMilitaryUnits(gs.map.planets));
 		}
-		inhabit(gs);
 		attack(gs);
+		inhabit(gs);
 		convertOverpopulation(gs);
 		decideProduction(gs);
 		develop(gs);
 	}
 
-
 	static void decideProduction(GameState gs) {
 		Planet[] owned = gs.currentPlayer.planets(gs.map.planets);
+		sort!"a.calculateWorkforce() > b.calculateWorkforce()"(owned);
 		int[] availables;
 		foreach(planet; owned) {
 			if(planet.queueInSteps > 1)
 				continue;
 			availables ~= planet.uniqueId;
-
 		}
-
+		double milEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
+		double sciEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Science).effectiveness;
+		int capacity = Ship.capacity(milEff, sciEff);
+		foreach(a; availables) {
+			GameState[3] hypGS;
+			hypGS[0] = gs.dup();//inhabitation
+			hypGS[1] = gs.dup();//military
+			hypGS[2] = gs.dup();//neither
+			hypGS[0].map.planetWithId(a).addShipOrder(ShipType.Inhabitation);
+			Planet p = hypGS[1].map.planetWithId(a);
+			if(p.militaryUnits < capacity) {
+				int neededPercent = p.numberToPercent(capacity - p.militaryUnits);
+				p.convertUnits(neededPercent);
+			}
+			p.addShipOrder(ShipType.Military, capacity);
+			//Measure differences
+			size_t best = -1;
+			long bestScore = long.min;
+			foreach(i, state; hypGS) {
+				long score = measure(state);
+				if(score > bestScore) {
+					best = i;
+					bestScore = score;
+				}
+			}
+			if(best == 0) {
+				gs.map.planetWithId(a).addShipOrder(ShipType.Inhabitation);
+				debug writeln("Really adding inhabitation ship");
+			} 
+			else if(best == 1) {
+				Planet planet = gs.map.planetWithId(a);
+				if(planet.militaryUnits < capacity) {
+					int neededPercent = planet.numberToPercent(capacity - planet.militaryUnits);
+					planet.convertUnits(neededPercent);
+				}
+				planet.addShipOrder(ShipType.Military, capacity);
+				debug writeln("Really adding military ship");
+			}
+		}
 		//addISOrders(gs);
 		//addMSOrders(gs);
 	}
 
-	static void addMSOrders(GameState gs) {
+	static long measure(GameState gs) {
+		gs.shift();//enemy turn (dont make any moves)
+		gs.shift();//back to AI
+		AI.attack(gs);
+		AI.inhabit(gs);
+		return evaluate(gs);
+	}
+	/** Adds military ships orders to destroy smallest planets **/
+	/*static void addMSOrders(GameState gs) {
 		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
 		sort!"a.populationSum < b.populationSum"(enemy);
 		int i=0;
@@ -65,9 +110,9 @@ class AI : Player {
 			i++;
 			//enemy = gs.notCurrentPlayer.planets(gs.map.planets);
 		} while(i<enemy.length && i<limit && added == 0);
-	}
+	}*/
 	/** Adds number of military ship orders needed to destroy planet's population **/
-	static int addMSOrdersToDestroy(GameState gs, Planet planet) {
+	/*static int addMSOrdersToDestroy(GameState gs, Planet planet) {
 		int totalAdded = 0;
 		int utd = planet.populationSum;
 		double totalForce = 0;
@@ -90,8 +135,8 @@ class AI : Player {
 			}
 		}
 		return totalAdded;
-	}
-
+	}*/
+	/** Adds number of inhabitation ships not exceeding available planets **/
 	static void addISOrders(GameState gs) {
 		int optimal = to!int(gs.map.freePlanets.length) + 1;
 		int complete = to!int(gs.currentPlayer.inhabitationShips.length);

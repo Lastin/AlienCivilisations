@@ -92,7 +92,7 @@ abstract class Ship {
 }
 
 class MilitaryShip : Ship {
-	static double LAMBDA = 10.0;
+	static double LAMBDA = 100.0;
 	this(double eneEff, double sciEff, double completion) {
 		super(eneEff, sciEff, completion);
 	}
