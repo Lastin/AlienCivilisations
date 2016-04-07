@@ -61,6 +61,10 @@ class GameState {
 	@property PlayerEnum deadPlayer() {
 		bool humanDead = human.dead(_map.planets);
 		bool aiDead = ai.dead(_map.planets);
+		debug {
+			writefln("Human dead: %d", humanDead);
+			writefln("AI dead: %d", aiDead);
+		}
 		if(!aiDead && !humanDead)
 			return PlayerEnum.None;
 		if(humanDead && !aiDead)

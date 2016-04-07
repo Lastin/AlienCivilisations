@@ -126,6 +126,7 @@ class Play : AppFrame {
 			_gm.endTurn();
 			updatePlanetInfo(_selectedPlanet);
 			updatePlayerStats();
+			checkIfEnd();
 			return true;
 		};
 		inhabitButton.click = delegate (Widget source) {
@@ -454,6 +455,7 @@ class Play : AppFrame {
 		updatePlanetInfo(_selectedPlanet);
 		uint colour = 0x666633; //draw bg
 		VerticalLayout vl = new VerticalLayout();
+		vl.padding(Rect(50, 20, 50, 20));
 		HorizontalLayout titleBar = new HorizontalLayout();
 		titleBar.layoutWidth(FILL_PARENT);
 		string text = "DRAW";
@@ -477,11 +479,15 @@ class Play : AppFrame {
 		vl.backgroundColor(colour);
 		Button rtrn = new Button(null, "Return"d);
 		rtrn.click = delegate(Widget action){
+			switchPopup(null);
 			_vh.setMainMenu();
 			return true;
 		};
 		//vl.addChild(showStats());
+		vl.addChild(new VSpacer());
 		vl.addChild(rtrn);
+		vl.addChild(new VSpacer());
+		switchPopup(vl);
 	}
 	private void showStats() {
 		//TODO: add showing game statistics
