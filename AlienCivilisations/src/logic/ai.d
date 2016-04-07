@@ -117,6 +117,8 @@ class AI : Player {
 	static long measure(GameState gs) {
 		gs.shift();//enemy turn (dont make any moves)
 		gs.shift();//back to AI
+		gs.shift();//enemy turn (dont make any moves)
+		gs.shift();//back to AI
 		AI.attack(gs);
 		AI.inhabit(gs);
 		return evaluate(gs);
@@ -268,16 +270,6 @@ class AI : Player {
 			//update array
 			ms = gs.currentPlayer.militaryShips;
 		}
-		//Production of military ship reasoning
-		//TODO: finish reasoning for ms production
-		/*int utd = 0;
-		for(int j=0; j<rankedIds.length; j++) {
-			Planet p = gs.map.planetWithId(rankedIds[j]);
-			if(!p.owner)
-				continue;
-			utd += p.populationSum;
-		}*/
-
 	}
 	/** Returns ranking of planets to be attacked. Best first **/
 	static int[] planetAttackRank(GameState gs) {
@@ -371,9 +363,9 @@ class AI : Player {
 		Planet[] allP = gs.map.planets;
 		long mePoints = evaluatePlayer(gs, gs.currentPlayer);
 		long enemyPoints = evaluatePlayer(gs, gs.notCurrentPlayer);
-		return enemyPoints - mePoints;
+		return mePoints - enemyPoints;
 	}
-
+	/** Returns score for player **/
 	static long evaluatePlayer(GameState gs, Player player) {
 		/* Evaluated elements:
 		 * population > weighted
@@ -383,13 +375,13 @@ class AI : Player {
 		 */
 		long total = 0;
 		total += weightPop(player.population(gs.map.planets));
-		double milEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
+		/*double milEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
 		foreach(ship; gs.currentPlayer.militaryShips) {
 			total += to!long(ship.force(milEff));
 		}
 		foreach(ship; gs.currentPlayer.inhabitationShips) {
 			total += to!long(ship.onboard);
-		}
+		}*/
 		total += to!long(gs.currentPlayer.knowledgeTree.totalEff);
 		return total;
 	}
