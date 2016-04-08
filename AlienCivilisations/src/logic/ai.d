@@ -378,7 +378,63 @@ class AI : Player {
 		int result = (p[0..2].sum * g1 + p[2..7].sum * g2 + p[7..$].sum * g3) / g1+g2+g3;
 		return result;
 	}
+	/** Finds and develops best branch **/
 	static void develop(GameState gs) {
-
+		if(stepsToDevelop(gs) > 1)
+			return;
+		Branch[] undev = gs.currentPlayer.knowledgeTree.undevelopedBranches;
+		BranchName bestBranch;
+		long bestScore = -long.max;
+		foreach(branch; undev) {
+			GameState dup = gs.dup;
+			dup.currentPlayer.knowledgeTree.addOrder(branch.name);
+			long score = -negaMaxK(dup, 3, -long.max, long.max);
+			if(bestScore <= score) {
+				bestScore = score;
+				bestBranch = branch.name;
+			}
+		}
+		writefln("AI develops %s", bestBranch);
+		gs.currentPlayer.knowledgeTree.addOrder(bestBranch);
+	}
+	/** Returns score for best knowledge to develop, from given state **/
+	static long negaMaxK(GameState gs, int depth, long alpha, long beta) {
+		if(depth == 0)
+			return evaluateK(gs);
+		long bestScore = -long.max;
+		foreach(branch; gs.currentPlayer.knowledgeTree.undevelopedBranches) {
+			GameState dup = gs.dup;
+			long score = negaMaxK(dup, depth -1, -beta, -alpha);
+			bestScore = max(score, bestScore);
+			alpha = max(alpha, score);
+			if(alpha >= beta)
+				break;
+		}
+		return bestScore;
+	}
+	/** Evaluates current gamestate considering only one player, but all attributes **/
+	static long evaluateK(GameState gs) {
+		Player me = gs.currentPlayer;
+		double milEff = me.knowledgeTree.branch(BranchName.Military).effectiveness;
+		long score = evaluatePlayer(gs, me);
+		foreach(ship; me.inhabitationShips) {
+			score += to!long(ship.onboard);
+		}
+		foreach(ship; me.militaryShips) {
+			score += to!long(ship.force(milEff));
+		}
+		return score;
+	}
+	/** Returns number of steps in which queue would be emptied. Does not modify taken argument, tests on duplicate **/
+	static int stepsToDevelop(const GameState gs) {
+		GameState duplicate = gs.dup;
+		KnowledgeTree kt = duplicate.currentPlayer.knowledgeTree;
+		int steps = 0;
+		while(kt.orders.length > 0) {
+			duplicate.currentPlayer.completeTurn(duplicate.map.planets);
+			steps++;
+		}
+		writefln("Queue empty in %s", steps);
+		return steps;
 	}
 }

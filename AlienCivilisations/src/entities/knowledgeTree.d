@@ -162,7 +162,11 @@ public class KnowledgeTree {
 			_military.points,
 			_science.points
 		];
-		return new KnowledgeTree(points);
+		KnowledgeTree newKt = new KnowledgeTree(points);
+		foreach(element; _orders) {
+			newKt.addOrder(element);
+		}
+		return newKt;
 	}
 	override size_t toHash() nothrow {
 		double sum = 0;
