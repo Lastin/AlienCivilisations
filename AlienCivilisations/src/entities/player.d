@@ -8,6 +8,7 @@ import src.entities.branch;
 import std.conv;
 import std.algorithm.mutation;
 import std.stdio;
+import src.entities.map;
 
 class Player {
 	private {
@@ -67,20 +68,27 @@ class Player {
 	@property uint populationSum(Planet[] planets) {
 		uint sum = 0;
 		foreach(planet; planets) {
-			if(planet.owner == this)
+			if(planet.ownerId == _uniqueId)
 				sum += planet.populationSum;
 		}
 		return sum;
 	}
 	/** Returns true if player has no units and inhabitation ships left **/
-	@property bool dead(Planet[] planets) {
-		return populationSum(planets) == 0 && inhabitationShips.length == 0;
+	@property bool dead(Map map) {
+		bool dead = populationSum(map.planets) == 0 && (inhabitationShips.length == 0 || map.freePlanets.length == 0);
+		/*if(dead) {
+			writefln("%s delcared dead", name);
+			writefln("Population sum %s", populationSum(map.planets));
+			writefln("IS: %s", inhabitationShips.length);
+			writefln("Free planets: %s", map.freePlanets.length);
+		}*/
+		return dead; 
 	}
 	/** Returns all ships of type military **/
 	@property MilitaryShip[] militaryShips() {
 		MilitaryShip[] milShips;
 		foreach(Ship ship; _ships){
-			if(auto casted = cast(MilitaryShip)ship){
+			if(MilitaryShip casted = cast(MilitaryShip)ship){
 				milShips ~= casted;
 			}
 		}

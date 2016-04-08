@@ -59,12 +59,8 @@ class GameState {
 		return _queuePosition;
 	}
 	@property PlayerEnum deadPlayer() {
-		bool humanDead = human.dead(_map.planets);
-		bool aiDead = ai.dead(_map.planets);
-		debug {
-			writefln("Human dead: %d", humanDead);
-			writefln("AI dead: %d", aiDead);
-		}
+		bool humanDead = human.dead(_map);
+		bool aiDead = ai.dead(_map);
 		if(!aiDead && !humanDead)
 			return PlayerEnum.None;
 		if(humanDead && !aiDead)

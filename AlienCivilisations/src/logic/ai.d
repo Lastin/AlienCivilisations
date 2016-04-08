@@ -67,7 +67,7 @@ class AI : Player {
 			}
 			//Measure differences
 			size_t best = -1;
-			long bestScore = long.min;
+			long bestScore = -long.max;
 			foreach(i, state; hypGS) {
 				long score = measure(state);
 				if(score > bestScore) {
@@ -77,11 +77,11 @@ class AI : Player {
 			}
 			if(best == 1) {
 				addMilitaryOrder(gs, a, capacity);
-				debug writeln("Really adding military ship");
+				version(playerDebug) writeln("AI adds MS order");
 			}
 			else if(best == 2) {
 				gs.map.planetWithId(a).addShipOrder(ShipType.Inhabitation);
-				debug writeln("Really adding inhabitation ship");
+				debug writeln("AI adds IS order");
 			}
 		}
 	}
@@ -280,26 +280,17 @@ class AI : Player {
 		foreach(planet; enemy) {
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, planet.uniqueId);
-			long score = negaMaxA(duplicate, 2, long.min, long.max);
+			long score = -negaMaxA(duplicate, 2, -long.max, long.max);
 			synchronized {
 				scores ~= tuple(planet.uniqueId, score);
 			}
 			duplicate.destroy();
 		}
-		/*{
-			//No planet attacked
-			GameState duplicate = gs.dup();
-			attackAndShift(duplicate, -1);
-			long score = negaMaxA(duplicate, 2, long.min, long.max);
-			scores ~= tuple(-1, score);
-			duplicate.destroy();
-		}*/
 		sort!"a[1] > b[1]"(scores);
 		//Convert tuple to single array
 		int[] ids;
 		ids.reserve(scores.length);
 		foreach(score; scores) {
-			version (playerDebug) writefln("Score: %s", score[1]);
 			ids ~= score[0];
 		}
 		return ids;
@@ -319,7 +310,7 @@ class AI : Player {
 	}
 	static long negaMaxA(GameState gs, int depth, long alpha, long beta) {
 		//TERMINAL
-		if(depth <= 0 || gs.currentPlayer.militaryShips.length == 0)
+		if(depth <= 0) // || gs.currentPlayer.militaryShips.length == 0
 			return evaluate(gs);
 		PlayerEnum dead = gs.deadPlayer;
 		if(dead == PlayerEnum.Both) {
@@ -328,19 +319,20 @@ class AI : Player {
 		}
 		else if(dead == gs.currentPlayerEnum) {
 			//Current dead
-			return long.min;
+			//using -max instead of min because of overflow
+			return -long.max;
 		}
 		else if(dead != PlayerEnum.None){
 			//Enemy dead
 			return long.max;
 		}
 		//NON-TERMINAL
-		long bestScore = long.min;
+		long bestScore = -long.max;
 		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
-		foreach(planet; parallel(enemy)) {
+		foreach(planet; enemy) {
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, planet.uniqueId);
-			long score = -negaMaxA(duplicate, depth -1, long.min, long.max);
+			long score = -negaMaxA(duplicate, depth -1, -beta, -alpha);
 			duplicate.destroy();
 			synchronized {
 				bestScore = max(score, bestScore);
@@ -349,13 +341,6 @@ class AI : Player {
 					break;
 			}
 		}
-		/*{
-			GameState duplicate = gs.dup();
-			attackAndShift(duplicate, -1);
-			long score = -negaMaxA(duplicate, depth -1, long.min, long.max);
-			duplicate.destroy();
-			bestScore = max(score, bestScore);
-		}*/
 		return bestScore;
 	}
 	/** Returns score for game state. The larger, the better for current player**/
