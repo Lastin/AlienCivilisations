@@ -891,7 +891,6 @@ class Play : AppFrame {
 					Button {
 						id: knowledgeTreeButton
 						text: "KNOWLEDGE TREE"
-						backgroundColor: 0x80969696
 						padding: 20
 						margins: 10
 					}

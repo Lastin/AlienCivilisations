@@ -19,17 +19,19 @@ import std.algorithm.iteration;
 import std.format;
 import std.algorithm;
 
-version = playerDebug;
+//version = aiDebug;
 
 class AI : Player {
+	private bool aiDisabled = false;
 	this(int uniqueId, KnowledgeTree knowledgeTree, Ship[] ships = null) {
 		super(uniqueId, "AI", knowledgeTree, ships);
 	}
 	void makeMove(GameState gs) {
+		if(aiDisabled) return;
 		//sense
 		//plan
 		//run
-		version(playerDebug) {
+		version(aiDebug) {
 			writefln("MS: %s", militaryShips.length);
 			writefln("IS: %s", inhabitationShips.length);
 			writefln("Military force: %s", totalMilitaryForce);
@@ -77,7 +79,7 @@ class AI : Player {
 			}
 			if(best == 1) {
 				addMilitaryOrder(gs, a, capacity);
-				version(playerDebug) writeln("AI adds MS order");
+				version(aiDebug) writeln("AI adds MS order");
 			}
 			else if(best == 2) {
 				gs.map.planetWithId(a).addShipOrder(ShipType.Inhabitation);
@@ -254,7 +256,7 @@ class AI : Player {
 		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
 		//Rank planets
 		int[] rankedIds = planetAttackRank(gs);
-		version (playerDebug) writeln(rankedIds);
+		version (aiDebug) writeln(rankedIds);
 		int i=0;
 		while(ms.length > 0 && i<rankedIds.length) {
 			Planet attacked = gs.map.planetWithId(rankedIds[i]);
