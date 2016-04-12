@@ -16,8 +16,7 @@ extern (C) int UIAppMain(string[] args) {
 	Window window = Platform.instance.createWindow("Alien Civilisations", 
 													null,
 													WindowFlag.Resizable,
-													width,
-													height);
+													width, height);
 	ViewHandler vh = new ViewHandler(window);
 	vh.setMainMenu();
 	//auto closeActions = window.onClose;

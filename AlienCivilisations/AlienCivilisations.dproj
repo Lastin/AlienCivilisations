@@ -49,6 +49,11 @@
         <String>EmbedStandardResources</String>
       </VersionIds>
     </VersionIds>
+    <DebugIds>
+      <DebugIds>
+        <String>demangle</String>
+      </DebugIds>
+    </DebugIds>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release</OutputPath>
