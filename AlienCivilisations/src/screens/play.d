@@ -38,7 +38,9 @@ class Play : AppFrame {
 		Widget _playerStatsContainer;
 		Widget _playersPlanetOptions;
 		ListWidget _shipOrdersList;
+		ListWidget _aiActionsList;
 		WidgetListAdapter _solAdapter;
+		WidgetListAdapter _ailAdapter;
 		PopupWidget _currentPopup;
 		bool _end = false;
 	}
@@ -67,12 +69,18 @@ class Play : AppFrame {
 		_gameState = _gm.state;
 		_mainContainer = childById("verticalContainer").childById("horizontalContainer");
 		_playerStatsContainer = _mainContainer.childById("vr1").childById("hr1");
-		_planetInfoContainer = _mainContainer.childById("rvp").childById("hr2").childById("vr2");
+		//planet informations
+		_planetInfoContainer = _mainContainer.childById("rvp").childById("hr2").childById("vr2").childById("planetInfoContainer");
 		_planetInfoContainer.visibility(Visibility.Invisible);
 		_playersPlanetOptions = _planetInfoContainer.childById("ppo");
 		_shipOrdersList = cast(ListWidget)_playersPlanetOptions.childById("shipOrdersList");
 		_solAdapter = new WidgetListAdapter();
 		_shipOrdersList.ownAdapter = _solAdapter;
+		//AI actions list
+		_aiActionsList = cast(ListWidget)_mainContainer.childById("rvp").childById("hr2").childById("vr2").childById("aiActionsList");
+		_ailAdapter = new WidgetListAdapter();
+		_aiActionsList.ownAdapter = _ailAdapter;
+		addAIActions();
 		//set camera positions
 		if(initCam) {
 			float tempX = 0;
@@ -774,115 +782,128 @@ class Play : AppFrame {
 					VerticalLayout {
 						id: rvp
 						layoutHeight: fill
-						VSpacer {}
 						HorizontalLayout {
 							id: hr2
+							layoutHeight: fill
 							VerticalLayout {
 								id: vr2
-								backgroundColor: 0x80969696
-								TextWidget {
-									padding: 10
-									id: planetName
-									text : ""
-									fontWeight: 800
-									fontSize: 20
-									textColor: white
-								}
-								TableLayout {
-									id: planetInfoTable
-									padding: 10
-									colCount: 2
-									TextWidget {
-										fontWeight: 800
-										textColor: white
-										text: "Capacity:"
-									}
-									TextWidget {
-										id: planetCapacity
-										textColor: white
-										text : "0"
-									}
-									TextWidget {
-										fontWeight: 800
-										textColor: white
-										text: "Population:"
-									}
-									TextWidget {
-										id: planetPopulation
-										textColor: white
-										text : "0"
-									}
-									TextWidget {
-										fontWeight: 800
-										textColor: white
-										text: "Military units:"
-										
-									}
-									TextWidget {
-										id: militaryUnits
-										textColor: white
-										text : "0"
-									}
-									TextWidget {
-										fontWeight: 800
-										textColor: white
-										text: "Productivity:"
-												
-									}
-									TextWidget {
-										id: productivity
-										textColor: white
-										text : "0"
-									}
-								}
-								Button {
-									id: inhabitButton
-									text: "Inhabit"
-									padding: 10
-									margins: 10
-								}
-
-								Button {
-									id: attackButton
-									text: "Attack"
-									padding: 10
-									margins: 10
-								}
+								layoutHeight: fill
+								VSpacer {}
 								VerticalLayout {
-									id: ppo
-									Button {
-										id: convertUnitsButton
-										text: "Convert units"
-										padding: 10
-										margins: 10
-									}
-									Button {
-										id: orderMilitaryShip
-										text: "Order military ship"
-										padding: 10
-										margins: 10
-									}
-									Button {
-										id: orderInhabitShip
-										text: "Order inhabitation ship"
-										padding: 10
-										margins: 10
-									}
+									id: planetInfoContainer
+									backgroundColor: 0x80969696
 									TextWidget {
-										id: olt
+										padding: 10
+										id: planetName
+										text : ""
 										fontWeight: 800
+										fontSize: 20
 										textColor: white
-										text: "Ship orders"
 									}
-									ListWidget {
-										id: shipOrdersList
-										maxHeight: 200
-										padding: 5
+									TableLayout {
+										id: planetInfoTable
+										padding: 10
+										colCount: 2
+										TextWidget {
+											fontWeight: 800
+											textColor: white
+											text: "Capacity:"
+										}
+										TextWidget {
+											id: planetCapacity
+											textColor: white
+											text : "0"
+										}
+										TextWidget {
+											fontWeight: 800
+											textColor: white
+											text: "Population:"
+										}
+										TextWidget {
+											id: planetPopulation
+											textColor: white
+											text : "0"
+										}
+										TextWidget {
+											fontWeight: 800
+											textColor: white
+											text: "Military units:"
+											
+										}
+										TextWidget {
+											id: militaryUnits
+											textColor: white
+											text : "0"
+										}
+										TextWidget {
+											fontWeight: 800
+											textColor: white
+											text: "Productivity:"
+													
+										}
+										TextWidget {
+											id: productivity
+											textColor: white
+											text : "0"
+										}
 									}
+									Button {
+										id: inhabitButton
+										text: "Inhabit"
+										padding: 10
+										margins: 10
+									}
+
+									Button {
+										id: attackButton
+										text: "Attack"
+										padding: 10
+										margins: 10
+									}
+									VerticalLayout {
+										id: ppo
+										Button {
+											id: convertUnitsButton
+											text: "Convert units"
+											padding: 10
+											margins: 10
+										}
+										Button {
+											id: orderMilitaryShip
+											text: "Order military ship"
+											padding: 10
+											margins: 10
+										}
+										Button {
+											id: orderInhabitShip
+											text: "Order inhabitation ship"
+											padding: 10
+											margins: 10
+										}
+										TextWidget {
+											id: olt
+											fontWeight: 800
+											textColor: white
+											text: "Ship orders"
+										}
+										ListWidget {
+											id: shipOrdersList
+											maxHeight: 200
+											padding: 5
+										}
+									}
+								}
+								VSpacer {}
+								//
+								ListWidget {
+									backgroundColor: 0x80969696
+									id:aiActionsList
+									maxHeight: 200
+									minHeight: 200
+									padding: 5
 								}
 							}
 						}
-						VSpacer {}
 					}
 				}
 				VSpacer{}
@@ -907,6 +928,21 @@ class Play : AppFrame {
 			_currentPopup = null;
 		} else {
 			_currentPopup = window.showPopup(popup, this);
+		}
+	}
+	private void addAIActions(){
+		_ailAdapter.clear();
+		for(int i=0; i<20; i++) {
+			HorizontalLayout sohl = new HorizontalLayout();
+			sohl.padding(2);
+			sohl.margins(2);
+			sohl.layoutWidth(FILL_PARENT);
+			VerticalLayout sovl = new VerticalLayout();
+			sovl.addChild(new TextWidget(null, "Action X"d).textColor(0xFFFFFF));
+			sohl.addChild(sovl);
+			sohl.addChild(new HSpacer());
+			sohl.backgroundColor(0x737373);
+			_ailAdapter.add(sohl);
 		}
 	}
 	/** Updates information in right hand panel about selected planet **/
