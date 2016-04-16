@@ -8,6 +8,8 @@ import std.conv;
 import src.entities.knowledgeTree;
 import std.stdio;
 import src.containers.gameState;
+import src.screens.play;
+import std.format;
 
 class GameManager {
 	//Constant values
@@ -33,7 +35,7 @@ class GameManager {
 		return _gs;
 	}
 
-	void endTurn(){
+	void endTurn(Play play){
 		_gs.currentPlayer.completeTurn(_gs.map.planets);
 		_gs.moveQPosition();
 		debug {
@@ -41,8 +43,10 @@ class GameManager {
 			writefln("Moving player %s", _gs.currentPlayer.name);
 		}
 		if(AI ai = cast(AI)_gs.currentPlayer){
-			ai.makeMove(_gs);
+			ai.makeMove(_gs, play);
 			_gs.currentPlayer.completeTurn(_gs.map.planets);
+			play.addAIAction(format("AI owns %s miliary ships", _gs.currentPlayer.militaryShips.length));
+			play.addAIAction(format("AI owns %s inhabitation ships", _gs.currentPlayer.inhabitationShips.length));
 			_gs.moveQPosition();
 		}
 		debug {

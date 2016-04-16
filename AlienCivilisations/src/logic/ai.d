@@ -18,6 +18,7 @@ import std.typecons;
 import std.algorithm.iteration;
 import std.format;
 import std.algorithm;
+import src.screens.play;
 
 //version = aiDebug;
 
@@ -26,7 +27,7 @@ class AI : Player {
 	this(int uniqueId, KnowledgeTree knowledgeTree, Ship[] ships = null) {
 		super(uniqueId, "AI", knowledgeTree, ships);
 	}
-	void makeMove(GameState gs) {
+	void makeMove(GameState gs, Play play) {
 		if(aiDisabled) return;
 		//sense
 		//plan
@@ -37,8 +38,8 @@ class AI : Player {
 			writefln("Military force: %s", totalMilitaryForce);
 			writefln("Military units: %s", totalMilitaryUnits(gs.map.planets));
 		}
-		attack(gs);
-		inhabit(gs);
+		attack(gs, play);
+		inhabit(gs, play);
 		convertOverpopulation(gs);
 		decideProduction(gs);
 		develop(gs);
@@ -121,8 +122,8 @@ class AI : Player {
 		gs.shift();//back to AI
 		gs.shift();//enemy turn (dont make any moves)
 		gs.shift();//back to AI
-		AI.attack(gs);
-		AI.inhabit(gs);
+		AI.attack(gs, null);
+		AI.inhabit(gs, null);
 		return evaluate(gs);
 	}
 	/** Adds military ships orders to destroy smallest planets **/
@@ -203,7 +204,7 @@ class AI : Player {
 		}
 	}*/
 	/** Uses inhabitation ships on best planets **/
-	static void inhabit(GameState gs) {
+	static void inhabit(GameState gs, Play play) {
 		Planet[] free = gs.map.freePlanets();
 		InhabitationShip[] ships = gs.currentPlayer.inhabitationShips();
 		sort!"a.capacity() > b.capacity()"(ships);
@@ -212,6 +213,9 @@ class AI : Player {
 		foreach(ship; ships) {
 			if(i<free.length) {
 				gs.currentPlayer.inhabitPlanet(free[i]);
+				if(play) {
+					play.addAIAction(format("AI inhabited " ~ free[i].name));
+				}
 				i++;
 			}
 		}
@@ -247,7 +251,7 @@ class AI : Player {
 		}
 	}
 	/** Finds best planet to be attacked and attacks **/
-	static void attack(GameState gs) {
+	static void attack(GameState gs, Play play) {
 		MilitaryShip[] ms = gs.currentPlayer.militaryShips;
 		if(ms.length == 0) {
 			return;
@@ -268,6 +272,9 @@ class AI : Player {
 					i++;
 					break;
 				}
+			}
+			if(play) {
+				play.addAIAction("AI attacked " ~ attacked.name);
 			}
 			//update array
 			ms = gs.currentPlayer.militaryShips;

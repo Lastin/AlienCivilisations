@@ -65,6 +65,11 @@ class Play : AppFrame {
 		_endPosition = _cameraPosition.dup;
 	}
 
+	private void updateAIInfo() {
+		addAIAction(format("AI owns %s miliary ships", _gameState.ai.militaryShips.length));
+		addAIAction(format("AI owns %s inhabitation ships", _gameState.ai.inhabitationShips.length));
+	}
+
 	void initialiseObjects(bool initCam = true) {
 		_gameState = _gm.state;
 		_mainContainer = childById("verticalContainer").childById("horizontalContainer");
@@ -80,7 +85,7 @@ class Play : AppFrame {
 		_aiActionsList = cast(ListWidget)_mainContainer.childById("rvp").childById("hr2").childById("vr2").childById("aiActionsList");
 		_ailAdapter = new WidgetListAdapter();
 		_aiActionsList.ownAdapter = _ailAdapter;
-		addAIActions();
+		updateAIInfo();
 		//set camera positions
 		if(initCam) {
 			float tempX = 0;
@@ -102,7 +107,7 @@ class Play : AppFrame {
 		//check if AI starts and makes it's turn if true
 		if(cast(AI)_gm.state.currentPlayer) {
 			debug writeln("Starting player AI");
-			_gm.endTurn();
+			_gm.endTurn(this);
 		}
 	}
 	/** Assigns functions to buttons **/
@@ -130,10 +135,14 @@ class Play : AppFrame {
 		endTurnButton.click = delegate (Widget source) {
 			if(_end)
 				return false;
+			_ailAdapter.clear();
 			switchPopup(null);
-			_gm.endTurn();
+			_gm.endTurn(this);
 			updatePlanetInfo(_selectedPlanet);
 			updatePlayerStats();
+			if(_ailAdapter.itemCount < 1) {
+				addAIAction("No actions takes");
+			}
 			checkIfEnd();
 			return true;
 		};
@@ -930,20 +939,20 @@ class Play : AppFrame {
 			_currentPopup = window.showPopup(popup, this);
 		}
 	}
-	private void addAIActions(){
-		_ailAdapter.clear();
-		for(int i=0; i<20; i++) {
-			HorizontalLayout sohl = new HorizontalLayout();
-			sohl.padding(2);
-			sohl.margins(2);
-			sohl.layoutWidth(FILL_PARENT);
-			VerticalLayout sovl = new VerticalLayout();
-			sovl.addChild(new TextWidget(null, "Action X"d).textColor(0xFFFFFF));
-			sohl.addChild(sovl);
-			sohl.addChild(new HSpacer());
-			sohl.backgroundColor(0x737373);
-			_ailAdapter.add(sohl);
-		}
+	void addAIAction(string action){
+		HorizontalLayout sohl = new HorizontalLayout();
+		sohl.margins(2);
+		sohl.layoutWidth(FILL_PARENT);
+		VerticalLayout sovl = new VerticalLayout();
+		MultilineTextWidget mltw = new MultilineTextWidget(null, to!dstring(action));
+		mltw.textColor(0xFFFFFF);
+		mltw.padding(2);
+		//mltw.maxWidth(100);
+		sovl.addChild(mltw);
+		sohl.addChild(sovl);
+		sohl.addChild(new HSpacer());
+		sohl.backgroundColor(0x737373);
+		_ailAdapter.add(sohl);
 	}
 	/** Updates information in right hand panel about selected planet **/
 	void updatePlanetInfo(Planet planet) {
