@@ -82,7 +82,7 @@ class Play : AppFrame {
 		_solAdapter = new WidgetListAdapter();
 		_shipOrdersList.ownAdapter = _solAdapter;
 		//AI actions list
-		_aiActionsList = cast(ListWidget)_mainContainer.childById("rvp").childById("hr2").childById("vr2").childById("aiActionsList");
+		_aiActionsList = cast(ListWidget)childById("verticalContainer").childById("hr3").childById("aiActionsList");
 		_ailAdapter = new WidgetListAdapter();
 		_aiActionsList.ownAdapter = _ailAdapter;
 		updateAIInfo();
@@ -118,7 +118,7 @@ class Play : AppFrame {
 		Widget convertUnitsButton = _planetInfoContainer.childById("convertUnitsButton");
 		Widget orderMilShipBtn = _planetInfoContainer.childById("orderMilitaryShip");
 		Widget orderInhShipBtn = _planetInfoContainer.childById("orderInhabitShip");
-		Widget knowledgeTreeButton = childById("verticalContainer").childById("hr3").childById("knowledgeTreeButton");
+		Widget knowledgeTreeButton = childById("verticalContainer").childById("hr3").childById("vr3").childById("knowledgeTreeButton");
 		//Assign
 		mouseEvent = &handleMouseEvent;
 		keyEvent = delegate (Widget source, KeyEvent event) {
@@ -903,26 +903,32 @@ class Play : AppFrame {
 									}
 								}
 								VSpacer {}
-								//
-								ListWidget {
-									backgroundColor: 0x80969696
-									id:aiActionsList
-									maxHeight: 200
-									minHeight: 200
-									padding: 5
-								}
 							}
 						}
 					}
 				}
 				VSpacer{}
 				HorizontalLayout {
+					layoutWidth: fill
 					id: hr3
-					Button {
-						id: knowledgeTreeButton
-						text: "KNOWLEDGE TREE"
-						padding: 20
-						margins: 10
+					VerticalLayout {
+						id: vr3
+						layoutHeight: fill
+						VSpacer{}
+						Button {
+							id: knowledgeTreeButton
+							text: "KNOWLEDGE TREE"
+							padding: 20
+							margins: 10
+						}
+					}
+					HSpacer {}
+					ListWidget {
+						backgroundColor: 0x80969696
+						id:aiActionsList
+						maxHeight: 200
+						minHeight: 200
+						padding: 5
 					}
 				}
 			}
