@@ -40,7 +40,8 @@
 -Jviews/res
 -Jviews/res/i18n
 -Jviews/res/mdpi
--Jviews/res/hdpi</ExtraCompilerArguments>
+-Jviews/res/hdpi
+-Jres</ExtraCompilerArguments>
     <VersionIds>
       <VersionIds>
         <String>USE_OPENGL</String>

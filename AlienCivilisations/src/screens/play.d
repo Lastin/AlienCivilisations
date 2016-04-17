@@ -19,7 +19,7 @@ import src.containers.gameState;
 import std.datetime;
 
 class Play : AppFrame {
-	private {
+	protected {
 		ViewHandler _vh;
 		//Vectors used for camera
 		bool _rightDown = false;
@@ -936,9 +936,11 @@ class Play : AppFrame {
 		return parseML(layout);
 	}
 	/** Switches popup shown in window, to see only one **/
-	private void switchPopup(Widget popup){
+	protected void switchPopup(Widget popup){
 		window.removePopup(_currentPopup);
-		_currentPopup.destroy();
+		if(_currentPopup && !_currentPopup.animating) {
+			_currentPopup.destroy();
+		}
 		if(!popup){
 			_currentPopup = null;
 		} else {

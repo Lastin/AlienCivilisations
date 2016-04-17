@@ -1,0 +1,550 @@
+{
+    "cameraPosition": {
+        "x": 2024,
+        "y": 3321
+    },
+    "date": "10:19:00 Apr 16 2016",
+    "game": "AlienCivilisations",
+    "gameState": {
+        "map": {
+            "planets": [
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": true,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Human's planet",
+                    "ownerId": 0,
+                    "population": [
+                        64,
+                        35,
+                        3271,
+                        937,
+                        937,
+                        937,
+                        937,
+                        937
+                    ],
+                    "position": {
+                        "x": 3587.72,
+                        "y": 3418.9
+                    },
+                    "radius": 60,
+                    "shipOrders": [],
+                    "uniqueId": 0
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": true,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "AI's planet",
+                    "ownerId": 1,
+                    "population": [
+                        45,
+                        68,
+                        35,
+                        2859,
+                        741,
+                        937,
+                        937,
+                        937
+                    ],
+                    "position": {
+                        "x": 447.148,
+                        "y": 2377.05
+                    },
+                    "radius": 60,
+                    "shipOrders": [
+                        {
+                            "completion": 3205.5,
+                            "eneEff": 1,
+                            "index": 0,
+                            "onboard": 955,
+                            "sciEff": 1,
+                            "type": "Military"
+                        }
+                    ],
+                    "uniqueId": 1
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 2",
+                    "ownerId": 0,
+                    "population": [
+                        3911,
+                        1171,
+                        1171,
+                        1171,
+                        1171,
+                        1171,
+                        1171,
+                        1171
+                    ],
+                    "position": {
+                        "x": 1062.03,
+                        "y": 484.835
+                    },
+                    "radius": 75,
+                    "shipOrders": [],
+                    "uniqueId": 2
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 8496,
+                    "militaryUnits": 0,
+                    "name": "Planet 3",
+                    "ownerId": 0,
+                    "population": [
+                        1062,
+                        1062,
+                        1062,
+                        1062,
+                        1062,
+                        1062,
+                        1062,
+                        1062
+                    ],
+                    "position": {
+                        "x": 730.208,
+                        "y": 3959.13
+                    },
+                    "radius": 68,
+                    "shipOrders": [],
+                    "uniqueId": 3
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 4",
+                    "ownerId": -1,
+                    "population": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "position": {
+                        "x": 2621.16,
+                        "y": 893.502
+                    },
+                    "radius": 44,
+                    "shipOrders": [],
+                    "uniqueId": 4
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": true,
+                    "food": 8000,
+                    "militaryUnits": 0,
+                    "name": "Planet 5",
+                    "ownerId": 0,
+                    "population": [
+                        1000,
+                        1000,
+                        1000,
+                        1000,
+                        1000,
+                        1000,
+                        1000,
+                        1000
+                    ],
+                    "position": {
+                        "x": 2385.29,
+                        "y": 4215.04
+                    },
+                    "radius": 64,
+                    "shipOrders": [],
+                    "uniqueId": 5
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 6",
+                    "ownerId": 0,
+                    "population": [
+                        46,
+                        4083,
+                        1234,
+                        1234,
+                        1234,
+                        1234,
+                        1234,
+                        1234
+                    ],
+                    "position": {
+                        "x": 4091.11,
+                        "y": 2020.91
+                    },
+                    "radius": 79,
+                    "shipOrders": [],
+                    "uniqueId": 6
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 7",
+                    "ownerId": 0,
+                    "population": [
+                        3911,
+                        1171,
+                        1171,
+                        1171,
+                        1171,
+                        1171,
+                        1171,
+                        1171
+                    ],
+                    "position": {
+                        "x": 1325.5,
+                        "y": 2755.5
+                    },
+                    "radius": 75,
+                    "shipOrders": [],
+                    "uniqueId": 7
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 8",
+                    "ownerId": -1,
+                    "population": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "position": {
+                        "x": 4686.88,
+                        "y": 2928
+                    },
+                    "radius": 63,
+                    "shipOrders": [],
+                    "uniqueId": 8
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 9",
+                    "ownerId": 1,
+                    "population": [
+                        38,
+                        2481,
+                        1203,
+                        1203,
+                        710,
+                        710,
+                        1203,
+                        1203
+                    ],
+                    "position": {
+                        "x": 2302.94,
+                        "y": 2823.82
+                    },
+                    "radius": 77,
+                    "shipOrders": [
+                        {
+                            "completion": 985.5,
+                            "eneEff": 1,
+                            "index": 0,
+                            "onboard": 1000,
+                            "sciEff": 1,
+                            "type": "Inhabitation"
+                        }
+                    ],
+                    "uniqueId": 9
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 7872,
+                    "militaryUnits": 0,
+                    "name": "Planet 10",
+                    "ownerId": 0,
+                    "population": [
+                        984,
+                        984,
+                        984,
+                        984,
+                        984,
+                        984,
+                        984,
+                        984
+                    ],
+                    "position": {
+                        "x": 3456.99,
+                        "y": 469.462
+                    },
+                    "radius": 63,
+                    "shipOrders": [],
+                    "uniqueId": 10
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": true,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 11",
+                    "ownerId": -1,
+                    "population": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "position": {
+                        "x": 4628.54,
+                        "y": 1093.79
+                    },
+                    "radius": 52,
+                    "shipOrders": [],
+                    "uniqueId": 11
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 12",
+                    "ownerId": -1,
+                    "population": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "position": {
+                        "x": 2953.1,
+                        "y": 1719.65
+                    },
+                    "radius": 55,
+                    "shipOrders": [],
+                    "uniqueId": 12
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 13",
+                    "ownerId": 1,
+                    "population": [
+                        2270,
+                        1125,
+                        1125,
+                        630,
+                        630,
+                        1125,
+                        1125,
+                        1125
+                    ],
+                    "position": {
+                        "x": 3064.61,
+                        "y": 4834.07
+                    },
+                    "radius": 72,
+                    "shipOrders": [
+                        {
+                            "completion": 2317.5,
+                            "eneEff": 1,
+                            "index": 0,
+                            "onboard": 990,
+                            "sciEff": 1,
+                            "type": "Military"
+                        }
+                    ],
+                    "uniqueId": 13
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": false,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 14",
+                    "ownerId": -1,
+                    "population": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "position": {
+                        "x": 2159,
+                        "y": 1979.22
+                    },
+                    "radius": 56,
+                    "shipOrders": [],
+                    "uniqueId": 14
+                },
+                {
+                    "attackedCount": 1,
+                    "breathableAtmosphere": true,
+                    "food": 0,
+                    "militaryUnits": 0,
+                    "name": "Planet 15",
+                    "ownerId": -1,
+                    "population": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "position": {
+                        "x": 4473.35,
+                        "y": 281.316
+                    },
+                    "radius": 57,
+                    "shipOrders": [],
+                    "uniqueId": 15
+                }
+            ],
+            "size": 5000
+        },
+        "players": [
+            {
+                "knowledgeTree": {
+                    "branches": {
+                        "Energy": 0,
+                        "Food": 0,
+                        "Military": 0,
+                        "Science": 27032
+                    },
+                    "orders": [
+                        {
+                            "branch": "Science",
+                            "index": 0
+                        }
+                    ]
+                },
+                "name": "Human",
+                "ships": [
+                    {
+                        "completion": 3500,
+                        "eneEff": 1,
+                        "onboard": 986,
+                        "sciEff": 1,
+                        "type": "Military"
+                    },
+                    {
+                        "completion": 3500,
+                        "eneEff": 1,
+                        "onboard": 986,
+                        "sciEff": 1,
+                        "type": "Military"
+                    },
+                    {
+                        "completion": 3500,
+                        "eneEff": 1,
+                        "onboard": 986,
+                        "sciEff": 1,
+                        "type": "Military"
+                    },
+                    {
+                        "completion": 3500,
+                        "eneEff": 1,
+                        "onboard": 986,
+                        "sciEff": 1,
+                        "type": "Military"
+                    },
+                    {
+                        "completion": 1500,
+                        "eneEff": 1,
+                        "onboard": 1000,
+                        "sciEff": 1,
+                        "type": "Inhabitation"
+                    },
+                    {
+                        "completion": 1500,
+                        "eneEff": 1,
+                        "onboard": 1000,
+                        "sciEff": 1,
+                        "type": "Inhabitation"
+                    },
+                    {
+                        "completion": 1500,
+                        "eneEff": 1,
+                        "onboard": 1000,
+                        "sciEff": 1,
+                        "type": "Inhabitation"
+                    },
+                    {
+                        "completion": 1500,
+                        "eneEff": 1,
+                        "onboard": 1000,
+                        "sciEff": 1,
+                        "type": "Inhabitation"
+                    }
+                ],
+                "type": "HUMAN",
+                "uniqueId": 0
+            },
+            {
+                "knowledgeTree": {
+                    "branches": {
+                        "Energy": 0,
+                        "Food": 0,
+                        "Military": 0,
+                        "Science": 21385
+                    },
+                    "orders": [
+                        {
+                            "branch": "Science",
+                            "index": 0
+                        }
+                    ]
+                },
+                "name": "AI",
+                "ships": [
+                    {
+                        "completion": 3500,
+                        "eneEff": 1,
+                        "onboard": 986,
+                        "sciEff": 1,
+                        "type": "Military"
+                    }
+                ],
+                "type": "AI",
+                "uniqueId": 1
+            }
+        ],
+        "queuePosition": 0
+    }
+}

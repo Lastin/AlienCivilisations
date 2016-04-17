@@ -124,6 +124,9 @@ class JSONParser {
 		string fileString = readText(file.name);
 		return parseJSON(fileString);
 	}
+	static JSONValue stringToJVAL(string str) {
+		return parseJSON(str);
+	}
 	/** Parses valid json structure to GameState **/
 	static GameState jsonToState(JSONValue json) {
 		try {

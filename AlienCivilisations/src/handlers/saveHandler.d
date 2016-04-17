@@ -15,10 +15,6 @@ class SaveHandler {
 	static File readSlot(int slot) {
 		return File(fullPath(slot));
 	}
-	static File readTutorial() {
-		string fp = expandTilde(saveDir) ~ "tutSave";
-		return File(fp);
-	}
 	static void saveJSON(int slot, JSONValue json) {
 		string fp = fullPath(slot);
 		string fullSP = expandTilde(saveDir);

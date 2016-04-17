@@ -50,8 +50,9 @@ class ViewHandler {
 		_window.mainWidget = _play;
 	}
 	void setTutorial() {
-		auto tutSave = SaveHandler.readTutorial();
-		JSONValue jsave = JSONParser.fileToJSON(tutSave);
+		//auto tutSave = SaveHandler.readTutorial();
+		string tut = import("tutSave");
+		JSONValue jsave = JSONParser.stringToJVAL(tut);
 		GameState gs = JSONParser.jsonToState(jsave);
 		GameManager gm = new GameManager(gs);
 		Point2D camPos = JSONParser.jsonToPoint(jsave["cameraPosition"]);
