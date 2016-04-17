@@ -241,7 +241,6 @@ class Tutorial : Play {
 		if(_stage == 17) {
 			_endTurnButton.enabled(true);
 		}
-		writeln(_stage);
 		if(_stage >= infos.length) {
 			_window.removePopup(_currentPopup);
 			if(_currentPopup) {

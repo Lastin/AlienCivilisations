@@ -938,7 +938,7 @@ class Play : AppFrame {
 	/** Switches popup shown in window, to see only one **/
 	protected void switchPopup(Widget popup){
 		window.removePopup(_currentPopup);
-		if(_currentPopup && !_currentPopup.animating) {
+		if(_currentPopup) {
 			_currentPopup.destroy();
 		}
 		if(!popup){
@@ -1045,10 +1045,7 @@ class Play : AppFrame {
 	}
 	override void animate(long interval) {
 		//_animation.animate(interval);
-		//invalidate();
-	}
-	@property override bool animating() {
-		return true;
+		invalidate();
 	}
 	@property override DrawableRef backgroundDrawable() const {
 		return cast(DrawableRef)_drawableRef;//(cast(Play)this)._drawableRef;
