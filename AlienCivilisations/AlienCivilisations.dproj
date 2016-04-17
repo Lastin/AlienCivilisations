@@ -123,6 +123,7 @@
     <Compile Include="src\containers\gameState.d" />
     <Compile Include="src\containers\move.d" />
     <Compile Include="src\containers\point2d.d" />
+    <Compile Include="src\screens\tutorial.d" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

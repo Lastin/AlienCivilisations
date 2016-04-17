@@ -26,6 +26,7 @@ class Menu : HorizontalLayout {
 		Widget _btnsContainer;
 		Widget _saveWidget;
 		Button _newBtn;
+		Button _tutBtn;
 		Button _loadBtn;
 		Button _contBtn;
 		Button _saveBtn;
@@ -43,6 +44,7 @@ class Menu : HorizontalLayout {
 		_saveWidget = childById("vl1").childById("saveWidget");
 		_saveWidget.visibility(Visibility.Gone);
 		_newBtn = cast(Button)_btnsContainer.childById("newBtn");
+		_tutBtn = cast(Button)_btnsContainer.childById("tutBtn");
 		_loadBtn = cast(Button)_btnsContainer.childById("loadBtn");
 		_contBtn = cast(Button)_btnsContainer.childById("contBtn");
 		_saveBtn = cast(Button)_btnsContainer.childById("saveBtn");
@@ -51,6 +53,10 @@ class Menu : HorizontalLayout {
 		//Set button actions
 		_newBtn.click = delegate (Widget source) {
 			vh.setNewPlay(window.width, window.height);
+			return true;
+		};
+		_tutBtn.click = delegate (Widget source) {
+			vh.setTutorial();
 			return true;
 		};
 		_loadBtn.click = delegate (Widget source) {
@@ -84,6 +90,7 @@ class Menu : HorizontalLayout {
 	void switchMenuView(MenuView view) {
 		if(view == MenuView.Main){
 			_newBtn.visibility(Visibility.Visible);
+			_tutBtn.visibility(Visibility.Visible);
 			_loadBtn.visibility(Visibility.Visible);
 			_contBtn.visibility(Visibility.Gone);
 			_saveBtn.visibility(Visibility.Gone);
@@ -92,6 +99,7 @@ class Menu : HorizontalLayout {
 			_btnsContainer.visibility(Visibility.Visible);
 		} else if(view == MenuView.Pause) {
 			_newBtn.visibility(Visibility.Gone);
+			_tutBtn.visibility(Visibility.Gone);
 			_loadBtn.visibility(Visibility.Gone);
 			_contBtn.visibility(Visibility.Visible);
 			_saveBtn.visibility(Visibility.Visible);
@@ -162,6 +170,13 @@ class Menu : HorizontalLayout {
 						Button {
 							id: newBtn
 							text: "NEW GAME"
+							margins: 10
+							fontSize: 150%
+							padding: Rect {100, 15, 100, 15}
+						}
+						Button {
+							id: tutBtn
+							text: "TUTORIAL"
 							margins: 10
 							fontSize: 150%
 							padding: Rect {100, 15, 100, 15}

@@ -9,6 +9,7 @@ import src.handlers.gameManager;
 import src.handlers.jsonParser;
 import src.containers.gameState;
 import src.containers.point2d;
+import src.screens.tutorial;
 
 class ViewHandler {
 	private {
@@ -47,6 +48,15 @@ class ViewHandler {
 	void setNewPlay(int width, int height) {
 		_play = new Play(this, null, width, height);
 		_window.mainWidget = _play;
+	}
+	void setTutorial() {
+		auto tutSave = SaveHandler.readTutorial();
+		JSONValue jsave = JSONParser.fileToJSON(tutSave);
+		GameState gs = JSONParser.jsonToState(jsave);
+		GameManager gm = new GameManager(gs);
+		Point2D camPos = JSONParser.jsonToPoint(jsave["cameraPosition"]);
+		_play = new Tutorial(this, gm, camPos, _window);
+		resumePlay();
 	}
 	void resumePlay() {
 		if(_play)
