@@ -45,12 +45,12 @@ class Play : AppFrame {
 		bool _end = false;
 	}
 
-	this(ViewHandler vh, GameManager gm = null){
+	this(ViewHandler vh, GameManager gm = null, int width = 0, int height = 0){
 		_vh = vh;
 		addChild(getLayout());
 		if(!gm) {
 			_gm = new GameManager();
-			initialiseObjects(true);
+			initialiseObjects(true, width, height);
 		} else {
 			_gm = gm;
 			initialiseObjects(false);
@@ -70,7 +70,7 @@ class Play : AppFrame {
 		addAIAction(format("AI owns %s inhabitation ships", _gameState.ai.inhabitationShips.length));
 	}
 
-	void initialiseObjects(bool initCam = true) {
+	void initialiseObjects(bool initCam = true, int width = 0, int height = 0) {
 		_gameState = _gm.state;
 		_mainContainer = childById("verticalContainer").childById("horizontalContainer");
 		_playerStatsContainer = _mainContainer.childById("vr1").childById("hr1");
@@ -95,7 +95,7 @@ class Play : AppFrame {
 				tempX = playerPlanets[0].position.x;
 				tempY = playerPlanets[0].position.y;
 			}
-			_cameraPosition = Point2D(tempX - _mainContainer.width / 2, tempY - _mainContainer.height / 2);
+			_cameraPosition = Point2D(tempX - width / 2, tempY - height / 2);
 			_endPosition = _cameraPosition.dup;
 			debug {
 				writefln("camera initial position: %s %s", tempX, tempY);
@@ -939,6 +939,7 @@ class Play : AppFrame {
 			_currentPopup = window.showPopup(popup, this);
 		}
 	}
+	/** Adds item to the AI action list **/
 	void addAIAction(string action){
 		HorizontalLayout sohl = new HorizontalLayout();
 		sohl.margins(2);

@@ -44,8 +44,8 @@ class ViewHandler {
 		_menu.switchMenuView(MenuView.Pause);
 		_window.mainWidget = _menu;
 	}
-	void setNewPlay() {
-		_play = new Play(this);
+	void setNewPlay(int width, int height) {
+		_play = new Play(this, null, width, height);
 		_window.mainWidget = _play;
 	}
 	void resumePlay() {

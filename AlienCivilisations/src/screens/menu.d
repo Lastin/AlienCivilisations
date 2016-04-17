@@ -50,7 +50,7 @@ class Menu : HorizontalLayout {
 		_exitBtn = cast(Button)_btnsContainer.childById("exitBtn");
 		//Set button actions
 		_newBtn.click = delegate (Widget source) {
-			vh.setNewPlay();
+			vh.setNewPlay(window.width, window.height);
 			return true;
 		};
 		_loadBtn.click = delegate (Widget source) {
