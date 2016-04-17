@@ -940,19 +940,20 @@ class Play : AppFrame {
 		}
 	}
 	/** Adds item to the AI action list **/
-	void addAIAction(string action){
+	void addAIAction(string action, uint colour = 0x737373){
 		HorizontalLayout sohl = new HorizontalLayout();
 		sohl.margins(2);
 		sohl.layoutWidth(FILL_PARENT);
 		VerticalLayout sovl = new VerticalLayout();
 		MultilineTextWidget mltw = new MultilineTextWidget(null, to!dstring(action));
+		mltw.minHeight(50);
 		mltw.textColor(0xFFFFFF);
-		mltw.padding(2);
+		//mltw.padding(2);
 		//mltw.maxWidth(100);
 		sovl.addChild(mltw);
 		sohl.addChild(sovl);
 		sohl.addChild(new HSpacer());
-		sohl.backgroundColor(0x737373);
+		sohl.backgroundColor(colour);
 		_ailAdapter.add(sohl);
 	}
 	/** Updates information in right hand panel about selected planet **/

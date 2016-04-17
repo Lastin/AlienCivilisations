@@ -214,7 +214,7 @@ class AI : Player {
 			if(i<free.length) {
 				gs.currentPlayer.inhabitPlanet(free[i]);
 				if(play) {
-					play.addAIAction(format("AI inhabited " ~ free[i].name));
+					play.addAIAction(format("AI inhabited " ~ free[i].name), 0x339933);
 				}
 				i++;
 			}
@@ -274,7 +274,7 @@ class AI : Player {
 				}
 			}
 			if(play) {
-				play.addAIAction("AI attacked " ~ attacked.name);
+				play.addAIAction("AI attacked " ~ attacked.name, 0xff0000);
 			}
 			//update array
 			ms = gs.currentPlayer.militaryShips;
