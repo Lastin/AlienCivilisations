@@ -1059,6 +1059,9 @@ class Play : AppFrame {
 	@property GameState gameState() {
 		return _gameState;
 	}
+	@property GameManager gameManager() {
+		return _gm;
+	}
 }
 
 class AnimatedBackground : Drawable {

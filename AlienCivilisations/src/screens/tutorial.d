@@ -11,7 +11,6 @@ import src.entities.planet;
 class Tutorial : Play {
 	private int _stage = -1;
 	private PopupWidget _currentPopup;
-	private Window _window;
 	private ViewHandler _vh;
 	private {
 		bool _movementEnabled = false;
@@ -26,12 +25,10 @@ class Tutorial : Play {
 		Widget _knowledgeTreeButton;
 	}
 
-	this(ViewHandler vh, GameManager gm, Point2D camPos, Window window) {
+	this(ViewHandler vh, GameManager gm, Point2D camPos) {
 		super(vh, gm, camPos);
-		_window = window;
 		_vh = vh;
 		init();
-		updateTutorial();
 	}
 	private void init() {
 		keyEvent = delegate (Widget source, KeyEvent event) {
@@ -147,7 +144,7 @@ class Tutorial : Play {
 		return true;
 	}
 
-	private void updateTutorial() {
+	void updateTutorial() {
 		_stage++;
 		string[] infos = [
 			//0
@@ -215,31 +212,26 @@ class Tutorial : Play {
 		if(_stage == 0 || _stage == infos.length - 1) {
 			fontSize = 30;
 		}
-		if(_stage == 2) {
-			_movementEnabled = true;
-		}
-		if(_stage == 3) {
-			_selectionEnabled = true;
-		}
-		if(_stage == 8) {
-			_orderMilShipBtn.enabled(true);
-			_orderInhShipBtn.enabled(true);
-		}
-		if(_stage == 10) {
-			_convertUnitsButton.enabled(true);
-		}
-		if(_stage == 11) {
-			_inhabitButton.enabled(true);
-		}
-		if(_stage == 12) {
-			_knowledgeTreeButton.enabled(true);
-			_deselectionEnabled = true;
-		}
-		if(_stage == 16) {
-			_attackButton.enabled(true);
-		}
-		if(_stage == 17) {
-			_endTurnButton.enabled(true);
+		switch(_stage) {
+			case 2: _movementEnabled = true;
+					break;
+			case 3: _selectionEnabled = true;
+					break;
+			case 8: _orderMilShipBtn.enabled(true); 
+					_orderInhShipBtn.enabled(true);
+					break;
+			case 10: _convertUnitsButton.enabled(true);
+					 break;
+			case 11: _inhabitButton.enabled(true);
+					 break;
+			case 12: _knowledgeTreeButton.enabled(true);
+					 _deselectionEnabled = true;
+					 break;
+			case 16: _attackButton.enabled(true);
+					 break;
+			case 17: _endTurnButton.enabled(true);
+					 break;
+			default: break;
 		}
 		if(_stage >= infos.length) {
 			_window.removePopup(_currentPopup);
@@ -248,8 +240,7 @@ class Tutorial : Play {
 			}
 			_vh.setMainMenu();
 		} else {
-			_currentPopup = _window.showPopup(tutWid(infos[_stage], fontSize));
+			_currentPopup = window.showPopup(tutWid(infos[_stage], fontSize));
 		}
-
 	}
 }
