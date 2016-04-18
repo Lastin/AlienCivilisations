@@ -1,10 +1,9 @@
 ﻿<Properties StartupItem="AlienCivilisations/AlienCivilisations.dproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/lib/dlangui/src/dlangui/core/types.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AlienCivilisations/lib/dlangui/src/dlangui/graphics/ftfonts.d">
     <Files>
-      <File FileName="AlienCivilisations/src/screens/play.d" Line="1083" Column="93" />
-      <File FileName="AlienCivilisations/src/screens/tutorial.d" Line="246" Column="23" />
-      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/core/types.d" Line="456" Column="15" />
+      <File FileName="AlienCivilisations/src/main.d" Line="20" Column="43" />
+      <File FileName="AlienCivilisations/lib/dlangui/src/dlangui/graphics/ftfonts.d" Line="335" Column="10" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

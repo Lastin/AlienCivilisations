@@ -204,6 +204,7 @@ Global
 		$23.NamingStyle = PascalCase
 		$23.IncludeInstanceMembers = True
 		$23.IncludeStaticEntities = True
+		version = 0.3.1
 		StartupItem = AlienCivilisations\AlienCivilisations.dproj
 	EndGlobalSection
 EndGlobal
