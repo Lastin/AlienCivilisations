@@ -21,7 +21,15 @@ https://github.com/buggins/dlangui
 which uses Derelict libraries for dynamic binding of OpenGL, SDL and other C++ libraries to D.  
 https://github.com/DerelictOrg
 
-To clone all needed repositories, run `clone_script` from projects main directory.
+----------------------------------------------------------------------------------------------------
+HOW TO USE:
+1. Clone this repository
+2. Run `clone_script` from projects main directory, to clone dependencies
+
+Compatible DLangUI SHA: 7ab93a22f5b54442aa631de50241662fbf70f328
+
+---------------------------------------------------------------------------------------------------
+
 
 Sources of the Derelict and Dlang UI must be used to `includes`
 *Project Options > Build > Includes > add source folders*
