@@ -7,5 +7,3 @@ for dir in ./*
 do
   git pull
 done
-cd ../../DMagick
-git pull
