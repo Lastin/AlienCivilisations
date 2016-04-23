@@ -22,25 +22,25 @@ which uses Derelict libraries for dynamic binding of OpenGL, SDL and other C++ l
 https://github.com/DerelictOrg
 
 ----------------------------------------------------------------------------------------------------
-HOW TO USE:
-1. Clone this repository
-2. Run `clone_script` from projects main directory, to clone dependencies
+HOW TO USE:  
+1. Clone this repository  
+2. Run `clone_script` from projects main directory, to clone dependencies  
 
 Compatible DLangUI SHA: 7ab93a22f5b54442aa631de50241662fbf70f328
 
 ---------------------------------------------------------------------------------------------------
 
 
-Sources of the Derelict and Dlang UI must be used to `includes`
+Sources of the Derelict and Dlang UI must be used to `includes`  
 *Project Options > Build > Includes > add source folders*
 
-Also add dlangui-monod-linux to project, and set it as dependency to your project
+Also add dlangui-monod-linux to project, and set it as dependency to your project  
 *Project Options > Build > Project Dependencies*
 
-In *Project Options > Build > Compiling > Linking* tick `Link in static/shared libraries from nested dependencies`
+In *Project Options > Build > Compiling > Linking* tick `Link in static/shared libraries from nested dependencies`  
 
 
-In *Project Options > Build > Compiling > Compiling* add to *Version constants* `USE_OPENGL;USE_SDL;USE_FREETYPE;EmbedStandardResources`
+In *Project Options > Build > Compiling > Compiling* add to *Version constants* `USE_OPENGL;USE_SDL;USE_FREETYPE;EmbedStandardResources`  
 and in *Extra Compiler Options* add
 ```
 -Jviews
