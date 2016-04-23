@@ -1,25 +1,35 @@
-﻿module src.handlers.jsonParser;
+﻿/**
+This module implements custom JSON parser.
+It serialises the classes used in game into JSON.
+It parses JSON string back into those classes.
+Parser handles floating/double/integer data types, to save correctly, and prevent exceptions when reading the files.
 
-import std.json;
-import std.file;
-import std.stdio;
-import src.entities.player;
-import src.entities.knowledgeTree;
-import src.entities.branch;
-import src.entities.ship;
-import src.entities.map;
-import src.entities.planet;
-import src.screens.play;
-import std.conv;
-import std.typecons;
-import std.algorithm : sort;
-import std.format;
+
+Author: Maksym Makuch
+ **/
+
+module src.handlers.jsonParser;
+
 import src.containers.gameState;
 import src.containers.point2d;
+import src.entities.branch;
+import src.entities.knowledgeTree;
+import src.entities.map;
+import src.entities.planet;
+import src.entities.player;
+import src.entities.ship;
 import src.logic.ai;
+import src.screens.play;
+import std.algorithm : sort;
+import std.conv;
+import std.file;
+import std.format;
+import std.json;
+import std.stdio;
+import std.typecons;
 
 class JSONParser {
-	/** Parses object Play into json structure preserving camera position and game state **/
+	/** Serialises object Play into json structure preserving camera position and game state **/
 	static JSONValue playToJSON(Play play) {
 		GameState state = play.gameState;
 		Point2D camPos = play.cameraPosition;
@@ -30,14 +40,14 @@ class JSONParser {
 		writeln(save.toPrettyString());
 		return save;
 	}
-	/** Parses GameState object and its contents into JSON **/
+	/** Serialises GameState object and its contents into JSON **/
 	private static JSONValue stateToJSON(GameState state) {
 		JSONValue jState = ["queuePosition" : state.queuePosition];
 		jState.object["players"] = playersToJSON(state.players);
 		jState.object["map"] = mapToJSON(state.map);
 		return jState;
 	}
-	/** Converts Map object and its contents into JSONValue **/
+	/** Serialises Map object and its contents into JSONValue **/
 	private static JSONValue mapToJSON(Map map) {
 		JSONValue jMap = ["size" : map.size];
 		jMap.object["planets"] = JSONValue();
@@ -47,7 +57,7 @@ class JSONParser {
 		}
 		return jMap;
 	}
-	/** Converts Planet object into JSONValue **/
+	/** Serialises Planet object into JSONValue **/
 	private static JSONValue planetToJSON(Planet planet, ) {
 		JSONValue jsonPlanet = ["name" : planet.name];
 		jsonPlanet.object["uniqueId"] = planet.uniqueId;
@@ -66,11 +76,11 @@ class JSONParser {
 		jsonPlanet.object["shipOrders"] = jShipOrders;
 		return jsonPlanet;
 	}
-	/** Converts Vector2d object into JSONValue **/
+	/** Serialises Vector2d object into JSONValue **/
 	private static JSONValue pointToJSON(Point2D vec) {
 		return JSONValue(["x": vec.x, "y": vec.y]);
 	}
-	/** Converts Player object and its knowledge tree and ships into JSONValue **/
+	/** Serialises Player object and its knowledge tree and ships into JSONValue **/
 	private static JSONValue[] playersToJSON(Player[] players){
 		JSONValue[] jPlayers;
 		foreach(player; players) {
@@ -83,7 +93,7 @@ class JSONParser {
 		}
 		return jPlayers;
 	} 
-	/** Converts array of Ship objects into JSONValue **/
+	/** Serialises array of Ship objects into JSONValue **/
 	private static JSONValue[] shipsToJSON(Ship[] ships) {
 		JSONValue[] jShips;
 		foreach(ship; ships){
@@ -101,7 +111,7 @@ class JSONParser {
 		}
 		return jShips;
 	}
-	/** Converts KnowledgeTree object into JSONValue **/
+	/** Serialises KnowledgeTree object into JSONValue **/
 	private static JSONValue ktToJSON(KnowledgeTree kt) {
 		JSONValue jkt = JSONValue();
 		jkt.type = JSON_TYPE.OBJECT;
@@ -119,15 +129,16 @@ class JSONParser {
 		}
 		return jkt;
 	}
-	/** Parses file in json format to associative array of type JSONValue **/
+	/** Parses file in JSON format to JSONValue type object **/
 	static JSONValue fileToJSON(File file) {
 		string fileString = readText(file.name);
 		return parseJSON(fileString);
 	}
+	/** Takes a JSON string and returns JSONValue type object  **/
 	static JSONValue stringToJVAL(string str) {
 		return parseJSON(str);
 	}
-	/** Parses valid json structure to GameState **/
+	/** Parses valid JSON string to GameState object **/
 	static GameState jsonToState(JSONValue json) {
 		try {
 			Player[] players;
@@ -146,7 +157,7 @@ class JSONParser {
 		}
 		return null;
 	}
-	/** Parses valid json structure to src.entities.Map **/
+	/** Parses valid JSON string to src.entities.Map object **/
 	static Map jsonToMap(JSONValue jmap, Player[] players) {
 		JSONValue[] jplanets = jmap["planets"].array;
 		Planet[] planets;
@@ -156,7 +167,7 @@ class JSONParser {
 		float size = safeFloat(jmap["size"]);
 		return new Map(size, planets);
 	}
-	/** Parses valid json structure to Planet, adds owner if one's id was saved. Order queue is not currently sorted **/
+	/** Parses valid JSON string to Planet object, adds owner if one's id was saved **/
 	static Planet jsonToPlanet(JSONValue jplanet, Player[] players) {
 		string name = jplanet["name"].str;
 		int uniqueId = to!int(jplanet["uniqueId"].integer);
@@ -175,7 +186,6 @@ class JSONParser {
 		foreach(jship; jsonSO) {
 			Ship s = jsonToShip(jship);
 			int index = to!int(jship["index"].integer);
-			//shipOrders ~= jsonToShip(jship);
 			shipOrdersIndexed ~= tuple(s, index);
 		}
 		sort!("a[1] < b[1]")(shipOrdersIndexed);
@@ -192,13 +202,13 @@ class JSONParser {
 		debug writefln("New planet %s owner: %s", name, planet.ownerId);
 		return planet;
 	}
-	/** Parses valid json structure to Vector2d struct **/
+	/** Parses valid JSON string to Vector2d struct. Handles float/int data type. **/
 	static Point2D jsonToPoint(JSONValue jvec) {
 		float x = safeFloat(jvec["x"]);
 		float y = safeFloat(jvec["y"]);
 		return Point2D(x, y);
 	}
-	/** Parses valid json structure to Player **/
+	/** Parses valid JSON string to Player object **/
 	static Player jsonToPlayer(JSONValue jplayer) {
 		int uniqueId = to!int(jplayer["uniqueId"].integer);
 		string name = jplayer["name"].str;
@@ -213,7 +223,7 @@ class JSONParser {
 		}
 		return new Player(uniqueId, name, kt, ships);
 	}
-	/** Parses valid json structure to Ship **/
+	/** Parses valid JSON string to Ship object **/
 	static Ship jsonToShip(JSONValue jship) {
 		double eneEff = safeFloat(jship["eneEff"]);
 		double sciEff = safeFloat(jship["sciEff"]);
@@ -228,7 +238,7 @@ class JSONParser {
 			return new InhabitationShip(eneEff, sciEff, completion);
 		}
 	}
-	/** Parses valid json structure to KnowledgeTree. Orders are sorted by index **/
+	/** Parses valid JSON string to KnowledgeTree object. Orders are sorted by index **/
 	static KnowledgeTree jsonToKT(JSONValue jkt) {
 		uint ene = to!uint(jkt["branches"]["Energy"].integer);
 		uint foo = to!uint(jkt["branches"]["Food"].integer);
@@ -249,7 +259,7 @@ class JSONParser {
 		}
 		return kt;
 	}
-	/** Ensures parsing JSONValue to floating point number, whether it was saved as integer in json
+	/** Ensures parsing JSONValue to floating point number, whether it was saved as integer in JSON
 	Return 0.0 if format has been mismatched **/
 	static float safeFloat(JSONValue value) {
 		try {

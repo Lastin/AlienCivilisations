@@ -123,7 +123,6 @@
     <Compile Include="src\handlers\viewHandler.d" />
     <Compile Include="src\handlers\saveHandler.d" />
     <Compile Include="src\containers\gameState.d" />
-    <Compile Include="src\containers\move.d" />
     <Compile Include="src\containers\point2d.d" />
     <Compile Include="src\screens\tutorial.d" />
   </ItemGroup>
@@ -134,8 +133,5 @@
     <Folder Include="src\logic\" />
     <Folder Include="src\screens\" />
     <Folder Include="src\containers\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\logic\oldAI.d" />
   </ItemGroup>
 </Project>

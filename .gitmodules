@@ -1,0 +1,3 @@
+[submodule "AlienCivilisations/lib/dlangui"]
+	path = AlienCivilisations/lib/dlangui
+	url = https://github.com/buggins/dlangui.git

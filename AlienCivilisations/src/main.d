@@ -1,13 +1,20 @@
-﻿module src.main;
+﻿/**
+This module is entry point for the program.
+
+Author: Maksym Makuch
+ **/
+
+module src.main;
 
 import dlangui;
-import std.stdio;
+import src.handlers.viewHanlder;
 import src.screens.menu;
 import src.screens.play;
-import src.handlers.viewHanlder;
+import std.stdio;
 
 mixin APP_ENTRY_POINT;
 
+/** Main function **/
 extern (C) int UIAppMain(string[] args) {
 	embeddedResourceList.addResources(embedResourcesFromList!("menu_resources.list")());
 	embeddedResourceList.addResources(embedResourcesFromList!("play_resources.list")());
@@ -17,11 +24,11 @@ extern (C) int UIAppMain(string[] args) {
 													null,
 													WindowFlag.Resizable,
 													width, height);
+	//Initialise view handler
 	ViewHandler vh = new ViewHandler(window);
+	//Set screen to main menu
 	vh.setMainMenu();
-	//auto closeActions = window.onClose;
 	window.onClose = delegate () {
-		//vh.destroyResources();
 		releaseResourcesOnAppExit();
 	};
 	window.backgroundColor = 0;

@@ -1,4 +1,13 @@
-﻿module src.entities.branch;
+﻿/**
+This module implements knowledge tree branch.
+It is initialised by the knowledge tree.
+It takes the integer of points on initialisation.
+It hold name and points of branch in variables, other properties are rvalues, calculated on the run.
+
+Author: Maksym Makuch
+ **/
+
+module src.entities.branch;
 
 import src.entities.knowledgeTree;
 import std.algorithm.iteration;
@@ -7,6 +16,7 @@ import std.stdio;
 import std.conv;
 
 public enum int MAX_LEVEL = 5;
+
 class Branch {
 	private {
 		enum double DEPENDENCY_EFFECT = 0.1;
@@ -44,7 +54,7 @@ class Branch {
 		}
 		return effness;
 	}
-	/** Returns points within current branch **/
+	/** Returns points within the branch **/
 	@trusted @property uint points() const nothrow {
 		return _points;
 	}
@@ -52,7 +62,7 @@ class Branch {
 	@property bool full() const {
 		return level() >= MAX_LEVEL;
 	}
-	/** Adds parameter as dependency of called object **/
+	/** Adds dependency to this branch **/
 	void addDependency(Branch dependency) {
 		_dependencies ~= dependency;
 	}
@@ -71,12 +81,13 @@ class Branch {
 		_points += points;
 		return 0;
 	}
-	/** Returns number of experience points to next level **/
+	/** Returns number of experience points until the next level **/
 	uint nextExp(){
 		if(full)
 			return 0;
 		return MULTIPLIERS[level] * POPULATION_CONSTANT - _points;
 	}
+	/** Returns the level of the branch as string **/
 	override string toString() {
 		return to!string(level());
 	}

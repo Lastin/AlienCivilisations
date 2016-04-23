@@ -1,13 +1,24 @@
-﻿module src.handlers.commandParser;
+﻿/**
+This module implements the command parser.
+It parsed strings into commands and parameters
+
+It has was a temporary solution for testing without compelte GUI.
+
+It is deprecated.
+
+Author: Maksym Makuch
+ **/
+
+module src.handlers.commandParser;
 
 import dlangui;
+import src.containers.gameState;
+import src.entities.branch;
+import src.entities.player;
 import src.handlers.gameManager;
 import std.format;
-import src.entities.player;
-import src.entities.branch;
-import src.containers.gameState;
 
-class CommandParser : VerticalLayout {
+deprecated class CommandParser : VerticalLayout {
 	private {
 		string[] _commands =
 		[
@@ -28,7 +39,7 @@ class CommandParser : VerticalLayout {
 		output = new EditBox();
 		keyEvent.connect(delegate (Widget source, KeyEvent event) => handleKeyInput(source, event));
 	}
-
+	/** Overrides input function. Executes function with ENTER and prints result on custom widget **/
 	bool handleKeyInput(Widget source, KeyEvent event) {
 		if(event.action == KeyAction.KeyDown) {
 			if(event.keyCode == KeyCode.RETURN) {
@@ -46,7 +57,7 @@ class CommandParser : VerticalLayout {
 		}
 		return true;
 	}
-
+	/** Takes string and parses it into command. Returns result **/
 	string[] runCommand(dstring raw) {
 		string[] message;
 		try {

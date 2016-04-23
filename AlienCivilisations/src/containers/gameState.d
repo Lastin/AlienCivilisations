@@ -1,19 +1,35 @@
-﻿module src.containers.gameState;
-import src.entities.map;
-import src.entities.player;
-import src.logic.ai;
-import src.entities.ship;
-import src.entities.planet;
+﻿/**
+This module hold the game state.
+
+It stores the references to the:
+ -map
+ -players
+ -queue position
+
+It is initialised by the GameManager class
+It is used throughout the gameplay, ai decision making and saving of the state into JSON
+
+Author: Maksym Makuch
+ **/
+
+module src.containers.gameState;
+
 import src.containers.point2d;
+import src.entities.map;
+import src.entities.planet;
+import src.entities.player;
+import src.entities.ship;
+import src.logic.ai;
 import std.stdio;
 
+/** Enum used to pass the type of the player(s) **/
 enum PlayerEnum : ubyte {
 	None,
 	Human,
 	AI,
 	Both
 }
-/** Container for current, or hypothetical game state, holding references to all essential data **/
+/** Class contains current or hypothetical game state **/
 class GameState {
 	private {
 		Map _map;
@@ -27,37 +43,45 @@ class GameState {
 		_players = players;
 		_queuePosition = queuePosition;
 	}
+	/** Returns the map **/
 	@property Map map() {
 		return _map;
 	}
-	/** Returns all players objects **/
+	/** Returns all players **/
 	@property Player[] players() {
 		return _players;
 	}
-	/** Returns current player object **/
+	/** Returns player in control (this turn) **/
 	@property Player currentPlayer() {
 		return _players[_queuePosition];
 	}
+	/** Returns player not in control (this turn) **/
 	@property Player notCurrentPlayer() {
 		return _players[(_queuePosition+1) % _players.length];
 	}
+	/** Returns unique identifier of player in control (this turn) **/
 	@property int currentPlayerId() {
 		return currentPlayer.uniqueId;
 	}
+	/** Returns enum of player in control (this turn) **/
 	@property int currentPlayerEnum() {
 		if(cast(AI)currentPlayer)
 			return PlayerEnum.AI;
 		return PlayerEnum.Human;
 	}
+	/** Returns human player **/
 	@property Player human(){
 		return _players[0];
 	}
+	/** Returns artificial player **/
 	@property AI ai(){
 		return cast(AI)_players[1];
 	}
+	/** Returns queue position **/
 	@property size_t queuePosition() const {
 		return _queuePosition;
 	}
+	/** Returns enum of which player is dead (this turn) **/
 	@property PlayerEnum deadPlayer() {
 		bool humanDead = human.dead(_map);
 		bool aiDead = ai.dead(_map);
@@ -72,14 +96,13 @@ class GameState {
 	/** Moves queue position to next available position **/
 	void moveQPosition() {
 		_queuePosition = ++_queuePosition % _players.length;
-		//debug writefln("Queue position: %s", _queuePosition);
 	}
-	/** Completes turn on a player and moves queue position **/
+	/** Completes turn of current player and moves queue position **/
 	void shift() {
 		currentPlayer.completeTurn(_map.planets);
 		moveQPosition();
 	}
-	/** Returns duplicate of the state **/
+	/** Returns duplicate of this state **/
 	GameState dup() const  {
 		Player[] playersDup = duplicatePlayers();
 		Planet[] planetsDup = _map.duplicatePlanets(playersDup);//duplicatePlanets(playersDup);

@@ -1,19 +1,33 @@
-﻿module src.screens.menu;
+﻿/**
+This module implements menu screen.
+Menu can be displayed in three modes:
+-main
+-pause
+-save
+The layout is changed using function switchMenuView()
 
-import dlangui;
-import std.stdio;
-import src.screens.play;
+When game is loaded, user is first presented with "main" appearance
+
+Author: Maksym Makuch
+ **/
+
+module src.screens.menu;
+
 import core.thread;
+import dlangui;
 import src.handlers.jsonParser;
-import std.file;
-import std.path;
+import src.handlers.saveHandler;
+import src.handlers.viewHanlder;
+import src.screens.play;
 import std.algorithm;
 import std.array;
-import src.handlers.viewHanlder;
+import std.file;
 import std.format;
 import std.json;
-import src.handlers.saveHandler;
+import std.path;
+import std.stdio;
 
+/** Enum used to indicate desired look of menu **/
 enum MenuView : ubyte {
 	Main,
 	Pause,
@@ -60,7 +74,7 @@ class Menu : HorizontalLayout {
 			return true;
 		};
 		_loadBtn.click = delegate (Widget source) {
-			//showSaveWidget();
+			//ShowSaveWidget();
 			_saving = false;
 			switchMenuView(MenuView.Save);
 			return true;
@@ -70,7 +84,7 @@ class Menu : HorizontalLayout {
 			return true;
 		};
 		_saveBtn.click = delegate (Widget source) {
-			//showSaveWidget(true);
+			//ShowSaveWidget(true);
 			_saving = true;
 			switchMenuView(MenuView.Save);
 			return true;
@@ -237,7 +251,6 @@ class Menu : HorizontalLayout {
 		loadSlot.visibility(Visibility.Invisible);
 		deleteSlot.visibility(Visibility.Invisible);
 		saveToSlot.visibility(Visibility.Invisible);
-		//_btnsContainer.visibility(Visibility.Gone);
 		//Initialise adapter and add elements
 		ListWidget lw = cast(ListWidget)_saveWidget.childById("slotsList");
 		WidgetListAdapter wla = new WidgetListAdapter();

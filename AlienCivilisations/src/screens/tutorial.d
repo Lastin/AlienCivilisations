@@ -1,12 +1,24 @@
-﻿module src.screens.tutorial;
+﻿/**
+This module implements tutorial screen.
+It is extension to play class, with custom overridings for mouse and keyboard behaviours.
 
-import src.screens.play;
-import src.handlers.viewHanlder;
-import src.handlers.gameManager;
-import src.containers.point2d;
+This screen is accessible to user from main menu.
+In this mode, user is presented with one popup widget visible all the time.
+Extra options in the HUD and game are enabled as user progresses with tutorial.
+
+
+Author: Maksym Makuch
+ **/
+
+module src.screens.tutorial;
+
 import dlangui;
-import std.stdio;
+import src.containers.point2d;
 import src.entities.planet;
+import src.handlers.gameManager;
+import src.handlers.viewHanlder;
+import src.screens.play;
+import std.stdio;
 
 class Tutorial : Play {
 	private int _stage = -1;
@@ -24,12 +36,13 @@ class Tutorial : Play {
 		Widget _orderInhShipBtn;
 		Widget _knowledgeTreeButton;
 	}
-
+	/** Single constructor used along with custom game save for tutorial **/
 	this(ViewHandler vh, GameManager gm, Point2D camPos) {
 		super(vh, gm, camPos);
 		_vh = vh;
 		init();
 	}
+	/** Initialises the object fields by fetching elements from the layout, and disables buttons initially **/
 	private void init() {
 		keyEvent = delegate (Widget source, KeyEvent event) {
 			return false;
@@ -41,6 +54,7 @@ class Tutorial : Play {
 		_orderMilShipBtn = _planetInfoContainer.childById("orderMilitaryShip");
 		_orderInhShipBtn = _planetInfoContainer.childById("orderInhabitShip");
 		_knowledgeTreeButton = childById("verticalContainer").childById("hr3").childById("vr3").childById("knowledgeTreeButton");
+		//Disable HUD buttons
 		_endTurnButton.enabled(false);
 		_inhabitButton.enabled(false);
 		_attackButton.enabled(false);
@@ -49,6 +63,7 @@ class Tutorial : Play {
 		_orderInhShipBtn.enabled(false);
 		_knowledgeTreeButton.enabled(false);
 	}
+	/** Returns generic tutorial popup widget with custom text and font size **/
 	private Widget tutWid(string text, int size) {
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.minWidth(600);
@@ -85,6 +100,7 @@ class Tutorial : Play {
 		vl.backgroundColor(0x404040);
 		return vl;
 	}
+	/** Overrides the mouse events. Checks if actions are enabled before executing them **/
 	override bool handleMouseEvent(Widget source, MouseEvent event) {
 		if(_end)
 			return false;
@@ -143,7 +159,7 @@ class Tutorial : Play {
 		//super.handleMouseEvent(source,event);
 		return true;
 	}
-
+	/** Updates tutorial popup widget text and font size, and enables new options with progress of the tutorial **/
 	void updateTutorial() {
 		_stage++;
 		string[] infos = [

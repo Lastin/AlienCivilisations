@@ -1,14 +1,26 @@
-﻿module src.entities.player;
+﻿/**
+This module implements the player.
+It is base class for AI.
+It hold:
+-unique identifier
+-name
+-knowledge tree object
+-array of ships owned by the player
 
+Author: Maksym Makuch
+ **/
+
+module src.entities.player;
+
+import src.entities.branch;
 import src.entities.knowledgeTree;
+import src.entities.map;
 import src.entities.planet;
 import src.entities.ship;
 import src.handlers.gameManager;
-import src.entities.branch;
-import std.conv;
 import std.algorithm.mutation;
+import std.conv;
 import std.stdio;
-import src.entities.map;
 
 class Player {
 	private {
@@ -17,7 +29,7 @@ class Player {
 		Ship[] _ships;
 		protected int _uniqueId;
 	}
-
+	/** Constructor. Ships array is optional **/
 	this(int uniqueId, string name, KnowledgeTree knowledgeTree, Ship[] ships = null) {
 		_uniqueId = uniqueId;
 		_name = name;
@@ -28,14 +40,15 @@ class Player {
 	@property KnowledgeTree knowledgeTree() {
 		return _knowledgeTree;
 	}
+	/** Returns the duplicate of the player's knowledge tree **/
 	@property KnowledgeTree knowledgeTree() const {
 		return _knowledgeTree.dup;
 	}
-	/** Player's written name **/
+	/** Returns player's name **/
 	@property string name() const {
 		return _name;
 	}
-	/** Returns planets which belong to the player **/
+	/** Returns the planets owned by the player. Found from the given list **/
 	@property Planet[] planets(Planet[] list){
 		Planet[] owned;
 		foreach(Planet p; list) {
@@ -44,6 +57,7 @@ class Player {
 		}
 		return owned;
 	}
+	/** Returns the array of population, combined from all planets owned by the player **/
 	@property uint[8] population(Planet[] list) {
 		Planet[] owned = planets(list);
 		uint[8] total = [0,0,0,0,0,0,0,0];
@@ -52,11 +66,11 @@ class Player {
 		}
 		return total;
 	}
-	/** Returns all ships **/
+	/** Returns all ships owned by the player **/
 	@property Ship[] ships(){
 		return _ships;
 	}
-	/** Returns duplicates of ships **/
+	/** Returns duplicates of all ships owned by the player **/
 	@property Ship[] ships() const {
 		Ship[] duplicates;
 		foreach(const Ship origin; _ships){
@@ -64,7 +78,7 @@ class Player {
 		}
 		return duplicates;
 	}
-	/** Returns sum of all player's planet's populations **/
+	/** Returns sum of the population from all planets owned by this player **/
 	@property uint populationSum(Planet[] planets) {
 		uint sum = 0;
 		foreach(planet; planets) {
@@ -76,15 +90,9 @@ class Player {
 	/** Returns true if player has no units and inhabitation ships left **/
 	@property bool dead(Map map) {
 		bool dead = populationSum(map.planets) == 0 && (inhabitationShips.length == 0 || map.freePlanets.length == 0);
-		/*if(dead) {
-			writefln("%s delcared dead", name);
-			writefln("Population sum %s", populationSum(map.planets));
-			writefln("IS: %s", inhabitationShips.length);
-			writefln("Free planets: %s", map.freePlanets.length);
-		}*/
 		return dead; 
 	}
-	/** Returns all ships of type military **/
+	/** Returns all ships of military type, owned by this player **/
 	@property MilitaryShip[] militaryShips() {
 		MilitaryShip[] milShips;
 		foreach(Ship ship; _ships){
@@ -94,7 +102,7 @@ class Player {
 		}
 		return milShips;
 	}
-	/** Returns the sum of forces on all military ships **/
+	/** Returns the sum of forces on all military ships owned by this player **/
 	@property totalMilitaryForce() {
 		double sum = 0;
 		MilitaryShip[] ms = militaryShips();
@@ -104,7 +112,7 @@ class Player {
 		}
 		return sum;
 	}
-	/** Returns all ships of type inhabitation **/
+	/** Returns all ships of inhabitation type, owned by this player **/
 	@property InhabitationShip[] inhabitationShips(){
 		InhabitationShip[] inhShips;
 		foreach(Ship ship; _ships){
@@ -118,11 +126,11 @@ class Player {
 	@property int uniqueId() const {
 		return _uniqueId;
 	}
-	/** Adds a ship to list of player'savailable ships **/
+	/** Adds a ship to list of ships owned by this player **/
 	void addShip(Ship ship){
 		_ships ~= ship;
 	}
-	/** Function executing actions on the end of the turn **/
+	/** Function executes the actions on the end of turn. Calls function to update planets and develop knowledge tree. **/
 	void completeTurn(Planet[] allPlanets) {
 		Planet[] myPlanets = planets(allPlanets);
 		int totalPopulation = 0;
@@ -133,11 +141,10 @@ class Player {
 		}
 		knowledgeTree.develop(totalPopulation);
 	}
-	/** Attacks given planet using given military ship with force based on player knowledge tree and ship units **/
+	/** Attacks given planet using given military ship with force based on player knowledge tree and units onboard that ship **/
 	void attackPlanet(MilitaryShip attackingShip, Planet planet, bool affectShip = true){
 		double milEff = _knowledgeTree.branch(BranchName.Military).effectiveness;
 		attackingShip.attackPlanet(planet, milEff, affectShip);
-		//TODO: check if removing works properly
 		if(attackingShip.empty) {
 			foreach(i, Ship ship; _ships){
 				if(ship == attackingShip){
@@ -161,6 +168,7 @@ class Player {
 			}
 		}
 	}
+	/** Returns the sum of military units from all planets **/
 	@property uint totalMilitaryUnits (Planet[] allP) {
 		uint total = 0;
 		Planet[] owned = planets(allP);
@@ -169,7 +177,8 @@ class Player {
 		}
 		return total;
 	}
-	/** Returns player with given unique id, or null if none found **/
+	/** Returns player with given unique id, from given list of players. Null if id is -1.
+	 * Throws exception or null if not found, depending on the compilation flag **/
 	static Player findPlayerWithId(int ownerId, Player[] players) {
 		if(ownerId == -1){
 			return null;
@@ -180,9 +189,12 @@ class Player {
 			}
 			debug {
 				throw new Exception("Cannot find planet owner");
+			} else {
+				return null;
 			}
 		}
 	}
+	/** Combines data from components of this object to produce hash value **/
 	override size_t toHash() nothrow {
 		double sum = 0;
 		foreach(s; _ships) {

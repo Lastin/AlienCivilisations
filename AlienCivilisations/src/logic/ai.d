@@ -1,24 +1,36 @@
-﻿module src.logic.ai;
+﻿/**
+This module implements artificial player.
+It is extension to the Player class.
 
+Upon calling makeMove(), the AI uses game state to make decisions.
+Play class taken as an argument, is used to update AI action list widget in the play screen.
+
+Constructor is only used to pass the name as "AI" to parent class constructor
+
+Author: Maksym Makuch
+ **/
+
+module src.logic.ai;
+
+import core.thread;
+import src.containers.gameState;
+import src.entities.branch;
 import src.entities.knowledgeTree;
 import src.entities.map;
 import src.entities.planet;
 import src.entities.player;
 import src.entities.ship;
-import std.stdio;
-import core.thread;
-import src.entities.branch;
-import std.concurrency;
-import std.parallelism;
-import src.containers.gameState;
-import std.algorithm;
-import std.conv;
-import std.math;
-import std.typecons;
-import std.algorithm.iteration;
-import std.format;
-import std.algorithm;
 import src.screens.play;
+import std.algorithm;
+import std.algorithm;
+import std.algorithm.iteration;
+import std.concurrency;
+import std.conv;
+import std.format;
+import std.math;
+import std.parallelism;
+import std.stdio;
+import std.typecons;
 
 //version = aiDebug;
 
@@ -27,6 +39,7 @@ class AI : Player {
 	this(int uniqueId, KnowledgeTree knowledgeTree, Ship[] ships = null) {
 		super(uniqueId, "AI", knowledgeTree, ships);
 	}
+	/** This function, when called, makes decisions in game **/
 	void makeMove(GameState gs, Play play) {
 		if(aiDisabled) return;
 		//sense
@@ -44,20 +57,24 @@ class AI : Player {
 		decideProduction(gs);
 		develop(gs);
 	}
-
+	/** Finds the best production decisions for each of the planets owned by the current player **/
 	static void decideProduction(GameState gs) {
 		Planet[] owned = gs.currentPlayer.planets(gs.map.planets);
 		sort!"a.calculateWorkforce() > b.calculateWorkforce()"(owned);
+		//Compose the list of planet's ids with orders completed within 1 step
 		int[] availables;
 		foreach(planet; owned) {
 			if(planet.queueInSteps > 1)
 				continue;
 			availables ~= planet.uniqueId;
 		}
+		//Store values to avoid recalculating them multiple times in loop
 		double milEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
 		double sciEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Science).effectiveness;
 		int capacity = Ship.capacity(milEff, sciEff);
+		//Check if inhabitation ships should be produced
 		bool produceIS = produceIS(gs);
+		//For each owned planet, decide on production
 		foreach(a; availables) {
 			GameState[] hypGS;
 			hypGS ~= gs.dup();//neither
@@ -84,15 +101,15 @@ class AI : Player {
 			}
 			else if(best == 2) {
 				gs.map.planetWithId(a).addShipOrder(ShipType.Inhabitation);
-				debug writeln("AI adds IS order");
+				version(aiDebug) writeln("AI adds IS order");
 			}
 		}
 	}
-	/** Adds military ship order to planet with id **/
+	/** Adds military ship order to planet with given unique identifier **/
 	static void addMilitaryOrder(GameState gs, int planetId, int capacity) {
-		//takes capacity as an argument to not recalculate it multiple times in a loop that calls this function
+		/** Takes capacity as an argument to not recalculate it multiple times in a loop that calls this function **/
 		Planet p = gs.map.planetWithId(planetId);
-		//convert units to obtain maximum force
+		//Convert units to obtain maximum ship force
 		if(p.militaryUnits < capacity) {
 			int neededPercent = p.numberToPercent(capacity - p.militaryUnits);
 			p.convertUnits(neededPercent);
@@ -104,7 +121,7 @@ class AI : Player {
 		int optimal = to!int(gs.map.freePlanets.length) + 1;
 		int complete = to!int(gs.currentPlayer.inhabitationShips.length);
 		int totalIS = complete;
-		//add ships in production
+		//Add ships in production
 		foreach(planet; gs.currentPlayer.planets(gs.map.planets)) {
 			int count = 0;
 			foreach(order; planet.shipOrders) {
@@ -116,7 +133,7 @@ class AI : Player {
 		int needed = optimal - complete;
 		return needed > 0;
 	}
-	/** Moves game queue twice and performs attack and inhabitation moves. Returns evaluation of state **/
+	/** Finishes turn on the game state few times, then performs attack and inhabitation moves. Returns evaluation of state **/
 	static long measure(GameState gs) {
 		gs.shift();//enemy turn (dont make any moves)
 		gs.shift();//back to AI
@@ -126,83 +143,6 @@ class AI : Player {
 		AI.inhabit(gs, null);
 		return evaluate(gs);
 	}
-	/** Adds military ships orders to destroy smallest planets **/
-	/*static void addMSOrders(GameState gs) {
-		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
-		sort!"a.populationSum < b.populationSum"(enemy);
-		int i=0;
-		int limit = 2;
-		int added = 0;
-		do {
-			added += addMSOrdersToDestroy(gs, enemy[i]);
-			i++;
-			//enemy = gs.notCurrentPlayer.planets(gs.map.planets);
-		} while(i<enemy.length && i<limit && added == 0);
-	}*/
-	/** Adds number of military ship orders needed to destroy planet's population **/
-	/*static int addMSOrdersToDestroy(GameState gs, Planet planet) {
-		int totalAdded = 0;
-		int utd = planet.populationSum;
-		double totalForce = 0;
-		double mEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
-		foreach(ms; gs.currentPlayer.militaryShips) {
-			totalForce += ms.force(mEff);
-		}
-		double needForce = utd - totalForce;
-		if(needForce > 0) {
-			int nmu = to!int(needForce / (MilitaryShip.LAMBDA * mEff));
-			double sciEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Science).effectiveness;
-			double eneEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Energy).effectiveness;
-			int cap = MilitaryShip.capacity(eneEff, sciEff);
-			int shipsNeeded = nmu / cap;
-			for(int i=0; i<shipsNeeded; i++) {
-				Planet fp = fastestProduction(gs);
-				int units = min(cap, fp.militaryUnits);
-				fp.addShipOrder(ShipType.Military, units);
-				++totalAdded;
-			}
-		}
-		return totalAdded;
-	}*/
-	/** Adds number of inhabitation ships not exceeding available planets **/
-	/*static void addISOrders(GameState gs) {
-		int optimal = to!int(gs.map.freePlanets.length) + 1;
-		int complete = to!int(gs.currentPlayer.inhabitationShips.length);
-		int totalIS = complete;
-		Planet[] ownedP = gs.currentPlayer.planets(gs.map.planets);
-		foreach(planet; ownedP) {
-			int count = 0;
-			foreach(order; planet.shipOrders) {
-				if(cast(InhabitationShip)order)
-					count++;
-			}
-			totalIS += count;
-		}
-		int needed = optimal - complete;
-		if(needed > 0) {
-			int limit = 2;
-			int[] excluded;
-			for(int i=0; i<needed; i++) {
-				Planet bp = fastestProduction(gs);
-				if(!bp)
-					return;
-				if(!canFind(excluded, bp.uniqueId)) {
-					bp.addShipOrder(ShipType.Inhabitation);
-					if(bp.shipOrders.length >= limit) {
-						excluded ~= bp.uniqueId;
-					}
-				}
-			}
-		}
-		else if(needed < 0) {
-			//cancel exceeding orders, but probaly would not be ever executed.
-			//TODO:  add cancelation
-			int canCancel = totalIS - complete;
-			for(int i=0; i<canCancel; i++) {
-				
-			}
-		}
-	}*/
 	/** Uses inhabitation ships on best planets **/
 	static void inhabit(GameState gs, Play play) {
 		Planet[] free = gs.map.freePlanets();
@@ -235,7 +175,7 @@ class AI : Player {
 		}
 		return best;
 	}
-	/** Converts civil units to military **/
+	/** Converts civil units to military, to avoid overpopulation factor taking effect **/
 	static void convertOverpopulation(GameState gs) {
 		Planet[] allPlanets = gs.map.planets;
 		Planet[] owned = gs.currentPlayer.planets(allPlanets);
@@ -250,10 +190,11 @@ class AI : Player {
 			}
 		}
 	}
-	/** Finds best planet to be attacked and attacks **/
+	/** Create ranking of best planets to attack and performs the attacks **/
 	static void attack(GameState gs, Play play) {
 		MilitaryShip[] ms = gs.currentPlayer.militaryShips;
 		if(ms.length == 0) {
+			//If no military ships owned
 			return;
 		}
 		double milEff = gs.currentPlayer.knowledgeTree.branch(BranchName.Military).effectiveness;
@@ -262,6 +203,7 @@ class AI : Player {
 		int[] rankedIds = planetAttackRank(gs);
 		version (aiDebug) writeln(rankedIds);
 		int i=0;
+		//Attack until there are no planets left to attack, or player runs out of military ships
 		while(ms.length > 0 && i<rankedIds.length) {
 			Planet attacked = gs.map.planetWithId(rankedIds[i]);
 			if(!attacked)
@@ -269,6 +211,7 @@ class AI : Player {
 			foreach(ship; ms) {
 				gs.currentPlayer.attackPlanet(ship, attacked, true);
 				if(!attacked.owner) {
+					//If planet population destroyed completly, then move to the next planet in the ranking
 					i++;
 					break;
 				}
@@ -276,7 +219,7 @@ class AI : Player {
 			if(play) {
 				play.addAIAction("AI attacked " ~ attacked.name, 0xff0000);
 			}
-			//update array
+			//Update military ship array
 			ms = gs.currentPlayer.militaryShips;
 		}
 	}
@@ -285,8 +228,8 @@ class AI : Player {
 		Planet[] enemy = gs.notCurrentPlayer.planets(gs.map.planets);
 		Tuple!(int, long)[] scores;
 		scores.reserve(enemy.length + 1);
-		//Planet attacked
 		foreach(planet; enemy) {
+			//For each enemy planet, create duplicate and experiment on it
 			GameState duplicate = gs.dup();
 			attackAndShift(duplicate, planet.uniqueId);
 			long score = -negaMaxA(duplicate, 2, -long.max, long.max);
@@ -304,7 +247,7 @@ class AI : Player {
 		}
 		return ids;
 	}
-	// Attacks planet with given id, and moves queue
+	/** Attacks planet with given id, and moves queue **/
 	static void attackAndShift(GameState gs, int planetId) {
 		if(planetId >= 0){
 			Planet attacked = gs.map.planetWithId(planetId);
@@ -317,6 +260,7 @@ class AI : Player {
 		gs.currentPlayer.completeTurn(gs.map.planets);
 		gs.moveQPosition();
 	}
+	/** NegaMax algorithm, created decision tree of planets attacks. Returns best score, derived from given game state **/
 	static long negaMaxA(GameState gs, int depth, long alpha, long beta) {
 		//TERMINAL
 		if(depth <= 0) // || gs.currentPlayer.militaryShips.length == 0
@@ -387,13 +331,14 @@ class AI : Player {
 		int result = (p[0..2].sum * g1 + p[2..7].sum * g2 + p[7..$].sum * g3) / g1+g2+g3;
 		return result;
 	}
-	/** Finds and develops best branch **/
+	/** Finds and develops best knowledge tree branch **/
 	static void develop(GameState gs) {
 		if(stepsToDevelop(gs) > 1)
 			return;
 		Branch[] undev = gs.currentPlayer.knowledgeTree.undevelopedBranches;
 		BranchName bestBranch;
 		long bestScore = -long.max;
+		//Test each branch which has not yet reached maximum level
 		foreach(branch; undev) {
 			GameState dup = gs.dup;
 			dup.currentPlayer.knowledgeTree.addOrder(branch.name);
@@ -406,7 +351,8 @@ class AI : Player {
 		writefln("AI develops %s", bestBranch);
 		gs.currentPlayer.knowledgeTree.addOrder(bestBranch);
 	}
-	/** Returns score for best knowledge to develop, from given state **/
+	/** This version of negamax returns the best score for the game state,
+	derived from current game state by making knowledge tree developments **/
 	static long negaMaxK(GameState gs, int depth, long alpha, long beta) {
 		if(depth == 0)
 			return evaluateK(gs);
@@ -421,7 +367,8 @@ class AI : Player {
 		}
 		return bestScore;
 	}
-	/** Evaluates current gamestate considering only one player, but all attributes **/
+	/** Evaluates current gamestate considering only one player, but all attributes.
+	Used by the negaMaxK, for evaluation of knowledge tree development decisions **/
 	static long evaluateK(GameState gs) {
 		Player me = gs.currentPlayer;
 		double milEff = me.knowledgeTree.branch(BranchName.Military).effectiveness;
@@ -443,7 +390,7 @@ class AI : Player {
 			duplicate.currentPlayer.completeTurn(duplicate.map.planets);
 			steps++;
 		}
-		writefln("Queue empty in %s", steps);
+		version (aiDebug) writefln("Queue empty in %s", steps);
 		return steps;
 	}
 }

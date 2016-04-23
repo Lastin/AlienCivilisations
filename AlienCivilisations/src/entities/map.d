@@ -1,18 +1,34 @@
-﻿module src.entities.map;
+﻿/**
+This module implements the map used in game.
+It hold the size and references to the planets.
 
+It offers two contructors:
+-initialise planets and assign owners - this is when initialising new map
+-takes already initialised list of planets and store it in the instance variable
+
+When intialising new map, it places the planets randomly, at distance no closer than specified.
+When initialising new map, identical planets are created for each player and assigned ownership to them, others have randomly generated properties.
+
+Author: Maksym Makuch
+ **/
+
+module src.entities.map;
+
+import src.containers.point2d;
 import src.entities.planet;
 import src.entities.player;
+import src.entities.ship;
 import std.conv;
+import std.format;
 import std.random;
 import std.stdio;
-import src.containers.point2d;
-import src.entities.ship;
-import std.format;
 
 class Map {
+
 	private immutable float _size;
 	private Planet[] _planets;
 
+	/** Takes size, number of planets and players. Initialises new planets and assigns ownerships **/
 	this(float size, int planetCount, Player[] players) {
 		_size = size;
 		int idCount = 0;
@@ -33,12 +49,12 @@ class Map {
 			}
 		}
 	}
-
+	/** Takes the size and already initialised planets (stores planets in the instance array) **/
 	this(float size, Planet[] planets) {
 		_size = size;
 		_planets = planets;
 	}
-	/** Adds planet to list and returns same planet **/
+	/** Adds planet to list of all planets, and returns same planet **/
 	Planet addPlanet(Planet planet) {
 		_planets ~= planet;
 		return planet;
@@ -54,7 +70,8 @@ class Map {
 		}
 		return false;
 	}
-	/** Returns planet which border is closer than minimum distance minus radius of vector **/
+	/** Returns planet which border is closer than minimum distance minus radius of vector.
+	Default minimal distance in place, pass number as third argument to use custom value **/
 	Planet collides(Point2D vector, float radius, float minDistance = 700) {
 		foreach(Planet planet; _planets){
 			auto distance = vector.getEuclideanDistance(planet.position) - radius - planet.radius;
@@ -87,7 +104,7 @@ class Map {
 	@property Planet[] planets() {
 		return _planets;
 	}
-	/** Returns duplicates of the planets**/
+	/** Returns duplicates of the planets. Assigns ownership to the player, from argument list, found by same unique identifier as current owner **/
 	@property Planet[] duplicatePlanets(Player[] players) const {
 		Planet[] duplicates;
 		foreach(const Planet origin; _planets){
@@ -100,7 +117,7 @@ class Map {
 	@property float size() const {
 		return _size;
 	}
-	/**  **/
+	/** Returns vacant planets **/
 	@property Planet[] freePlanets() {
 		Planet[] free;
 		foreach(planet; _planets) {
@@ -109,6 +126,7 @@ class Map {
 		}
 		return free;
 	}
+	/** Returns the player belonging to the player with given unique identifier **/
 	Planet[] playerPlanets(int puid) {
 		Planet[] pp;
 		foreach(planet; planets) {
@@ -118,6 +136,7 @@ class Map {
 		}
 		return pp;
 	}
+	/** Returns the instance of the planet found by given unique identifier **/
 	Planet planetWithId(int uniqueId) {
 		foreach(planet; _planets) {
 			if(planet.uniqueId == uniqueId)

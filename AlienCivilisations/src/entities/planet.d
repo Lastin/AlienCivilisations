@@ -1,15 +1,29 @@
-﻿module src.entities.planet;
+﻿/**
+This module implements the planets used in game.
+It offers to constructors:
+-taking 5 arguments, other values of the planet are set to 0 or null
+-taking all parameters, used to duplicate the planet, or create object from the values read from JSON
 
-import std.algorithm;
-import std.conv;
+Name, position, radius, breathable atmosphere and unique identifier are immutable.
+
+Function with member function attribute "const" are to be used to inform the
+compiler explicitly, that an object on which the function is called should not modify that object
+
+Author: Maksym Makuch
+ **/
+
+module src.entities.planet;
+
+import src.containers.point2d;
+import src.entities.knowledgeTree;
 import src.entities.player;
 import src.entities.ship;
-import std.format;
-import src.entities.knowledgeTree;
-import std.stdio;
-import std.math;
-import src.containers.point2d;
+import std.algorithm;
+import std.conv;
 import std.digest.md;
+import std.format;
+import std.math;
+import std.stdio;
 
 public enum int POPULATION_CONSTANT = 10000;
 enum double FOOD_CONSUMPTION_RATE = 1;
@@ -32,7 +46,7 @@ class Planet {
 		Ship[] _shipOrders;
 		int _attackedCount = 0;
 	}
-
+	/** Constructor for creating new planet with 0 or null values **/
 	this(int uniqueId, string name, Point2D position, float radius, bool breathableAtmosphere) {
 		_uniqueId = uniqueId;
 		_breathableAtmosphere = breathableAtmosphere;
@@ -49,7 +63,7 @@ class Planet {
 		_militaryUnits = militaryUnits;
 		_shipOrders = shipOrders;
 	}
-	/** Returns duplicate of the planet. Takes object to not pass wrong owner reference **/
+	/** Returns duplicate of the planet. Ownership is assigned to the player in argument **/
 	Planet dup(Player newOwner) const {
 		string name = name();
 		int uniqueId = uniqueId();
@@ -64,40 +78,51 @@ class Planet {
 		pDup.setOwner(newOwner);
 		return pDup;
 	}
-
+	/** Returns the position of the planet **/
 	@property Point2D position() {
 		return _position;
 	}
+	/** Returns the position of the planet **/
 	@property Point2D position() const {
 		return _position.dup;
 	}
+	/** Returns the breathable atmosphere property **/
 	@property bool breathableAtmosphere() const {
 		return _breathableAtmosphere;
 	}
+	/** Returns the capacity of the planet, calculated using radius **/
 	@property int capacity() {
 		return to!int(_radius / 10 * POPULATION_CONSTANT);
 	}
+	/** Returns the total of the population array **/
 	@trusted @property uint populationSum() const nothrow {
 		return _population[].sum;
 	}
+	/** Returns the radius **/
 	@property float radius() const {
 		return _radius;
 	}
+	/** Returns the name **/
 	@property string name() const {
 		return _name;
 	}
+	/** Returns the reference of the owner **/
 	@property Player owner() {
 		return _owner;
 	}
+	/** Returns the food property **/
 	@property double food() const {
 		return _food;
 	}
+	/** Returns the military units on this planet **/
 	@property uint militaryUnits() const {
 		return _militaryUnits;
 	}
+	/** Returns the population array of this planet **/
 	@property uint[8] population() {
 		return _population;
 	}
+	/** Returns the population array of this planet **/
 	@property uint[8] population() const {
 		uint[8] na;
 		foreach(i, number; _population) {
@@ -105,24 +130,29 @@ class Planet {
 		}
 		return na;
 	}
+	/** Returns the unique identifier of the planet owner, or -1 if owner is null **/
 	@property int ownerId() const {
 		if(!_owner)
 			return -1;
 		return _owner.uniqueId;
 	}
+	/** Returns the array of ships ordered to produce **/
 	@property Ship[] shipOrders() {
 		return _shipOrders;
 	}
+	/** Returns the duplicate of the ship orders array. All object inside are duplicated **/
 	@property Ship[] shipOrdersDups() const {
 		return Ship.duplicateShips(_shipOrders);
 	}
+	/** Returns the unique identifier of this planet **/
 	@property int uniqueId() const {
 		return _uniqueId;
 	}
-
+	/** Returns the name and position of this planet as string **/
 	override public string toString() {
 		return format("Planet: %s Position X:%s Y:%s", _name, _position.x, _position.y);
 	}
+	/** Sets new owner **/
 	Planet setOwner(Player player) {
 		_owner = player;
 		if(!_owner)
@@ -145,12 +175,12 @@ class Planet {
 	@property int attackedCount() {
 		return _attackedCount;
 	}
-	/**Sets new owner of the planet and sets units from inhabitation ship**/
+	/** Sets new owner of the planet and distributes units onboard across population array **/
 	void inhabit(Player owner, InhabitationShip ship){
 		if(owner)
 			return;
 		_owner = owner;
-		int ppa = to!int(ship.unitsOnboard / 8);
+		int ppa = to!int(ship.onboard / 8);
 		_population = [ppa,ppa,ppa,ppa,ppa,ppa,ppa,ppa];
 	}
 	/** Sets population to default value of 1/8th maximum capacity **/
@@ -169,7 +199,10 @@ class Planet {
 		version(planetDebug) writefln("Calulated workforce: %s", result);
 		return result;
 	}
-	/** Function affects planet's attributes. Should be called after player finishes move **/
+	/** Function called on the end of player's turn.
+	 * Function affects planet's attributes.
+	 * Function calculates workforce, produces ships and modifies food value and population
+	 **/
 	void step(bool affectOwner) {
 		double workforce = calculateWorkforce();
 		version(planetDebug) {
@@ -189,11 +222,10 @@ class Planet {
 		}
 		_food = 0;
 	}
-	/** 
-	 * Food supply at best increases at arythmetic rate
-	 * 1 > 2 > 3 > 4 > 5
-	**/
+	/** Function modifies the food value depending on the given workforce and population **/
 	private void affectFood(double workforce) {
+		/** Food supply at best increases at arythmetic rate
+		 * 1 > 2 > 3 > 4 > 5 **/
 		//Consume food
 		double fpe = _owner.knowledgeTree.branch(BranchName.Food).effectiveness;
 		version(planetDebug) {
@@ -206,24 +238,26 @@ class Planet {
 		version(planetDebug) writefln("New food = %s", _food);
 		_food = max(_food, 0);
 	}
-	/**
-	 * Population grows at exponential rate
-	 * 1 > 2 > 4 > 8 > 16
-	**/
+	/** Function modifies the population, using multiple properties **/
 	private void growPopulation() {
+		/** Population grows at exponential rate
+		 * 1 > 2 > 4 > 8 > 16 **/
+		//set overpopulation to 1
 		double opf = 1;
-		//POWER(1 + (SUM(A2:H2) - N3) / N3,2)
+		//Ff population overflows, then calculate opf
 		if(populationSum > capacity){
 			version (planetDebug) writeln("[ Overpopulation takes effect! ]");
 			double overflow = populationSum - capacity;
 			opf -= (overflow / capacity);
 			opf = max(opf, 0.01);
 		}
+		// Remove ownership if population extincted
 		if(populationSum == 0){
 			version(planetDebug) writeln("Population empty!");
 			_owner = null;
 			return;
 		}
+		//Calculate food per unit and food factor 
 		double fpu = _food / (populationSum * FOOD_CONSUMPTION_RATE);
 		double foodFactor = (fpu / (fpu + 1)) * 2;
 		foodFactor = min(1.5, max(foodFactor, 0.01));
@@ -241,10 +275,11 @@ class Planet {
 			writefln("OPF = %s", opf);
 			writefln("Birth factor = %s", birthFactor);
 		}
+		//Add newborns to the head of the array
 		_population[0] = to!int(newBorns);
 		assert(_population[0] >= 0);
 	}
-	/** Converts civil units into military units **/
+	/** Converts given percent of the civil units (from certain groups)  into military **/
 	uint convertUnits(int percent) {
 		uint p = max(0, min(percent, 100));
 		uint g1 = to!int(_population[2] * p/100);
@@ -259,13 +294,14 @@ class Planet {
 		}
 		return g1 + g2;
 	}
-	/** Converts percentage to military callable units **/
+	/** Converts percentage to military convertible units **/
 	uint percentToNumber(int percent) const {
 		uint p = max(0, min(percent, 100));
 		uint g1 = to!int(_population[2] * p/100);
 		uint g2 = to!int(_population[3] * p/100);
 		return g1 + g2;
 	}
+	/** Converts given number to percent of the convertible units (0 to 100)**/
 	int numberToPercent(int amount) const {
 		int target = amount * 100 / _population[2..4].sum;
 		return min(100, max(target, 0));
@@ -303,7 +339,6 @@ class Planet {
 			}
 		}
 		if(populationSum == 0) {
-			//_owner = null;
 			setOwner(null);
 		}
 		version(planetDebug) { 
@@ -312,7 +347,7 @@ class Planet {
 		}
 		return force;
 	}
-	/** Produces ships from the queue **/
+	/** Produces ships from the queue, removes from queue if finished **/
 	private double produceShips(double workforce, bool addToOwner) {
 		foreach(Ship s; _shipOrders) {
 			workforce = s.build(workforce);
@@ -325,7 +360,7 @@ class Planet {
 		}
 		return workforce;
 	}
-	/** Adds order for ship to queue **/
+	/** Adds order for ship production to the end of the queue **/
 	void addShipOrder(ShipType type, int units = 0) {
 		double eneEff = _owner.knowledgeTree.branch(BranchName.Energy).effectiveness;
 		double sciEff = _owner.knowledgeTree.branch(BranchName.Science).effectiveness;
@@ -343,7 +378,7 @@ class Planet {
 			_shipOrders ~= new InhabitationShip(eneEff, sciEff, 0);
 		}
 	}
-	/** Returns number of steps needed to complete the ship **/
+	/** Returns number of steps needed to complete the ship. Number may change with every turn **/
 	int stepsToCompleteOrder(Ship ship) {
 		int steps = 0;
 		foreach(Ship s; _shipOrders) {
@@ -353,7 +388,7 @@ class Planet {
 		}
 		return steps;
 	}
-	/** Removes order at index from queue **/
+	/** Removes order at index from the queue **/
 	void cancelOrder(int index){
 		version(planetDebug) writefln("Removing order #%s", index);
 		_shipOrders = _shipOrders.remove(index);
@@ -366,7 +401,7 @@ class Planet {
 		}
 		_shipOrders = null;
 	}
-	/** Returns length of ship queue in steps, using current production rate **/
+	/** Returns length of ship queue in steps. Calculated using current production rate. Number may change with every turn **/
 	int queueInSteps(){
 		double neededDev = 0;
 		foreach(ship; _shipOrders) {
@@ -384,6 +419,7 @@ class Planet {
 		_militaryUnits = mu;
 		_shipOrders = so;
 	}
+	/** Combines data from components of this object to produce hash value **/
 	override size_t toHash() nothrow {
 		double sum = 0;
 		sum += populationSum;
@@ -394,6 +430,6 @@ class Planet {
 			sum += so.toHash;
 		}
 		sum += _attackedCount;
-		return cast(size_t)(sum);//super.toHash;
+		return cast(size_t)(sum);
 	}
 }

@@ -1,4 +1,13 @@
-﻿module src.entities.knowledgeTree;
+﻿/**
+This module implements knowledge tree.
+It initialises and stores the references to 4 objects of Branch
+Uses single contructor, can take points on initialisation.
+Branches are distinguished by BranchName enumerator
+
+Author: Maksym Makuch
+ **/
+
+module src.entities.knowledgeTree;
 
 import src.entities.branch;
 import std.format;
@@ -20,6 +29,8 @@ public class KnowledgeTree {
 		BranchName[] _orders;
 		double lambda = 0.1;
 	}
+	/** Contructor, takes fixed size array of unsigned integer in contructor.
+	 * Each element in the should contain initial points for the branches (in alphabetical order) **/
 	this(uint[4] points) {
 		_energy = 	new Branch(BranchName.Energy,	points[0]);
 		_food = 	new Branch(BranchName.Food, 	points[1]);
@@ -29,6 +40,8 @@ public class KnowledgeTree {
 			addDependencies(branch);
 		}
 	}
+	/** Returns the object of branch, recognised by enum parameter.
+	 * Throws exception if branch could not be found **/
 	@property Branch branch(BranchName branch) {
 		switch(branch){
 			case BranchName.Energy: 	return _energy;
@@ -38,6 +51,8 @@ public class KnowledgeTree {
 			default: 					throw new Exception("Unknown branch");
 		}
 	}
+	/** Returns the object of branch, recognised by string parameter
+	 * Throws exception if branch could not be found **/
 	@property Branch branch(string branchName) {
 		switch(branchName){
 			case "Energy": 		return _energy;
@@ -47,11 +62,12 @@ public class KnowledgeTree {
 			default: 			throw new Exception("Unknown branch");
 		}
 	}
-	/** Returns branches in alphabetical naming order **/
+	/** Returns objects of branches, in alphabetical naming order **/
 	@property Branch[4] branches() {
 		return [_energy, _food, _military, _science];
 	}
-	/** Returns development orders **/
+	/** Returns tuples of development orders.
+	First element is branch name, second is target level of given order**/
 	@property Tuple!(BranchName, int)[] orders(){
 		Tuple!(BranchName, int)[] orderPairs;
 		int[4] levels = [_energy.level, _food.level, _military.level, _science.level];
@@ -78,7 +94,7 @@ public class KnowledgeTree {
 		}
 		return orderPairs;
 	}
-	/** Returns branches which haven't reached max level **/
+	/** Returns total efficiency of the knowledge tree **/
 	@property double totalEff(){
 		double total = 0;
 		foreach(bn; EnumMembers!BranchName) {
@@ -86,6 +102,7 @@ public class KnowledgeTree {
 		}
 		return total;
 	}
+	/** Returns branches which haven't reached maximum level **/
 	@property Branch[] undevelopedBranches() {
 		Branch[] nfd;
 		foreach(bn; EnumMembers!BranchName){
@@ -95,6 +112,8 @@ public class KnowledgeTree {
 		}
 		return nfd;
 	}
+	/** Adds dependencies to a branch in argument.
+	 * Dependencies differ between branches of different branch name **/
 	void addDependencies(Branch branch){
 		if(branch.name == BranchName.Energy) {
 			branch.addDependency(_science);
@@ -111,14 +130,16 @@ public class KnowledgeTree {
 			branch.addDependency(_energy);
 		}
 	}
+	/** Returns levels of all branches in string format **/
 	override string toString() {
 		return format("energy: %s \nfood: %s \nmilitary: %s \nscience: %s",
 			_energy, _food, _military, _science);
 	}
-	/** Develops branches in queue using given points **/
+	/** Develops branches in queue using points given in argument **/
 	int develop(int population){
 		uint points = to!uint(population * totalEff * lambda);
 		version(debugTree) {
+			//Used for debugging
 			writeln("--------------------------------------");
 			writeln("Developing knowledge tree");
 			writefln("Population total: %s", population);
@@ -137,6 +158,7 @@ public class KnowledgeTree {
 		version(debugTree) writeln("--------------------------------------");
 		return points;
 	}
+	/** Adds development order to the queue, if sum of branch level and orders for this branch does not exceed maximum level **/
 	bool addOrder(BranchName toAdd){
 		if(branch(toAdd).full)
 			return false;
@@ -153,7 +175,7 @@ public class KnowledgeTree {
 	void clearOrders() {
 		_orders = null;
 	}
-	//Returns duplicate of the current object, without references to original
+	/** Returns the duplicate of this knowledge tree **/
 	KnowledgeTree dup() const {
 		uint[4] points = 
 		[
@@ -168,6 +190,7 @@ public class KnowledgeTree {
 		}
 		return newKt;
 	}
+	/** Combines data from components of this object to produce hash value **/
 	override size_t toHash() nothrow {
 		double sum = 0;
 		sum += _energy.points;

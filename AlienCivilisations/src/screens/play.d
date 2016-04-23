@@ -1,22 +1,44 @@
-﻿module src.screens.play;
+﻿/**
+This module implements play screen.
+It consists of the Play and AnimatedBackground class.
+
+It uses AppFrame to display animated background and combinations of various layouts for HUD
+It hold the reference to view handler, to switch to main menu on ESCAPE button press.
+
+There are two constructors available:
+-without camera position in argument, is for new game. Camera position is set to human player's planet position
+-with camera position is for existing game state, loaded from game save or loaded back from pause menu
+
+Game manager is used to handle end of turns.
+Mouse events and keyboard events are overriden to custom functions.
+
+Selected planet is update in animated background when user clicks with mouse.
+Animated background hold the reference to the planet list directly, to get
+planet positions and sizes more efficiently when rendering
+
+
+Author: Maksym Makuch
+ **/
+
+module src.screens.play;
 
 import dlangui;
+import src.containers.gameState;
+import src.containers.point2d;
+import src.entities.branch;
+import src.entities.knowledgeTree;
 import src.entities.planet;
 import src.entities.player;
-import src.handlers.gameManager;
-import src.screens.menu;
-import std.stdio;
 import src.entities.ship;
-import src.entities.knowledgeTree;
-import src.entities.branch;
-import std.format;
-import src.logic.ai;
-import std.math;
+import src.handlers.gameManager;
 import src.handlers.jsonParser;
 import src.handlers.viewHanlder;
-import src.containers.point2d;
-import src.containers.gameState;
+import src.logic.ai;
+import src.screens.menu;
 import std.datetime;
+import std.format;
+import std.math;
+import std.stdio;
 
 class Play : AppFrame {
 	protected {
@@ -26,7 +48,7 @@ class Play : AppFrame {
 		Point2D _startPosition;
 		Point2D _endPosition;
 		Point2D _cameraPosition;
-		//other
+		//Other
 		GameManager _gm;
 		GameState _gameState;
 		Planet _selectedPlanet;
@@ -44,7 +66,7 @@ class Play : AppFrame {
 		PopupWidget _currentPopup;
 		bool _end = false;
 	}
-
+	/** Constructor for start of the new game **/
 	this(ViewHandler vh, GameManager gm = null, int width = 0, int height = 0){
 		_vh = vh;
 		addChild(getLayout());
@@ -58,23 +80,23 @@ class Play : AppFrame {
 		assignButtonsActions();
 		updatePlayerStats();
 	}
-
+	/** Constructor for loading from save or switching back from menu **/
 	this(ViewHandler vh, GameManager gm, Point2D camPos) {
 		this(vh, gm);
 		_cameraPosition = camPos;
 		_endPosition = _cameraPosition.dup;
 	}
-
+	/** Updates the AI information displayed in the AI action list widget **/
 	private void updateAIInfo() {
 		addAIAction(format("AI owns %s miliary ships", _gameState.ai.militaryShips.length));
 		addAIAction(format("AI owns %s inhabitation ships", _gameState.ai.inhabitationShips.length));
 	}
-
+	/** Initialises objects and fetches elements of GUI to object fields. Additionally checks if AI should make move first **/
 	void initialiseObjects(bool initCam = true, int width = 0, int height = 0) {
 		_gameState = _gm.state;
 		_mainContainer = childById("verticalContainer").childById("horizontalContainer");
 		_playerStatsContainer = _mainContainer.childById("vr1").childById("hr1");
-		//planet informations
+		//Planet informations
 		_planetInfoContainer = _mainContainer.childById("rvp").childById("hr2").childById("vr2").childById("planetInfoContainer");
 		_planetInfoContainer.visibility(Visibility.Invisible);
 		_playersPlanetOptions = _planetInfoContainer.childById("ppo");
@@ -110,7 +132,7 @@ class Play : AppFrame {
 			_gm.endTurn(this);
 		}
 	}
-	/** Assigns functions to buttons **/
+	/** Assigns functions to the buttons and mouse/keyboard events **/
 	private void assignButtonsActions(){
 		Widget endTurnButton = _playerStatsContainer.childById("endTurnButton");
 		Widget inhabitButton = _planetInfoContainer.childById("inhabitButton");
@@ -119,7 +141,7 @@ class Play : AppFrame {
 		Widget orderMilShipBtn = _planetInfoContainer.childById("orderMilitaryShip");
 		Widget orderInhShipBtn = _planetInfoContainer.childById("orderInhabitShip");
 		Widget knowledgeTreeButton = childById("verticalContainer").childById("hr3").childById("vr3").childById("knowledgeTreeButton");
-		//Assign
+		//Assign button actions, and default handlers
 		mouseEvent = &handleMouseEvent;
 		keyEvent = delegate (Widget source, KeyEvent event) {
 			if(_end)
@@ -218,9 +240,6 @@ class Play : AppFrame {
 					_animatedBackground.setSelectedPlanet(_selectedPlanet);
 					updatePlanetInfo(_selectedPlanet);
 				}
-				/*if(clickedOn && clickedOn != _selectedPlanet){
-
-				}*/
 			}
 		}
 		if(event.button == MouseButton.Right){
@@ -259,8 +278,11 @@ class Play : AppFrame {
 		return true;
 	}
 
-	/*Widgets and layouts sections*/
-	/** Returns knowledge tree development popup window **/
+	/** 
+	 * Widgets and layouts sections
+ 	**/
+
+	/** Returns knowledge tree window **/
 	private Widget knowledgeTreePopup(){
 		Widget popup = defaultPopup("Knowledge Tree Development");
 		TableLayout tl = new TableLayout();
@@ -374,7 +396,6 @@ class Play : AppFrame {
 		buttons[2].click = delegate (Widget source) => dgt(BranchName.Military);
 		buttons[3].click = delegate (Widget source) => dgt(BranchName.Science);
 		popup.addChild(tl);
-
 		//separator
 		popup.addChild(new VSpacer().backgroundColor(0x333333));
 		//DEVELOPMENT ORDERS
@@ -424,7 +445,7 @@ class Play : AppFrame {
 		foreach(MilitaryShip ship; _gameState.human.militaryShips) {
 			HorizontalLayout hl = new HorizontalLayout();
 			hl.addChild(new CheckBox("checkBox"));
-			hl.addChild(new TextWidget(null, "Military units onboard: " ~ to!dstring(ship.unitsOnboard)).textColor(0xFFFFFF));
+			hl.addChild(new TextWidget(null, "Military units onboard: " ~ to!dstring(ship.onboard)).textColor(0xFFFFFF));
 			hl.backgroundColor(0x737373);
 			hl.padding(2);
 			hl.margins(2);
@@ -435,12 +456,6 @@ class Play : AppFrame {
 			selected[index] = !selected[index];
 			auto cb = cast(CheckBox)wla.itemWidget(index).childById("checkBox");
 			cb.checked = selected[index];
-			/*MilitaryShip s = _gameState.human.militaryShips[index];
-			_gameState.human.attackPlanet(s, _selectedPlanet);
-			debug {
-				writefln("Attacked planet: %s", _selectedPlanet.name);
-				writefln("Using ship: %s", index);
-			}*/
 			return true;
 		};
 		popupWindow.addChild(shipsList);
@@ -463,6 +478,7 @@ class Play : AppFrame {
 		popupWindow.addChild(btnContainer);
 		return popupWindow;
 	}
+	/** Display end of game widget and lock actions if either of the players is dead **/
 	private void checkIfEnd() {
 		PlayerEnum dead = _gameState.deadPlayer();
 		if(dead == PlayerEnum.None)
@@ -500,14 +516,13 @@ class Play : AppFrame {
 			_vh.setMainMenu();
 			return true;
 		};
-		//vl.addChild(showStats());
 		vl.addChild(new VSpacer());
 		vl.addChild(rtrn);
 		vl.addChild(new VSpacer());
 		switchPopup(vl);
 	}
 	private void showStats() {
-		//TODO: add showing game statistics
+		//Future work: add displaying statistics after ending of the match
 	}
 	/** Returns widget for putting an order of ship on the planet **/
 	private Widget orderMilitaryShipPopup(){
@@ -534,7 +549,7 @@ class Play : AppFrame {
 		//
 		ScrollBar slider = new ScrollBar(null, Orientation.Horizontal);
 		slider.pageSize(1);
-		//Set slider properties dependent on player stats
+		//Set slider properties depending on player properties
 		int maxCapacity = Ship.capacity(_gameState.human);
 		if(_selectedPlanet.militaryUnits < 100) {
 			slider.minValue = 100 / _selectedPlanet.militaryUnits;
@@ -552,15 +567,8 @@ class Play : AppFrame {
 			return to!int(_selectedPlanet.militaryUnits * percent);
 		};
 		total.text(to!dstring(sliderToUnits()));
-		//set slider change event
+		//Handler for slider movements
 		slider.scrollEvent = delegate(AbstractSlider source, ScrollEvent event) {
-			/*
-			if(sliderToUnits() > Ship.capacity(_gameState.human)){
-				maxInfo.visibility(Visibility.Visible);
-				maxInfo.text = "Capacity exceeded. Ship will only hold it's max capacity"d;
-			} else {
-				maxInfo.visibility(Visibility.Invisible);
-			}*/
 			total.text(to!dstring(sliderToUnits()));
 			return true;
 		};
@@ -655,7 +663,7 @@ class Play : AppFrame {
 			
 			return true;
 		};
-		//info
+		//Info
 		TextWidget extraInfo = new TextWidget(null, "*Only units from 2nd and 3rd age group are converted"d);
 		extraInfo.textColor = 0xFFFFFF;
 		extraInfo.padding = 7;
@@ -667,6 +675,7 @@ class Play : AppFrame {
 		buttonContainer.addChild(new HSpacer());
 		buttonContainer.addChild(apply);
 		buttonContainer.addChild(cancel);
+		//Assign button actions
 		apply.click = delegate(Widget action){
 			_selectedPlanet.convertUnits(slider.position+1);
 			switchPopup(null);
@@ -678,13 +687,14 @@ class Play : AppFrame {
 			switchPopup(null);
 			return true;
 		};
-		//Layout properties
+		//Add elements to popup window
 		popupWindow.addChild(infoContainer);
 		popupWindow.addChild(slider);
 		popupWindow.addChild(extraInfo);
 		popupWindow.addChild(buttonContainer);
 		return popupWindow;
 	}
+	/** Returns the generic template of popup Widget **/
 	private Widget defaultPopup(string title){
 		VerticalLayout layout = new VerticalLayout;
 		//Title bar
@@ -702,6 +712,7 @@ class Play : AppFrame {
 		layout.backgroundColor(0x4B4B4B);
 		return layout;
 	}
+	/** Returns generic popup for displaying informations on the screen **/
 	private Widget infoPopup(string title, string message){
 		Widget popup = defaultPopup(title);
 		MultilineTextWidget msg = new MultilineTextWidget(null, to!dstring(message));
@@ -723,6 +734,7 @@ class Play : AppFrame {
 		popup.addChild(btnCont);
 		return popup;
 	}
+	/** Parses the string to layout and returns it as a Widget **/
 	private Widget getLayout(){
 		auto layout =
 			q{
@@ -935,7 +947,7 @@ class Play : AppFrame {
 		};
 		return parseML(layout);
 	}
-	/** Switches popup shown in window, to see only one **/
+	/** Switches popup shown in window, to see only one at a time **/
 	protected void switchPopup(Widget popup){
 		window.removePopup(_currentPopup);
 		if(_currentPopup) {
@@ -956,8 +968,6 @@ class Play : AppFrame {
 		MultilineTextWidget mltw = new MultilineTextWidget(null, to!dstring(action));
 		mltw.minHeight(50);
 		mltw.textColor(0xFFFFFF);
-		//mltw.padding(2);
-		//mltw.maxWidth(100);
 		sovl.addChild(mltw);
 		sohl.addChild(sovl);
 		sohl.addChild(new HSpacer());
@@ -992,7 +1002,7 @@ class Play : AppFrame {
 						} else {
 							sovl.addChild(new TextWidget(null, "Inhabitation ship"d).textColor(0xFFFFFF));
 						}
-						sovl.addChild(new TextWidget(null, "Units: " ~ to!dstring(ship.unitsOnboard)).textColor(0xFFFFFF));
+						sovl.addChild(new TextWidget(null, "Units: " ~ to!dstring(ship.onboard)).textColor(0xFFFFFF));
 						sovl.addChild(new TextWidget(null, "Cost: "d ~ to!dstring(ship.buildCost)).textColor(0xFFFFFF));
 						int stepsRequired = planet.stepsToCompleteOrder(ship);
 						sovl.addChild(new TextWidget(null, "Steps required: "d ~ to!dstring(stepsRequired)).textColor(0xFFFFFF));
@@ -1043,33 +1053,42 @@ class Play : AppFrame {
 		_playerStatsContainer.childById("totalMilitaryUnits").text = to!dstring(militaryUnitTotal);
 		_playerStatsContainer.childById("inhabitationShipCount").text = to!dstring(_gameState.human.inhabitationShips.length);
 	}
+	/** Invalidates after drawing, to require another drawing **/
 	override void animate(long interval) {
-		//_animation.animate(interval);
 		invalidate();
 	}
+	/** Returns the drawable background casted to DrawableRef type **/
 	@property override DrawableRef backgroundDrawable() const {
-		return cast(DrawableRef)_drawableRef;//(cast(Play)this)._drawableRef;
+		return cast(DrawableRef)_drawableRef;
 	}
+	/** Returns animated background **/
 	@property AnimatedBackground animatedBackground() {
 		return _animatedBackground;
 	}
+	/** Returns the camera position **/
 	@property Point2D cameraPosition() {
 		return _cameraPosition;
 	}
+	/** Returns the real game state **/
 	@property GameState gameState() {
 		return _gameState;
 	}
+	/** Returns the game manager **/
 	@property GameManager gameManager() {
 		return _gm;
 	}
 }
 
+
+/** This class is used to render the background in the play screen. **/
 class AnimatedBackground : Drawable {
+
 	private DrawableRef[] _background;
 	private Point2D* _cameraPosition;
 	private Planet[] _planets;
 	private Planet _selected;
 	private GameState _state;
+
 	this(Point2D* cameraPosition, GameState state) {
 		_cameraPosition = cameraPosition;
 		_state = state;
@@ -1078,11 +1097,11 @@ class AnimatedBackground : Drawable {
 		_background ~= drawableCache.get("noise2.tiled");
 		_background ~= drawableCache.get("noise3.tiled");
 	}
-
+	/** Sets selected planet to given argument **/
 	void setSelectedPlanet(Planet selected){
 		_selected = selected;
 	}
-
+	/** Use Drawing buffer to draw the objects on the screen **/
 	override void drawTo(DrawBuf buf, Rect rc, uint state = 0, int tilex0 = 0, int tiley0 = 0) {
 		SysTime frameStart = Clock.currTime();
 		Rect noisePos;
@@ -1094,13 +1113,14 @@ class AnimatedBackground : Drawable {
 			_background[i].drawTo(buf, noisePos, state, tilex0, tiley0);
 		}
 		DrawBufRef image = drawableCache.getImage("earth");
-		//Image circle = new Image(Geometry(10, 10), new Color("white"));
 		foreach(Planet planet; _planets) {
+			//If a planet is selected, draw lines
 			if(_selected && _selected != planet) {
 				int relX = to!int(_selected.position.x - _cameraPosition.x);
 				int relY = to!int(_selected.position.y - _cameraPosition.y);
 				int x = to!int(planet.position.x - _cameraPosition.x);
 				int y = to!int(planet.position.y - _cameraPosition.y);
+				//Set colour of the line
 				uint colour = 0x0033cc;
 				if(planet.owner){
 					if(planet.owner == _state.human)
@@ -1119,7 +1139,6 @@ class AnimatedBackground : Drawable {
 			int y = to!int(planet.position.y - _cameraPosition.y);
 			buf.drawRescaled(Rect(x-radius, y-radius, x+radius, y+radius), image, Rect(0,0,image.width,image.height));
 		}
-		//buf.drawImage(500, 500, image.get);
 	}
 	@property override int width() {
 		return 1;
