@@ -2,3 +2,5 @@
 # Handy script for cloning repositories
 cd AlienCivilisations/lib
 git clone --recursive https://github.com/buggins/dlangui.git
+cd dlanui
+git reset --hard 0e3a2b8c513a8f82f95f2ce87fa228a5100e41c1

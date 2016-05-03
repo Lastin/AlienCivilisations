@@ -332,8 +332,8 @@ class Menu : HorizontalLayout {
 		loadSlot.click = delegate (Widget source) {
 			int slot = lw.selectedItemIndex;
 			_vh.loadPlay(slot);
-			_saveWidget.visibility(Visibility.Gone);
-			_btnsContainer.visibility(Visibility.Visible);
+			//_saveWidget.visibility(Visibility.Gone);
+			//_btnsContainer.visibility(Visibility.Visible);
 			return true;
 		};
 		deleteSlot.click = delegate (Widget source) {
